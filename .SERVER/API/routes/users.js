@@ -12,6 +12,8 @@ const {
   updateUser,
   getJemerCardDataByEmail,
   getAllUsersByGenreId,
+  getUsernames,
+  getUsersFiltered,
 } = require("../controllers/users")
 
 router.post("/signup", signup)
@@ -26,6 +28,10 @@ router.post("/login", login)
 // router.patch('/patchuserbyid/:userId', verifyToken, updateUser)
 
 router.get("/getallusers", getAllUsers)
+
+router.get("/jammersfetchfiltered", getUsersFiltered)
+
+router.get("/getjemerusernames", getUsernames)
 
 router.get("/getallusersbyganer/:genreid", getAllUsersByGenreId)
 

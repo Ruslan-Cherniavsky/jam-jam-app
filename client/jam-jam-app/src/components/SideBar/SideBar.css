@@ -1,0 +1,24 @@
+/* Sidebar.css */
+
+.nav-link-custom {
+  color: gray;
+  transition: background-color 0.3s;
+  background-color: transparent;
+  /* margin-bottom: 1%; */
+  /* font-size: 23px; */
+}
+
+.nav-link-custom:hover {
+  background-color: #f0f0f0;
+}
+
+/* .sidebar-container {
+  width: 250px;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+} */

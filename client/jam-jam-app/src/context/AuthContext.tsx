@@ -36,6 +36,7 @@ import {
 } from "../redux/reducers/FirbaseUserDataSlice" // Import your user slice
 
 import {setUserId} from "../redux/reducers/UserDataSlice"
+import {Navigate} from "react-router-dom"
 
 export interface AuthContextProps {
   currentUser: FirebaseUser | null
@@ -67,6 +68,8 @@ interface AuthProviderProps {
 export function AuthProvider({children}: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null)
   const [loading, setLoading] = useState(true)
+  const [username, setUsername] = useState<string>("")
+
   const dispatch = useDispatch()
   const firebaseUserData = useSelector(selectFirebaseUserData)
 
@@ -83,6 +86,23 @@ export function AuthProvider({children}: AuthProviderProps) {
   ): Promise<UserCredential> => {
     return signInWithEmailAndPassword(auth, email, password)
   }
+
+  // const login = async (
+  //   email: string,
+  //   password: string
+  // ): Promise<UserCredential> => {
+  //   const userCredential = await signInWithEmailAndPassword(
+  //     auth,
+  //     email,
+  //     password
+  //   )
+
+  //   if (userCredential.user && userCredential.user.emailVerified) {
+  //     return userCredential
+  //   } else {
+  //     throw new Error("Email not verified")
+  //   }
+  // }
 
   const logout = async (): Promise<void> => {
     return signOut(auth)
@@ -122,6 +142,15 @@ export function AuthProvider({children}: AuthProviderProps) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user)
+
+      if (user) {
+        // If the user is logged in, check email verification status
+        if (!user.emailVerified) {
+          // User's email is not verified, handle accordingly
+          console.log("Email not verified")
+        }
+      }
+
       setLoading(false)
     })
 
@@ -130,15 +159,22 @@ export function AuthProvider({children}: AuthProviderProps) {
 
   useEffect(() => {
     try {
-      if (currentUser && currentUser?.email) {
+      if (currentUser && currentUser.emailVerified) {
         dataAxios
           .jemerCardDataFetchByEmail(currentUser.email)
           .then((userData: any) => {
             dispatch(setUserDataMongoDB(userData.user))
-            // console.log("initializationuser data  -----------", userData.user)
+
+            // console.log(
+            //   "initializationuser data  -----------",
+            //   userData.user.userName
+            // )
           })
       } else {
+        return
       }
+
+      setLoading(false)
     } catch (error) {
       console.error(error)
     }

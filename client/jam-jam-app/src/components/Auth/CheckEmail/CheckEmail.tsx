@@ -1,6 +1,6 @@
-import {useState} from "react"
+import {useEffect, useState} from "react"
 import {Card, Alert, Button} from "react-bootstrap"
-import {Link} from "react-router-dom"
+import {Link, useNavigate} from "react-router-dom"
 import {auth} from "../../../services/firebaseConfig"
 import {useAuthContext} from "../../../context/AuthContext"
 
@@ -9,6 +9,16 @@ export default function CheckEmail() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (currentUser?.emailVerified) {
+      return navigate("/")
+    }
+    if (!currentUser) {
+      return navigate("/login")
+    }
+  }, [])
 
   async function handleResendVerification() {
     try {
@@ -35,34 +45,39 @@ export default function CheckEmail() {
 
   return (
     <>
-      <Card>
-        <Card.Body>
-          <h2 className="text-center mb-4">Check your email</h2>
-          {error ? <Alert variant="danger">{error}</Alert> : null}
+      <div className="authContainer ">
+        <div className="authDiv w-100">
+          <Card>
+            <Card.Body>
+              <h2 className="text-center mb-4">Check your email</h2>
+              {error ? <Alert variant="danger">{error}</Alert> : null}
 
-          {!error || message ? (
-            <Alert variant="info">
-              We've sent a verification link to your email address. Please check
-              your email and click on the link to verify your account.
-            </Alert>
-          ) : null}
+              {!error || message ? (
+                <Alert variant="info">
+                  We've sent a verification link to your email address. Please
+                  check your email and click on the link to verify your account.
+                </Alert>
+              ) : null}
 
-          <div className="w-100 text-center mt-2">
-            Didn't receive the email?{" "}
-          </div>
+              <div className="w-100 text-center mt-2">
+                Didn't receive the email?{" "}
+              </div>
 
-          <Button
-            disabled={loading}
-            className="w-100"
-            onClick={handleResendVerification}>
-            Resend Verification Email
-          </Button>
-          <div className="w-100 text-center mt-2">
-            Your email has been verified? Try to <Link to="/login">Log in</Link>{" "}
-            again
-          </div>
-        </Card.Body>
-      </Card>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                className="w-100 mt-3"
+                onClick={handleResendVerification}>
+                Resend Verification Email
+              </Button>
+              <div className="w-100 text-center mt-2">
+                Your email has been verified? Try to{" "}
+                <Link to="/login">Log in</Link> again
+              </div>
+            </Card.Body>
+          </Card>
+        </div>
+      </div>
     </>
   )
 }

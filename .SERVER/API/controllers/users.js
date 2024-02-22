@@ -15,11 +15,12 @@ const signup = async (req, res) => {
     street,
     age,
     gender,
-    ganers,
+    genres,
     instruments,
     img,
     references,
     oboutMe,
+    links,
     role,
   } = req.body
 
@@ -40,12 +41,13 @@ const signup = async (req, res) => {
       street: street,
       age: age,
       gender: gender,
-      ganers: ganers,
+      genres: genres,
       instruments: instruments,
       img: img,
       references: references,
       oboutMe: oboutMe,
       role: role,
+      links: links,
     })
 
     await user.save()
@@ -96,8 +98,121 @@ const login = async (req, res) => {
 const getAllUsers = async (req, res) => {
   try {
     // const users = await User.find()
-    const users = await User.find().populate("ganers instruments")
+    const users = await User.find().populate("genres instruments")
     return res.status(200).json({users})
+  } catch (error) {
+    res.status(500).json({error})
+  }
+}
+
+const getUsersFiltered = async (req, res) => {
+  const params = req.query
+  try {
+    console.log("Params:", params)
+
+    const queryConditions = {}
+
+    if (params.genres && params.genres.length > 0) {
+      queryConditions.genres = {
+        $all: params.genres.map((id) => mongoose.Types.ObjectId(id)),
+      }
+    }
+
+    if (params.instruments && params.instruments.length > 0) {
+      queryConditions.instruments = {
+        $all: params.instruments.map((id) => mongoose.Types.ObjectId(id)),
+      }
+    }
+
+    if (params.country) {
+      queryConditions.country = params.country
+    }
+
+    if (params.region) {
+      queryConditions.region = params.region
+    }
+
+    if (params.city) {
+      queryConditions.city = params.city
+    }
+
+    // Check if there are any conditions specified
+    if (Object.keys(queryConditions).length === 0) {
+      return res.status(400).json({error: "No search conditions provided."})
+    }
+
+    const users = await User.find(queryConditions).populate(
+      "genres instruments"
+    )
+
+    return res.json(users)
+  } catch (error) {
+    console.error("Error filtering users:", error)
+    res.status(500).json({error})
+  }
+}
+
+// const getUsersFiltered = async (req, res) => {
+//   const params = req.query
+//   try {
+//     // console.log("Params:", params)
+
+//     //TODO ----- understand this:
+
+//     const queryConditions = {
+//       $or: [],
+//     }
+
+//     if (params.genres && params.genres.length > 0) {
+//       queryConditions.$or.push({
+//         genres: {$in: params.genres.map((id) => mongoose.Types.ObjectId(id))},
+//       })
+//     }
+
+//     if (params.instruments && params.instruments.length > 0) {
+//       queryConditions.$or.push({
+//         instruments: {
+//           $in: params.instruments.map((id) => mongoose.Types.ObjectId(id)),
+//         },
+//       })
+//     }
+
+//     if (params.country) {
+//       queryConditions.country = params.country
+//     }
+
+//     if (params.region) {
+//       queryConditions.region = params.region
+//     }
+
+//     if (params.city) {
+//       queryConditions.city = params.city
+//     }
+
+//     // console.log("aaaaaaaaaaaaaaaa", queryConditions)
+
+//     // if (!params.country && !params.genres && !params.instruments) {
+//     //   const users = await User.find().populate("genres instruments")
+//     //   return res.json(users)
+//     // }
+
+//     const users = await User.find(queryConditions).populate(
+//       "genres instruments"
+//     )
+
+//     // console.log("rrrrrrrrrrrrrrrr", users)
+//     return res.json(users)
+//   } catch (error) {
+//     console.error("Error filtering users:", error)
+//     res.status(500).json({error})
+//   }
+// }
+
+const getUsernames = async (req, res) => {
+  try {
+    // const users = await User.find()
+    const usernames = await User.find({}, "userName")
+    return res.status(200).json({usernames})
   } catch (error) {
     res.status(500).json({error})
   }
@@ -125,7 +240,7 @@ const getJemerCardDataById = async (req, res) => {
   const userId = req.params.userid
 
   try {
-    const user = await User.findById(userId)
+    const user = await User.findById(userId).populate("genres instruments")
     if (!user) {
       return res.status(404).json({message: "User not found! "})
     }
@@ -139,7 +254,7 @@ const updateUser = async (req, res) => {
   const userId = req.params.userId
   try {
     if (userId) {
-      const user = await User.findById(userId)
+      const user = await User.findById(userId).populate("genres instruments")
       if (!user) {
         return res.status(404).json({message: "USER not found!"})
       }
@@ -155,6 +270,7 @@ const deleteUserById = async (req, res) => {
   const userId = req.params.userid
   try {
     const user = await User.findById(userId)
+
     if (!user) {
       return res.status(404).json({message: "User not found!"})
     }
@@ -169,7 +285,7 @@ const getJemerCardDataByEmail = async (req, res) => {
   const email = req.params.useremail
 
   try {
-    const user = await User.findOne({email})
+    const user = await User.findOne({email}).populate("genres instruments")
     console.log(user)
     if (!user) {
       return res.status(404).json({message: "User not found!"})
@@ -189,4 +305,6 @@ module.exports = {
   updateUser,
   getJemerCardDataByEmail,
   getAllUsersByGenreId,
+  getUsernames,
+  getUsersFiltered,
 }

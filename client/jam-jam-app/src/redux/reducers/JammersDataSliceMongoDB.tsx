@@ -7,7 +7,7 @@ interface JammersDataSlice {
 }
 
 const initialState: JammersDataSlice = {
-  data: [],
+  data: [] || undefined,
   status: true,
 }
 

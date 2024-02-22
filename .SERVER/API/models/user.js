@@ -16,14 +16,15 @@ const userSchema = mongoose.Schema({
   firstName: {type: String, min: 5, max: 30},
   lastName: {type: String, min: 5, max: 30},
 
-  country: {type: String, min: 5, max: 30},
-  city: {type: String, min: 5, max: 30},
-  street: {type: String, min: 5, max: 130},
+  country: {type: String, min: 5, max: 60},
+  isoCode: {type: String, min: 5, max: 60},
+  city: {type: String, min: 5, max: 90},
+  region: {type: String, min: 5, max: 130},
 
   age: {type: Number, min: 10, max: 130},
   gender: {type: String},
 
-  ganers: [
+  genres: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Genres",
@@ -39,6 +40,28 @@ const userSchema = mongoose.Schema({
   img: {type: String},
   references: {type: String, max: 300},
   oboutMe: {type: String, max: 700},
+  //TODO -----
+
+  links: [{type: String, min: 5, max: 700}],
+
+  // friends: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "Friends",
+  //   },
+  // ],
+  // jamesCreated: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "Friends",
+  //   },
+  // ],
+  // jamesJoined: [
+  //   {
+  //     type: mongoose.Schema.Types.ObjectId,
+  //     ref: "Friends",
+  //   },
+  // ],
 
   createdAt: {type: Date, immutable: true, default: () => Date.now()},
   role: {type: String, default: "user", required: true},

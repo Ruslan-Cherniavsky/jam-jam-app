@@ -2,11 +2,25 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
 import {User as FirebaseUser} from "firebase/auth"
 
-interface UserDataSliceMongoDB {
-  userName: string
+export interface UserDataSliceMongoDB {
+  _id: string
+  email: string
   userRole: string
-  userId: string
-  musicalGaners: any
+  //---
+  img: string
+  userName: string
+  firstName: string
+  lastName: string
+  city: string
+  region: string
+  isoCode: string
+  country: string
+  age: number
+  gender: string
+  genres: Array<Object>
+  instruments: Array<Object>
+  links: Array<string>
+  oboutMe: string
 }
 
 interface UserDataStateMongoDB {
@@ -35,8 +49,6 @@ const userDataSliceMongoDB = createSlice({
 
 export const {setUserDataMongoDB, clearUserDataMongoDB} =
   userDataSliceMongoDB.actions
-
-// Selector function to get user data from the state
 
 export default userDataSliceMongoDB.reducer
 

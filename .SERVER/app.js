@@ -27,13 +27,15 @@ const checkUserAutchData = require("../.SERVER/API/middlewares/checkUserAuthData
 const usersRoutes = require("./API/routes/users")
 const genresRoutes = require("./API/routes/genres")
 const instrumentsRoutes = require("./API/routes/instruments")
+const links = require("./API/routes/links")
 
 app.use("/users", usersRoutes)
 
 app.use("/genres", genresRoutes)
 
 app.use("/instruments", instrumentsRoutes)
-
+0
+app.use("/links", links)
 // --TODO create firebase auth  !
 
 // app.use(verifyToken);
