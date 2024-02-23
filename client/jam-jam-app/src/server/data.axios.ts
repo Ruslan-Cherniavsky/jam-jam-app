@@ -10,8 +10,8 @@ interface Params {
 }
 
 const dataAxios: {
-  dataFetch: () => Promise<any>
-  jammersFetchFiltered: (params: Params) => Promise<any>
+  dataFetch: (pageNumber: any) => Promise<any>
+  jammersFetchFiltered: (params: Params, pageNumber: any) => Promise<any>
   genresFetch: () => Promise<any>
   instrumentsFetch: () => Promise<any>
   jemerCardDataFetch: (id: any) => Promise<any>
@@ -21,10 +21,11 @@ const dataAxios: {
   userCardDataUpdate: (id: any, payload: object) => Promise<any>
   createUserMongoDB: (email: string) => Promise<any>
 } = {
-  dataFetch: async () => {
+  dataFetch: async (pageNumber) => {
     try {
-      const {data} = await axios.get(`http://localhost:3500/users/getallusers`)
-
+      const {data} = await axios.get(
+        `http://localhost:3500/users/getallusers?page=${pageNumber}`
+      )
       return data
     } catch (err) {
       console.log(err)
@@ -95,10 +96,10 @@ const dataAxios: {
     }
   },
 
-  jammersFetchFiltered: async (params) => {
+  jammersFetchFiltered: async (params, pageNumber) => {
     try {
       const {data} = await axios.get(
-        `http://localhost:3500/users/jammersfetchfiltered`,
+        `http://localhost:3500/users/jammersfetchfiltered?page=${pageNumber}`,
         {params}
       )
 

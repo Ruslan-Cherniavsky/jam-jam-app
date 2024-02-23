@@ -1,0 +1,78 @@
+/* Loader.css */
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center horizontally */
+  height: 50vh; /* Adjust as needed */
+}
+
+.loader-images {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.loader-image {
+  width: 20px; /* Adjust the size of your images */
+  height: 400px;
+  position: absolute;
+  animation: spin 4s infinite linear;
+}
+
+.planet1 {
+  height: 300px;
+
+  animation-delay: 0.5s;
+  animation-duration: 8s;
+}
+.planet2 {
+  height: 200px;
+
+  animation-delay: 1s;
+  animation-duration: 10s;
+}
+.planet3 {
+  height: 250px;
+
+  animation-delay: 1.5s;
+  animation-duration: 12s;
+}
+.planet4 {
+  height: 150px;
+
+  animation-delay: 2s;
+  animation-duration: 14s;
+}
+.planet5 {
+  height: 500px;
+
+  animation-delay: 2.5s;
+  animation-duration: 16s;
+}
+.planet6 {
+  height: 450px;
+
+  animation-delay: 3s;
+  animation-duration: 18s;
+}
+.planet7 {
+  height: 410px;
+
+  animation-delay: 3.5s;
+  animation-duration: 20s;
+}
+.planet8 {
+  height: 370px;
+
+  animation-delay: 4s;
+  animation-duration: 22s;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

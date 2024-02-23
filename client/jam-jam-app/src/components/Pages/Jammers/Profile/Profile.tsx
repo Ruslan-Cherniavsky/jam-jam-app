@@ -1,10 +1,11 @@
 import React from "react"
-import {useParams} from "react-router-dom"
+import {Navigate, useParams} from "react-router-dom"
 import {Card, Container, Row, Col, Image, Button} from "react-bootstrap"
 import SocialMediaLinks from "../../User/UpdateProfilePage/SocialMediaLinks/SocialMediaLinks"
 import {faUserPlus, faMusic} from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {useAuthContext} from "../../../../context/AuthContext"
+import {useNavigate} from "react-router-dom"
 
 interface UserCardProps {
   user: {
@@ -34,6 +35,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
   // Use useParams to get the user ID from the route
   const {userId} = useParams<{userId: string}>()
   const {currentUser} = useAuthContext()
+  const navigate = useNavigate()
 
   const iconColor = "#BCBCBC" // Specify the desired color here
   const iconSpacing = "12px" // Specify the desired spacing here
@@ -47,14 +49,11 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
     // Logic to handle inviting user to jam
     console.log("Inviting to jam:", user.userName)
   }
-
+  const handleEditProfileClick = () => {
+    navigate("/update-profile")
+  }
   return (
     <Container className="mt-4">
-      {/* {user?.email === currentUser?.email ? (
-        <h2 style={{textAlign: "center"}}>My profile</h2>
-      ) : (
-        <h2 style={{textAlign: "center"}}>Jammer Profile</h2>
-      )} */}
       <Card>
         <Card.Header>
           <h2>
@@ -94,45 +93,62 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
           {/* <hr /> */}
           <h4>About Me</h4>
           <p>{user.oboutMe}</p>
-          {/* <h4>References</h4>
-          <p>{user.references}</p> */}
-          {/* <p>User ID from route: {userId}</p> */}
 
           <Row>
-            <Col>
-              <Button
-                variant="outline-dark"
-                size="sm"
-                className="mr-2"
-                style={{
-                  borderColor: iconColor,
-                  marginRight: "20px",
-                }}
-                disabled={user?.email === currentUser?.email}
-                onClick={handleAddToFriend}>
-                <FontAwesomeIcon
-                  style={{color: iconColor, marginRight: iconSpacing}}
-                  icon={faUserPlus}
-                  className="mr-1"
-                />{" "}
-                Add to Friend
-              </Button>
+            {user?.email !== currentUser?.email && (
+              <Col>
+                <Button
+                  variant="outline-dark"
+                  size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: iconColor,
+                    marginRight: "20px",
+                  }}
+                  disabled={user?.email === currentUser?.email}
+                  onClick={handleAddToFriend}>
+                  <FontAwesomeIcon
+                    style={{color: iconColor, marginRight: iconSpacing}}
+                    icon={faUserPlus}
+                    className="mr-1"
+                  />{" "}
+                  Add to Friend
+                </Button>
+                <Button
+                  disabled={user?.email === currentUser?.email}
+                  variant="outline-dark"
+                  size="sm"
+                  style={{
+                    borderColor: iconColor,
+                  }}
+                  onClick={handleInviteToJam}>
+                  <FontAwesomeIcon
+                    style={{color: iconColor, marginRight: iconSpacing}}
+                    icon={faMusic}
+                    className="mr-1"
+                  />{" "}
+                  Invite to Jam
+                </Button>
+              </Col>
+            )}
 
-              <Button
-                disabled={user?.email === currentUser?.email}
-                variant="outline-dark"
-                size="sm"
-                style={{
-                  borderColor: iconColor,
-                }}
-                onClick={handleInviteToJam}>
-                <FontAwesomeIcon
-                  style={{color: iconColor, marginRight: iconSpacing}}
-                  icon={faMusic}
-                  className="mr-1"
-                />{" "}
-                Invite to Jam
-              </Button>
+            <Col>
+              {user?.email === currentUser?.email && (
+                <Button
+                  variant="outline-dark"
+                  size="sm"
+                  style={{
+                    borderColor: iconColor,
+                  }}
+                  onClick={handleEditProfileClick}>
+                  <FontAwesomeIcon
+                    style={{color: iconColor, marginRight: iconSpacing}}
+                    icon={faMusic}
+                    className="mr-1"
+                  />{" "}
+                  Edit Profile
+                </Button>
+              )}
             </Col>
           </Row>
         </Card.Body>

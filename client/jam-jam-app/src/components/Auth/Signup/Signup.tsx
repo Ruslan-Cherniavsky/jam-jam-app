@@ -30,11 +30,21 @@ export default function Signup() {
     if (passwordRef.current!.value !== passwordConfirmRef.current!.value) {
       return setError("Passwords must match")
     }
+
+    if (passwordRef.current!.value.length < 6) {
+      return setError("Password must be at least 6 characters long")
+    }
+
+    if (!/[a-zA-Z]/.test(passwordRef.current!.value)) {
+      // Ensure that the password contains at least one letter
+      return setError("Password must contain at least one letter")
+    }
+
     try {
       setLoading(true)
       setError("")
-      await signup(emailRef.current!.value, passwordRef.current!.value)
 
+      await signup(emailRef.current!.value, passwordRef.current!.value)
       //TODO----clean this block
       try {
         await sendCurrentEmailVerification()
@@ -59,17 +69,6 @@ export default function Signup() {
     }
     setLoading(false)
   }
-
-  // async function sendVerificationEmail() {
-  //   if (currentUser) {
-  //     try {
-  //       await sendCurrentEmailVerification()
-  //       console.log("Verification email sent successfully")
-  //     } catch (error) {
-  //       console.error("Error sending verification email: ")
-  //     }
-  //   }
-  // }
 
   async function handleGoogleSignup() {
     try {

@@ -46,6 +46,7 @@ const HomePage = () => {
 
                 <Col md={12} lg={12} className="home-section">
                   <img
+                    style={{width: "1100px"}}
                     className="homeImages rounded"
                     src="https://firebasestorage.googleapis.com/v0/b/jam-jam-development.appspot.com/o/images%2FOIG3888666666.png?alt=media&token=8ae50f56-55fe-45e1-995a-ba42aff2e81d"
                     alt=""

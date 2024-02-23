@@ -19,6 +19,7 @@ import {
 } from "../../../redux/reducers/UserDataSliceMongoDB"
 import {setUsersData} from "../../../redux/reducers/JammersDataSliceMongoDB"
 import "./Filter.css"
+import axios from "axios"
 
 type InputChangeEvent = ChangeEvent<HTMLInputElement>
 type SelectChangeEvent = ChangeEvent<HTMLSelectElement>
@@ -26,6 +27,9 @@ type InputChangeTextArea = React.ChangeEvent<HTMLTextAreaElement>
 
 interface FilterProps {
   setIfFilteringCB: Function
+  fetchFilteredCB: Function
+  filteredStatusChange: Function
+  currentPage: number
 }
 
 const Filter = (filterProps: FilterProps) => {
@@ -111,8 +115,10 @@ const Filter = (filterProps: FilterProps) => {
       ) {
         console.log("Nothing is selected")
 
-        const userData = await dataAxios.dataFetch()
-        dispatch(setUsersData(userData.users))
+        filterProps.filteredStatusChange()
+
+        // const userData = await dataAxios.dataFetch()
+        // dispatch(setUsersData(userData.users))
         // setLoading(false)
         // return
       } else if (
@@ -134,13 +140,7 @@ const Filter = (filterProps: FilterProps) => {
 
         console.log("params ", params)
 
-        const filteredUsersData = await dataAxios.jammersFetchFiltered(params)
-
-        console.log("filtered user data ", filteredUsersData)
-
-        if (filteredUsersData) {
-          dispatch(setUsersData(filteredUsersData))
-        }
+        filterProps.fetchFilteredCB(params)
       }
     } catch (error: any) {
       console.log(error)

@@ -250,8 +250,11 @@ export default function UpdateProfile({
         )
         dispatch(setUserDataMongoDB(updatedUserData.user))
       }
-
-      navigate("/")
+      if (ifUserHaveValidDataInDB) {
+        navigate("/my-profile")
+      } else {
+        navigate("/")
+      }
     } catch (error: any) {
       console.log(error)
 

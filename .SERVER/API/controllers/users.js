@@ -95,22 +95,43 @@ const login = async (req, res) => {
   }
 }
 
+// const getAllUsers = async (req, res) => {
+//   try {
+//     // const users = await User.find()
+//     const users = await User.find().populate("genres instruments")
+//     return res.status(200).json({users})
+//   } catch (error) {
+//     res.status(500).json({error})
+//   }
+// }
+
 const getAllUsers = async (req, res) => {
+  const page = parseInt(req.query.page) || 1 // Get the requested page from query parameters
+  const perPage = 12 // Set the number of users per page
+
   try {
-    // const users = await User.find()
-    const users = await User.find().populate("genres instruments")
-    return res.status(200).json({users})
+    const totalUsers = await User.countDocuments()
+    const totalPages = Math.ceil(totalUsers / perPage)
+
+    const users = await User.find()
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("genres instruments")
+
+    return res.status(200).json({users, totalPages})
   } catch (error) {
     res.status(500).json({error})
   }
 }
 
 const getUsersFiltered = async (req, res) => {
+  const page = parseInt(req.query.page) || 1 // Get the requested page from query parameters
+  const perPage = 12 // Set the number of users per page
   const params = req.query
   try {
-    console.log("Params:", params)
-
     const queryConditions = {}
+
+    console.log("Params:", params)
 
     if (params.genres && params.genres.length > 0) {
       queryConditions.genres = {
@@ -141,72 +162,20 @@ const getUsersFiltered = async (req, res) => {
       return res.status(400).json({error: "No search conditions provided."})
     }
 
-    const users = await User.find(queryConditions).populate(
-      "genres instruments"
-    )
+    const totalUsers = await User.countDocuments(queryConditions)
+    const totalPages = Math.ceil(totalUsers / perPage)
 
-    return res.json(users)
+    const users = await User.find(queryConditions)
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("genres instruments")
+
+    return res.json({users, totalPages})
   } catch (error) {
     console.error("Error filtering users:", error)
     res.status(500).json({error})
   }
 }
-
-// const getUsersFiltered = async (req, res) => {
-//   const params = req.query
-//   try {
-//     // console.log("Params:", params)
-
-//     //TODO ----- understand this:
-
-//     const queryConditions = {
-//       $or: [],
-//     }
-
-//     if (params.genres && params.genres.length > 0) {
-//       queryConditions.$or.push({
-//         genres: {$in: params.genres.map((id) => mongoose.Types.ObjectId(id))},
-//       })
-//     }
-
-//     if (params.instruments && params.instruments.length > 0) {
-//       queryConditions.$or.push({
-//         instruments: {
-//           $in: params.instruments.map((id) => mongoose.Types.ObjectId(id)),
-//         },
-//       })
-//     }
-
-//     if (params.country) {
-//       queryConditions.country = params.country
-//     }
-
-//     if (params.region) {
-//       queryConditions.region = params.region
-//     }
-
-//     if (params.city) {
-//       queryConditions.city = params.city
-//     }
-
-//     // console.log("aaaaaaaaaaaaaaaa", queryConditions)
-
-//     // if (!params.country && !params.genres && !params.instruments) {
-//     //   const users = await User.find().populate("genres instruments")
-//     //   return res.json(users)
-//     // }
-
-//     const users = await User.find(queryConditions).populate(
-//       "genres instruments"
-//     )
-
-//     // console.log("rrrrrrrrrrrrrrrr", users)
-//     return res.json(users)
-//   } catch (error) {
-//     console.error("Error filtering users:", error)
-//     res.status(500).json({error})
-//   }
-// }
 
 const getUsernames = async (req, res) => {
   try {

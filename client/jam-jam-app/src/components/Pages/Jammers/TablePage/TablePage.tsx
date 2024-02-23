@@ -15,10 +15,10 @@ function JammersTablePage() {
   const dataLocal = useSelector((state: RootState) => state.usersData.data)
 
   useEffect(() => {
-    dataAxios.dataFetch().then((data) => {
-      dispatch(setUsersData(data.users))
-      console.log(data.users)
-    })
+    // dataAxios.dataFetch().then((data) => {
+    //   dispatch(setUsersData(data.users))
+    //   console.log(data.users)
+    // })
   }, [])
 
   return (
