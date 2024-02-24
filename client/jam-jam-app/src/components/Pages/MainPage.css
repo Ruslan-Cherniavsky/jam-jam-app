@@ -1,6 +1,9 @@
 /* .mainPageContainer {
   width: 100%;
 } */
+body {
+  overflow-y: scroll;
+}
 
 .sidebar-container {
   /* margin-top: 55px; */

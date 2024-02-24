@@ -49,7 +49,8 @@ export default function () {
           <Col>
             <Routes>
               <Route
-                path="/jammersList"
+                path="/jammersList/:params/"
+                // path="/jammersList/"
                 element={
                   <PrivateRouteVerified>
                     <JammersCardListPage />

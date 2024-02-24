@@ -2,7 +2,11 @@ import React from "react"
 import {Navigate, useParams} from "react-router-dom"
 import {Card, Container, Row, Col, Image, Button} from "react-bootstrap"
 import SocialMediaLinks from "../../User/UpdateProfilePage/SocialMediaLinks/SocialMediaLinks"
-import {faUserPlus, faMusic} from "@fortawesome/free-solid-svg-icons"
+import {
+  faUserPlus,
+  faMusic,
+  faBackward,
+} from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {useAuthContext} from "../../../../context/AuthContext"
 import {useNavigate} from "react-router-dom"
@@ -54,6 +58,26 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
   }
   return (
     <Container className="mt-4">
+      <Button
+        variant="outline-dark"
+        size="sm"
+        className="mr-2"
+        style={{
+          borderColor: iconColor,
+          marginRight: "20px",
+          marginBottom: "20px",
+        }}
+        disabled={user?.email === currentUser?.email}
+        onClick={() => {
+          navigate("/jammersList")
+        }}>
+        <FontAwesomeIcon
+          style={{color: iconColor, marginRight: iconSpacing}}
+          icon={faBackward}
+          className="mr-1"
+        />{" "}
+        Back to search
+      </Button>
       <Card>
         <Card.Header>
           <h2>

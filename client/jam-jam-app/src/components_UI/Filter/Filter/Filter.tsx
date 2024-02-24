@@ -29,7 +29,15 @@ interface FilterProps {
   setIfFilteringCB: Function
   fetchFilteredCB: Function
   filteredStatusChange: Function
-  currentPage: number
+}
+
+export interface IParams {
+  country: string
+  region: string
+  city: string
+  isoCode: string
+  genres: string
+  instruments: [Object]
 }
 
 const Filter = (filterProps: FilterProps) => {

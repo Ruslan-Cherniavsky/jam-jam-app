@@ -1,17 +1,13 @@
 import {useEffect, useState} from "react"
-
 import Loader from "../../../../components_UI/Loaders/Loader"
-import {useSelector, useDispatch} from "react-redux"
-import {RootState, AppDispatch} from "../../../../redux/store"
-import {setUsersData} from "../../../../redux/reducers/JammersDataSliceMongoDB"
+import {useDispatch} from "react-redux"
+import {AppDispatch} from "../../../../redux/store"
 import dataAxios from "../../../../server/data.axios"
 import JammersCardList from "../CardList/JammersCardList"
-import {useAuthContext} from "../../../../context/AuthContext"
-import {Col, Container, Pagination, Row} from "react-bootstrap"
-import Sidebar from "../../../SideBar/SideBar"
-import Filter from "../../../../components_UI/Filter/Filter/Filter"
-import ReactPaginate from "react-paginate"
-import axios from "axios"
+import {Pagination} from "react-bootstrap"
+import Filter, {IParams} from "../../../../components_UI/Filter/Filter/Filter"
+import {Navigate, useNavigate, useParams} from "react-router-dom"
+import "./CardListPage.css"
 
 function JammersCardListPage() {
   const useAppDispatch: () => AppDispatch = useDispatch
@@ -19,57 +15,97 @@ function JammersCardListPage() {
   const [ifFiltering, setIfFiltering] = useState(false)
   const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [ifFiltered, setIfFiltered] = useState(false)
-  const [params, setParams] = useState<Object | any>({})
+  const {page, params: urlParams} = useParams()
+  const [currentPage, setCurrentPage] = useState(Number(page) || 1) // Convert to number or default to 1
 
+  const [ifFiltered, setIfFiltered] = useState(false)
+  const [params, setParams] = useState<IParams | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
+
+  const navigate = useNavigate()
+  useEffect(() => {
+    if (!params) {
+      const newUrl = `/jammersList/${currentPage}`
+      navigate(newUrl)
+    }
+    if (params) {
+      const queryString = convertParamsToQueryString(params)
+
+      const newUrl = `/jammersList/page=${currentPage}&${queryString}`
+      navigate(newUrl)
+      // console.log(convertQueryStringToParams(queryString))
+      console.log(urlParams)
+      // console.log("WORRRRKKK")
+    }
+  }, [params, currentPage])
+
+  const convertParamsToQueryString = (params: any) => {
+    return Object.keys(params)
+      .map((key) => {
+        if (Array.isArray(params[key])) {
+          // If the property is an array, format it as an array in the query string
+          return params[key].map((value: any) => `${key}[]=${value}`).join("&")
+        } else {
+          // If the property is not an array, format it normally
+          return `${key}=${params[key]}`
+        }
+      })
+      .join("&")
+  }
+
+  const convertQueryStringToParams = (
+    queryString: string
+  ): Record<string, string | string[]> => {
+    const params: Record<string, string | string[]> = {}
+    const pairs = queryString.split("&")
+
+    for (const pair of pairs) {
+      const [key, value] = pair.split("=")
+      const decodedKey = decodeURIComponent(key)
+      const decodedValue = decodeURIComponent(value.replace(/\+/g, " "))
+
+      if (decodedKey.includes("[]")) {
+        const arrayKey = decodedKey.slice(0, -2)
+        params[arrayKey] = (params[arrayKey] as string[]) || []
+        ;(params[arrayKey] as string[]).push(decodedValue)
+      } else {
+        params[decodedKey] = decodedValue
+      }
+    }
+
+    return params
+  }
 
   function ifFilteringCB(ifFilteringProp: boolean) {
     setIfFiltering(ifFilteringProp)
   }
 
   const fetchFilteredCB = async (params: Object | any) => {
-    // const {data} = await axios.get(
-    //   `http://localhost:3500/users/jammersfetchfiltered?page=${currentPage}`,
-    //   {params}
-    // )
     setLoading(true)
-
-    // const data = await dataAxios.jammersFetchFiltered(params, 1)
-
-    // console.log(params)
     setParams(params)
     setIfFiltered(true)
-    // setTotalPages(data.totalPages)
-    // setJammers(data.users)
     setCurrentPage(1)
-    // setLoading(false)
   }
 
   useEffect(() => {
     const fetchJammers = async () => {
       try {
+        // if (urlParams?.includes("&country=")) {
+        //   console.log("paraaaaaaaaaaaaaaaaaaaaaaaaaaams", params)
+        //   console.log(
+        //     "paraaaaaaaaaaaaaaaaaaaaaaaaaaamseeeeeee",
+        //     convertQueryStringToParams(urlParams)
+        //   )
+        // }
+
         if (!ifFiltered) {
           setLoading(true)
-
-          // const {data} = await axios.get(
-          //   `http://localhost:3500/users/getallusers?page=${currentPage}`
-          // )
-
           const data = await dataAxios.dataFetch(currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
         }
         if (ifFiltered && params) {
           setLoading(true)
-
-          console.log("this is current params", params)
-
-          // const {data} = await axios.get(
-          //   `http://localhost:3500/users/jammersfetchfiltered?page=${currentPage}`,
-          //   {params}
-          // )
           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
 
           setIfFiltered(true)
@@ -95,15 +131,9 @@ function JammersCardListPage() {
 
   async function filteredStatusChange() {
     setLoading(true)
-
-    // const data = await dataAxios.dataFetch(currentPage)
-    // setJammers(data.users)
-    // setTotalPages(data.totalPages)
-    setParams({})
-
-    setCurrentPage(1)
     setIfFiltered(false)
-    setLoading(false)
+    setParams({})
+    setCurrentPage(1)
   }
 
   return (
@@ -113,26 +143,27 @@ function JammersCardListPage() {
           filteredStatusChange={filteredStatusChange}
           setIfFilteringCB={ifFilteringCB}
           fetchFilteredCB={fetchFilteredCB}
-          currentPage={currentPage}
         />
-        <Pagination>
-          <Pagination.Prev
-            onClick={() => handlePageChange(currentPage - 2)}
-            disabled={currentPage === 1}
-          />
-          {Array.from({length: totalPages}).map((_, index) => (
-            <Pagination.Item
-              key={index + 1}
-              active={currentPage === index + 1}
-              onClick={() => handlePageChange(index)}>
-              {index + 1}
-            </Pagination.Item>
-          ))}
-          <Pagination.Next
-            onClick={() => handlePageChange(currentPage)}
-            disabled={currentPage === totalPages}
-          />
-        </Pagination>
+        {jammers.length > 0 && (
+          <Pagination className="my-custom-pagination">
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 2)}
+              disabled={currentPage === 1}
+            />
+            {Array.from({length: totalPages}).map((_, index) => (
+              <Pagination.Item
+                key={index + 1}
+                active={currentPage === index + 1}
+                onClick={() => handlePageChange(index)}>
+                {index + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
+        )}
 
         {jammers && !ifFiltering && !loading ? (
           jammers.length > 0 ? (
