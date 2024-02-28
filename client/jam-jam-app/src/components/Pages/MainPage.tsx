@@ -49,13 +49,13 @@ export default function () {
           <Col>
             <Routes>
               <Route
-                path="/jammersList/:params/"
-                // path="/jammersList/"
+                path="/jammersList"
                 element={
                   <PrivateRouteVerified>
                     <JammersCardListPage />
                   </PrivateRouteVerified>
-                }></Route>
+                }
+              />
               {/* <Route
                 path="/"
                 element={

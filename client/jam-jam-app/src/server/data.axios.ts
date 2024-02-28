@@ -20,6 +20,8 @@ const dataAxios: {
   userDataFetch: () => Promise<any>
   userCardDataUpdate: (id: any, payload: object) => Promise<any>
   createUserMongoDB: (email: string) => Promise<any>
+  fetchGenresByIds: (genreIds: string[]) => Promise<any>
+  fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
 } = {
   dataFetch: async (pageNumber) => {
     try {
@@ -127,6 +129,32 @@ const dataAxios: {
         `http://localhost:3500/users/signup`,
         payload
       )
+      return data
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  fetchGenresByIds: async (genreIds) => {
+    try {
+      console.log(genreIds)
+      const {data} = await axios.patch(
+        `http://localhost:3500/genres/getgenresbyids`,
+        {genreIds}
+      )
+
+      return data
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  fetchInstrumentsByIds: async (instrumentIds) => {
+    try {
+      console.log(instrumentIds)
+      const {data} = await axios.patch(
+        `http://localhost:3500/instruments/getinstrumentsbyids`,
+        {instrumentIds}
+      )
+
       return data
     } catch (err) {
       console.log(err)

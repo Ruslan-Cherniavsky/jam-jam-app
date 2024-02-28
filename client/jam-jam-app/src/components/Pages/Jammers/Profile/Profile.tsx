@@ -69,7 +69,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
         }}
         disabled={user?.email === currentUser?.email}
         onClick={() => {
-          navigate("/jammersList")
+          navigate(-1)
         }}>
         <FontAwesomeIcon
           style={{color: iconColor, marginRight: iconSpacing}}

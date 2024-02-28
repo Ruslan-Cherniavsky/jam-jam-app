@@ -1,14 +1,5 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState} from "react"
-import {
-  Form,
-  Button,
-  Card,
-  Alert,
-  Col,
-  Container,
-  Row,
-  FormControl,
-} from "react-bootstrap"
+import {Form, Button, Col, Container, Row} from "react-bootstrap"
 import {Country, State, City} from "country-state-city"
 import MultiSelect from "../../MultiSelect/Multiselect"
 import dataAxios from "../../../server/data.axios"
@@ -20,6 +11,7 @@ import {
 import {setUsersData} from "../../../redux/reducers/JammersDataSliceMongoDB"
 import "./Filter.css"
 import axios from "axios"
+import {useLocation} from "react-router"
 
 type InputChangeEvent = ChangeEvent<HTMLInputElement>
 type SelectChangeEvent = ChangeEvent<HTMLSelectElement>
@@ -36,8 +28,8 @@ export interface IParams {
   region: string
   city: string
   isoCode: string
-  genres: string
-  instruments: [Object]
+  genres: []
+  instruments: []
 }
 
 const Filter = (filterProps: FilterProps) => {
@@ -47,37 +39,104 @@ const Filter = (filterProps: FilterProps) => {
   const [loading, setLoading] = useState(false)
   const [genres, setGenres] = useState<Array<Object>>([])
   const [instruments, setInstruments] = useState<Array<Object>>([])
+  const [currentUrlParams, setUrlParams] = useState<IParams | any>()
 
-  const [selectedInstruments, setSelectedInstruments] = useState<Array<string>>(
+  const [selectedInstruments, setSelectedInstruments] = useState<Array<Object>>(
     []
   )
-  const [selectedGenres, setSelectedGenres] = useState<Array<string>>([])
+  const [selectedGenres, setSelectedGenres] = useState<Array<Object>>([])
+  //------------
+  const [selectedInstruments2, setSelectedInstruments2] = useState<Array<any>>(
+    []
+  )
+  const [selectedGenres2, setSelectedGenres2] = useState<Array<any>>([])
+  //-------------------
+  const [fullCountryName, setFullCountryName] = useState<string | null>("")
 
   function selectedGenresCB(genres: Array<string>) {
-    setSelectedGenres(genres)
+    setSelectedGenres2(genres)
   }
   function selectedInstrumentsCB(instrumrnts: Array<string>) {
-    setSelectedInstruments(instrumrnts)
+    setSelectedInstruments2(instrumrnts)
   }
 
-  const dispatch = useDispatch()
+  const location = useLocation()
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const genresData = await dataAxios.genresFetch()
+        setGenres(genresData.genres)
+
+        const instrumentsData = await dataAxios.instrumentsFetch()
+        setInstruments(instrumentsData.instruments)
+      } catch (error) {
+        console.error(error)
+      }
+    }
+
+    fetchData()
+  }, [])
 
   useEffect(() => {
-    try {
-      dataAxios.genresFetch().then((data: any) => {
-        setGenres(data.genres)
-      })
+    const searchParams = new URLSearchParams(location.search)
+    const urlParams = {
+      country: parseNullOrUndefined(searchParams.get("country")) || "",
+      region: parseNullOrUndefined(searchParams.get("region")) || "",
+      city: parseNullOrUndefined(searchParams.get("city")) || "",
+      isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
+      genres: searchParams.getAll("genres[]") || [],
+      instruments: searchParams.getAll("instruments[]") || [],
+    }
 
-      dataAxios.instrumentsFetch().then((data: any) => {
-        console.log(data)
-        setInstruments(data.instruments)
+    setUrlParams(urlParams)
+
+    setFullCountryName(urlParams.country)
+    setSelectedCountry(urlParams.isoCode)
+    setSelectedRegion(urlParams.region)
+    setSelectedCity(urlParams.city)
+
+    if (urlParams.genres.length) {
+      const genresFromUrlArray = urlParams.genres
+      console.log("geners objects from url params", genresFromUrlArray)
+
+      dataAxios.fetchGenresByIds(genresFromUrlArray).then((currentGenres) => {
+        setSelectedGenres(currentGenres.genres)
+        setSelectedGenres2(urlParams.genres)
+
+        console.log(
+          "geners objects from url params with names",
+          currentGenres.genres
+        )
       })
-    } catch (error) {
-      console.error(error)
+    }
+    if (urlParams.instruments.length) {
+      const instrumentsFromUrlArray = urlParams.instruments
+      console.log("geners objects from url params", instrumentsFromUrlArray)
+
+      dataAxios
+        .fetchInstrumentsByIds(instrumentsFromUrlArray)
+        .then((currentInstruments) => {
+          setSelectedInstruments(currentInstruments.instruments)
+          setSelectedInstruments2(urlParams.instruments)
+
+          console.log(
+            "geners objects from url params with names",
+            currentInstruments.instruments
+          )
+        })
+    }
+
+    // console.log(urlParams.genres)
+    // console.log(urlParams.instruments)
+
+    // setSelectedGenres(urlParams.genres)
+    // setSelectedInstruments(urlParams.instruments)
+
+    function parseNullOrUndefined(value: any) {
+      return value === "null" ? null : value || null
     }
   }, [])
 
-  const [fullCountryName, setFullCountryName] = useState<string | null>("")
   const handleCountryChange = (e: InputChangeEvent) => {
     const selectedCountryCode = e.target.value
 
@@ -118,35 +177,26 @@ const Filter = (filterProps: FilterProps) => {
         !selectedRegion &&
         !selectedCity &&
         !selectedCountry &&
-        selectedGenres.length === 0 &&
-        selectedInstruments.length === 0
+        selectedGenres2.length === 0 &&
+        selectedInstruments2.length === 0
       ) {
-        console.log("Nothing is selected")
-
         filterProps.filteredStatusChange()
-
-        // const userData = await dataAxios.dataFetch()
-        // dispatch(setUsersData(userData.users))
-        // setLoading(false)
-        // return
       } else if (
         fullCountryName ||
         selectedRegion ||
         selectedCity ||
         selectedCountry ||
-        selectedGenres ||
-        selectedInstruments
+        selectedGenres2 ||
+        selectedInstruments2
       ) {
         const params = {
           country: fullCountryName,
           region: selectedRegion,
           city: selectedCity,
           isoCode: selectedCountry,
-          genres: selectedGenres,
-          instruments: selectedInstruments,
+          genres: selectedGenres2,
+          instruments: selectedInstruments2,
         }
-
-        console.log("params ", params)
 
         filterProps.fetchFilteredCB(params)
       }
@@ -160,13 +210,7 @@ const Filter = (filterProps: FilterProps) => {
 
   return (
     <>
-      <Container
-        className="selectContainer border rounded"
-        // style={{minHeight: "10vh", maxWidth: "136vh"}}
-        // style={{marginBottom: "20px"}}
-        // className="d-flex align-items-center border justify-content-center"
-        // className="d-flex align-items-center border justify-content-center"
-      >
+      <Container className="selectContainer border rounded">
         <Form onSubmit={handleSubmit}>
           <Row>
             <Col xl={2} lg={4} md={4}>
@@ -239,7 +283,7 @@ const Filter = (filterProps: FilterProps) => {
                 ifRequired={false}
                 dataArray={genres}
                 selectionName="genre"
-                selectedDB={genres}
+                selectedDB={selectedGenres}
                 selectedCallbackFn={selectedGenresCB}
               />
             </Col>
@@ -250,7 +294,7 @@ const Filter = (filterProps: FilterProps) => {
                 ifRequired={false}
                 dataArray={instruments}
                 selectionName="instrument"
-                selectedDB={instruments}
+                selectedDB={selectedInstruments}
                 selectedCallbackFn={selectedInstrumentsCB}
               />
             </Col>

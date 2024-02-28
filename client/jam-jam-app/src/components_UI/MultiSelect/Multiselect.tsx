@@ -32,24 +32,27 @@ export default function MultiSelect(props: SelectProps | null) {
   const [selectedUI, setSelectedUI] = React.useState<string[]>([])
 
   useEffect(() => {
-    const idArrayDefault: Array<string> = []
-    props?.selectedDB.map((selection: any) =>
-      idArrayDefault.push(selection[props.selectionName])
-    )
-    console.log(idArrayDefault)
-    setSelectedUI(idArrayDefault)
+    if (props?.selectedDB && props?.selectedDB.length > 0) {
+      const idArrayDefault: Array<string> = []
+      props?.selectedDB.map((selection: any) =>
+        idArrayDefault.push(selection[props.selectionName])
+      )
+
+      setSelectedUI(idArrayDefault)
+      console.log("1")
+    }
+
     //   setSelected(
     //     idArrayDefault.split(","))
     // )
-  }, [])
+  }, [props?.selectedDB.length])
 
   const handleChange = (event: SelectChangeEvent<typeof selectedUI>) => {
     const {
       target: {value},
     } = event
 
-    console.log()
-
+    // id of selection
     const idArray: Array<string> = []
     props?.dataArray.map(
       (selection: any) =>
@@ -57,24 +60,21 @@ export default function MultiSelect(props: SelectProps | null) {
         idArray.push(selection._id)
     )
 
+    props?.selectedCallbackFn(idArray)
+
+    //string names
     const idArrayDefault: Array<string> = []
+
     props?.selectedDB.map(
       (selection: any) =>
         value.includes(selection[props.selectionName]) &&
         idArrayDefault.push(selection[props.selectionName])
     )
 
-    // console.log(idArrayDefault)
-
     setSelectedUI(
       // On autofill we get a stringified value.
       typeof value === "string" ? value.split(",") : value
     )
-
-    console.log("selected to cb", idArray)
-
-    props?.selectedCallbackFn(idArray)
-    // console.log(dataProps)
   }
 
   return (

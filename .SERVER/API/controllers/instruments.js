@@ -48,8 +48,23 @@ const deleteInstrumentById = async (req, res) => {
   }
 }
 
+const getInstrumentsByIds = async (req, res) => {
+  const instrumentIds = req.body.instrumentIds // Assuming the array of genre IDs is in the request body
+  try {
+    // Convert array of strings to array of mongoose ObjectIds
+    const objectIdArray = instrumentIds.map((id) => mongoose.Types.ObjectId(id))
+
+    const instruments = await Instruments.find({_id: {$in: objectIdArray}})
+
+    return res.status(200).json({instruments})
+  } catch (error) {
+    return res.status(500).json({error})
+  }
+}
+
 module.exports = {
   addInstrument,
   getAllInstruments,
   deleteInstrumentById,
+  getInstrumentsByIds,
 }

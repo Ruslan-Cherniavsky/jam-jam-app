@@ -198,6 +198,8 @@ export default function UpdateProfile({
   //------------------------------SUBMIT---------------------------------
 
   async function handleSubmit(e: FormEvent) {
+    console.log("current aray", userDataDB?.instruments)
+
     e.preventDefault()
     try {
       setLoading(true)

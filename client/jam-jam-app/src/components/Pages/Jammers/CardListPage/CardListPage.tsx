@@ -6,38 +6,78 @@ import dataAxios from "../../../../server/data.axios"
 import JammersCardList from "../CardList/JammersCardList"
 import {Pagination} from "react-bootstrap"
 import Filter, {IParams} from "../../../../components_UI/Filter/Filter/Filter"
-import {Navigate, useNavigate, useParams} from "react-router-dom"
+import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom"
 import "./CardListPage.css"
+import {Country} from "country-state-city"
 
 function JammersCardListPage() {
+  const navigate = useNavigate()
+  const location = useLocation() // Use useLocation hook directly
   const useAppDispatch: () => AppDispatch = useDispatch
-  const dispatch = useAppDispatch()
   const [ifFiltering, setIfFiltering] = useState(false)
   const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
-  const {page, params: urlParams} = useParams()
-  const [currentPage, setCurrentPage] = useState(Number(page) || 1) // Convert to number or default to 1
+  const {page}: {page?: string} = useParams()
 
+  const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [params, setParams] = useState<IParams | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
+  const [urlSearchParams, setUrlSearchParams] = useState<IParams | any>({})
 
-  const navigate = useNavigate()
+  //url from search params set by use navigate
   useEffect(() => {
-    if (!params) {
-      const newUrl = `/jammersList/${currentPage}`
-      navigate(newUrl)
-    }
-    if (params) {
-      const queryString = convertParamsToQueryString(params)
+    const queryString = convertParamsToQueryString(params)
+    const newUrl = `/jammersList?page=${currentPage}&${queryString}`
 
-      const newUrl = `/jammersList/page=${currentPage}&${queryString}`
-      navigate(newUrl)
-      // console.log(convertQueryStringToParams(queryString))
-      console.log(urlParams)
-      // console.log("WORRRRKKK")
+    navigate(newUrl)
+  }, [currentPage, params, navigate])
+
+  useEffect(() => {
+    setLoading(true)
+
+    // Parse URL parameters and update state
+    const searchParams = new URLSearchParams(location.search)
+    const urlParams = {
+      // page: parseInt(searchParams.get("page")) || 1,
+      country: parseNullOrUndefined(searchParams.get("country")) || "",
+      region: parseNullOrUndefined(searchParams.get("region")) || "",
+      city: parseNullOrUndefined(searchParams.get("city")) || "",
+      isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
+      genres: searchParams.getAll("genres[]") || [],
+      instruments: searchParams.getAll("instruments[]") || [],
     }
-  }, [params, currentPage])
+    setUrlSearchParams(urlParams)
+
+    const urlParams2 = {
+      page: searchParams.get("page") || "1",
+    }
+
+    function parseNullOrUndefined(value: any) {
+      return value === "null" ? null : value || null
+    }
+
+    // Set initial currentPage based on the page parameter
+
+    setCurrentPage(Number(urlParams2.page))
+
+    if (
+      urlParams.country ||
+      urlParams.city ||
+      urlParams.region ||
+      urlParams.isoCode ||
+      urlParams.genres.length > 0 ||
+      urlParams.instruments.length > 0
+    ) {
+      setParams(urlParams)
+      setIfFiltered(true)
+    }
+
+    // setIfFiltered(false)
+    setLoading(false)
+
+    // ... rest of the code
+  }, [])
 
   const convertParamsToQueryString = (params: any) => {
     return Object.keys(params)
@@ -51,29 +91,6 @@ function JammersCardListPage() {
         }
       })
       .join("&")
-  }
-
-  const convertQueryStringToParams = (
-    queryString: string
-  ): Record<string, string | string[]> => {
-    const params: Record<string, string | string[]> = {}
-    const pairs = queryString.split("&")
-
-    for (const pair of pairs) {
-      const [key, value] = pair.split("=")
-      const decodedKey = decodeURIComponent(key)
-      const decodedValue = decodeURIComponent(value.replace(/\+/g, " "))
-
-      if (decodedKey.includes("[]")) {
-        const arrayKey = decodedKey.slice(0, -2)
-        params[arrayKey] = (params[arrayKey] as string[]) || []
-        ;(params[arrayKey] as string[]).push(decodedValue)
-      } else {
-        params[decodedKey] = decodedValue
-      }
-    }
-
-    return params
   }
 
   function ifFilteringCB(ifFilteringProp: boolean) {
@@ -90,25 +107,17 @@ function JammersCardListPage() {
   useEffect(() => {
     const fetchJammers = async () => {
       try {
-        // if (urlParams?.includes("&country=")) {
-        //   console.log("paraaaaaaaaaaaaaaaaaaaaaaaaaaams", params)
-        //   console.log(
-        //     "paraaaaaaaaaaaaaaaaaaaaaaaaaaamseeeeeee",
-        //     convertQueryStringToParams(urlParams)
-        //   )
-        // }
-
         if (!ifFiltered) {
           setLoading(true)
           const data = await dataAxios.dataFetch(currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
         }
-        if (ifFiltered && params) {
+        if (ifFiltered) {
           setLoading(true)
           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
 
-          setIfFiltered(true)
+          // setIfFiltered(true)
           setTotalPages(data.totalPages)
           setJammers(data.users)
         }

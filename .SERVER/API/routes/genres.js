@@ -7,6 +7,7 @@ const {
   getAllGenres,
   addGenre,
   deleteGenresById,
+  getGenresByIds,
 } = require("../controllers/genres")
 
 // router.get("/", verifyToken, getAllMusicalGeners);
@@ -18,6 +19,7 @@ const {
 // );
 
 router.get("/", getAllGenres)
+router.patch("/getgenresbyids", getGenresByIds)
 router.post("/add", addGenre)
 router.delete("/deletegenresbyid/:genreid", deleteGenresById)
 

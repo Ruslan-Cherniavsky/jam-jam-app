@@ -57,9 +57,10 @@ const Header: React.FC = () => {
           {/* <Nav.Link as={Link} to={`/jammersList`}>
             Jammers
           </Nav.Link> */}
-          <Nav.Link as={Link} to={`/jammersList/page=1`}>
+          <Nav.Link as={Link} to="/jammersList">
             Jammers
           </Nav.Link>
+
           <Nav.Link as={Link} to="/jam-events">
             Jam-Events
           </Nav.Link>
