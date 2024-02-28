@@ -8,12 +8,10 @@ import {Pagination} from "react-bootstrap"
 import Filter, {IParams} from "../../../../components_UI/Filter/Filter/Filter"
 import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom"
 import "./CardListPage.css"
-import {Country} from "country-state-city"
 
 function JammersCardListPage() {
   const navigate = useNavigate()
   const location = useLocation() // Use useLocation hook directly
-  const useAppDispatch: () => AppDispatch = useDispatch
   const [ifFiltering, setIfFiltering] = useState(false)
   const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
@@ -21,20 +19,28 @@ function JammersCardListPage() {
 
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
+  const [gettingUrlParams, setGettingUrlParams] = useState(true)
   const [params, setParams] = useState<IParams | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
-  const [urlSearchParams, setUrlSearchParams] = useState<IParams | any>({})
 
   //url from search params set by use navigate
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
     const newUrl = `/jammersList?page=${currentPage}&${queryString}`
 
+    // navigate({
+    //   pathname: "/jammersList",
+    //   search: `?query=${currentPage}&${queryString}`,
+    //   hash: "#hash",
+    // })
+
+    navigate(newUrl)
     navigate(newUrl)
   }, [currentPage, params, navigate])
 
   useEffect(() => {
     setLoading(true)
+    setGettingUrlParams(true)
 
     // Parse URL parameters and update state
     const searchParams = new URLSearchParams(location.search)
@@ -47,7 +53,6 @@ function JammersCardListPage() {
       genres: searchParams.getAll("genres[]") || [],
       instruments: searchParams.getAll("instruments[]") || [],
     }
-    setUrlSearchParams(urlParams)
 
     const urlParams2 = {
       page: searchParams.get("page") || "1",
@@ -70,12 +75,13 @@ function JammersCardListPage() {
       urlParams.instruments.length > 0
     ) {
       setParams(urlParams)
+
       setIfFiltered(true)
     }
 
     // setIfFiltered(false)
     setLoading(false)
-
+    setGettingUrlParams(false)
     // ... rest of the code
   }, [])
 
@@ -107,19 +113,18 @@ function JammersCardListPage() {
   useEffect(() => {
     const fetchJammers = async () => {
       try {
-        if (!ifFiltered) {
+        if (!ifFiltered && !gettingUrlParams) {
           setLoading(true)
           const data = await dataAxios.dataFetch(currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
-        }
-        if (ifFiltered) {
+          console.log("unfiltered rendering")
+        } else if (ifFiltered) {
           setLoading(true)
           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
-
-          // setIfFiltered(true)
           setTotalPages(data.totalPages)
           setJammers(data.users)
+          console.log("filtered rendering")
         }
 
         setLoading(false)

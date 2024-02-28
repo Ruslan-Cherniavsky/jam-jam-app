@@ -36,28 +36,32 @@ const Filter = (filterProps: FilterProps) => {
   const [selectedCountry, setSelectedCountry] = useState<string | null>("")
   const [selectedRegion, setSelectedRegion] = useState<string | null>("")
   const [selectedCity, setSelectedCity] = useState<string | null>("")
+  const [fullCountryName, setFullCountryName] = useState<string | null>("")
+  //------
   const [loading, setLoading] = useState(false)
   const [genres, setGenres] = useState<Array<Object>>([])
   const [instruments, setInstruments] = useState<Array<Object>>([])
-  const [currentUrlParams, setUrlParams] = useState<IParams | any>()
 
-  const [selectedInstruments, setSelectedInstruments] = useState<Array<Object>>(
-    []
-  )
-  const [selectedGenres, setSelectedGenres] = useState<Array<Object>>([])
-  //------------
-  const [selectedInstruments2, setSelectedInstruments2] = useState<Array<any>>(
-    []
-  )
-  const [selectedGenres2, setSelectedGenres2] = useState<Array<any>>([])
+  const [selectedInstrumentsObjects, setSelectedInstrumentsObjects] = useState<
+    Array<Object>
+  >([])
+  const [selectedGenresObjects, setSelectedGenresObjects] = useState<
+    Array<Object>
+  >([])
+  //------------------
+  const [selectedInstrumentsStrings, setSelectedInstrumentsStrings] = useState<
+    Array<string>
+  >([])
+  const [selectedGenresStrings, setSelectedGenresStrings] = useState<
+    Array<string>
+  >([])
   //-------------------
-  const [fullCountryName, setFullCountryName] = useState<string | null>("")
 
   function selectedGenresCB(genres: Array<string>) {
-    setSelectedGenres2(genres)
+    setSelectedGenresStrings(genres)
   }
   function selectedInstrumentsCB(instrumrnts: Array<string>) {
-    setSelectedInstruments2(instrumrnts)
+    setSelectedInstrumentsStrings(instrumrnts)
   }
 
   const location = useLocation()
@@ -88,8 +92,6 @@ const Filter = (filterProps: FilterProps) => {
       instruments: searchParams.getAll("instruments[]") || [],
     }
 
-    setUrlParams(urlParams)
-
     setFullCountryName(urlParams.country)
     setSelectedCountry(urlParams.isoCode)
     setSelectedRegion(urlParams.region)
@@ -100,8 +102,8 @@ const Filter = (filterProps: FilterProps) => {
       console.log("geners objects from url params", genresFromUrlArray)
 
       dataAxios.fetchGenresByIds(genresFromUrlArray).then((currentGenres) => {
-        setSelectedGenres(currentGenres.genres)
-        setSelectedGenres2(urlParams.genres)
+        setSelectedGenresObjects(currentGenres.genres)
+        setSelectedGenresStrings(urlParams.genres)
 
         console.log(
           "geners objects from url params with names",
@@ -116,8 +118,8 @@ const Filter = (filterProps: FilterProps) => {
       dataAxios
         .fetchInstrumentsByIds(instrumentsFromUrlArray)
         .then((currentInstruments) => {
-          setSelectedInstruments(currentInstruments.instruments)
-          setSelectedInstruments2(urlParams.instruments)
+          setSelectedInstrumentsObjects(currentInstruments.instruments)
+          setSelectedInstrumentsStrings(urlParams.instruments)
 
           console.log(
             "geners objects from url params with names",
@@ -177,8 +179,8 @@ const Filter = (filterProps: FilterProps) => {
         !selectedRegion &&
         !selectedCity &&
         !selectedCountry &&
-        selectedGenres2.length === 0 &&
-        selectedInstruments2.length === 0
+        selectedGenresStrings.length === 0 &&
+        selectedInstrumentsStrings.length === 0
       ) {
         filterProps.filteredStatusChange()
       } else if (
@@ -186,16 +188,16 @@ const Filter = (filterProps: FilterProps) => {
         selectedRegion ||
         selectedCity ||
         selectedCountry ||
-        selectedGenres2 ||
-        selectedInstruments2
+        selectedGenresStrings ||
+        selectedInstrumentsStrings
       ) {
         const params = {
           country: fullCountryName,
           region: selectedRegion,
           city: selectedCity,
           isoCode: selectedCountry,
-          genres: selectedGenres2,
-          instruments: selectedInstruments2,
+          genres: selectedGenresStrings,
+          instruments: selectedInstrumentsStrings,
         }
 
         filterProps.fetchFilteredCB(params)
@@ -283,7 +285,7 @@ const Filter = (filterProps: FilterProps) => {
                 ifRequired={false}
                 dataArray={genres}
                 selectionName="genre"
-                selectedDB={selectedGenres}
+                selectedDB={selectedGenresObjects}
                 selectedCallbackFn={selectedGenresCB}
               />
             </Col>
@@ -294,7 +296,7 @@ const Filter = (filterProps: FilterProps) => {
                 ifRequired={false}
                 dataArray={instruments}
                 selectionName="instrument"
-                selectedDB={selectedInstruments}
+                selectedDB={selectedInstrumentsObjects}
                 selectedCallbackFn={selectedInstrumentsCB}
               />
             </Col>
