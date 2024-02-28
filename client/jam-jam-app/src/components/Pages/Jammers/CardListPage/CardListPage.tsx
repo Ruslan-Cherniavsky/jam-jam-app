@@ -20,6 +20,7 @@ function JammersCardListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
+
   const [params, setParams] = useState<IParams | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
 
@@ -33,14 +34,12 @@ function JammersCardListPage() {
     //   search: `?query=${currentPage}&${queryString}`,
     //   hash: "#hash",
     // })
-
     navigate(newUrl)
     navigate(newUrl)
   }, [currentPage, params, navigate])
 
   useEffect(() => {
     setLoading(true)
-    setGettingUrlParams(true)
 
     // Parse URL parameters and update state
     const searchParams = new URLSearchParams(location.search)
@@ -135,7 +134,7 @@ function JammersCardListPage() {
     }
 
     fetchJammers()
-  }, [currentPage, params])
+  }, [currentPage, gettingUrlParams, params])
 
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {

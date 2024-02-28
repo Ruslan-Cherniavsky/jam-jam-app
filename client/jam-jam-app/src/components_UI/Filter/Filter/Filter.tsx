@@ -99,21 +99,21 @@ const Filter = (filterProps: FilterProps) => {
 
     if (urlParams.genres.length) {
       const genresFromUrlArray = urlParams.genres
-      console.log("geners objects from url params", genresFromUrlArray)
+      // console.log("geners objects from url params", genresFromUrlArray)
 
       dataAxios.fetchGenresByIds(genresFromUrlArray).then((currentGenres) => {
         setSelectedGenresObjects(currentGenres.genres)
         setSelectedGenresStrings(urlParams.genres)
 
-        console.log(
-          "geners objects from url params with names",
-          currentGenres.genres
-        )
+        // console.log(
+        //   "geners objects from url params with names",
+        //   currentGenres.genres
+        // )
       })
     }
     if (urlParams.instruments.length) {
       const instrumentsFromUrlArray = urlParams.instruments
-      console.log("geners objects from url params", instrumentsFromUrlArray)
+      // console.log("geners objects from url params", instrumentsFromUrlArray)
 
       dataAxios
         .fetchInstrumentsByIds(instrumentsFromUrlArray)
@@ -121,10 +121,10 @@ const Filter = (filterProps: FilterProps) => {
           setSelectedInstrumentsObjects(currentInstruments.instruments)
           setSelectedInstrumentsStrings(urlParams.instruments)
 
-          console.log(
-            "geners objects from url params with names",
-            currentInstruments.instruments
-          )
+          // console.log(
+          //   "geners objects from url params with names",
+          //   currentInstruments.instruments
+          // )
         })
     }
 
