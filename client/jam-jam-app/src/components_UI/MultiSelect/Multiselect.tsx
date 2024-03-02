@@ -37,14 +37,8 @@ export default function MultiSelect(props: SelectProps | null) {
       props?.selectedDB.map((selection: any) =>
         idArrayDefault.push(selection[props.selectionName])
       )
-
       setSelectedUI(idArrayDefault)
-      console.log("1")
     }
-
-    //   setSelected(
-    //     idArrayDefault.split(","))
-    // )
   }, [props?.selectedDB.length])
 
   const handleChange = (event: SelectChangeEvent<typeof selectedUI>) => {
@@ -52,17 +46,16 @@ export default function MultiSelect(props: SelectProps | null) {
       target: {value},
     } = event
 
-    // id of selection
+    // id of selection:
     const idArray: Array<string> = []
     props?.dataArray.map(
       (selection: any) =>
         value.includes(selection[props.selectionName]) &&
         idArray.push(selection._id)
     )
-
     props?.selectedCallbackFn(idArray)
 
-    //string names
+    //string names:
     const idArrayDefault: Array<string> = []
 
     props?.selectedDB.map(
@@ -70,27 +63,17 @@ export default function MultiSelect(props: SelectProps | null) {
         value.includes(selection[props.selectionName]) &&
         idArrayDefault.push(selection[props.selectionName])
     )
-
-    setSelectedUI(
-      // On autofill we get a stringified value.
-      typeof value === "string" ? value.split(",") : value
-    )
+    setSelectedUI(typeof value === "string" ? value.split(",") : value)
   }
 
   return (
     <>
-      {/* <FormControl sx={{m: 1, width: 200, height: 85}}> */}
       <FormControl
         size="small"
         className="multiselectContainer"
         style={{
           marginTop: "20px",
-
-          // margin: "11px 0px 11px 0px ",
-          // maxWidth: 200,
-        }}
-        // sx={{m: 0, width: 200, height: 85}}
-      >
+        }}>
         <InputLabel id="demo-multiple-checkbox-label">
           {props?.selectionName || "Select"}
         </InputLabel>

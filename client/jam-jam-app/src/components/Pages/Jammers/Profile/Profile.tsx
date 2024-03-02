@@ -67,7 +67,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
           marginRight: "20px",
           marginBottom: "20px",
         }}
-        disabled={user?.email === currentUser?.email}
+        // disabled={user?.email === currentUser?.email}
         onClick={() => {
           navigate(-1)
         }}>
@@ -76,7 +76,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
           icon={faBackward}
           className="mr-1"
         />{" "}
-        Back to search
+        Back
       </Button>
       <Card>
         <Card.Header>
@@ -87,7 +87,13 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
         <Card.Body>
           <Row>
             <Col md={4}>
-              <Image src={user.img} className="img-fluid" alt="User" fluid />
+              <Image
+                style={{margin: "0px 0px 15px 0px"}}
+                src={user.img}
+                className="img-fluid"
+                alt="User"
+                fluid
+              />
             </Col>
             <Col md={8}>
               <h3>{`${user.firstName} ${user.lastName}`}</h3>

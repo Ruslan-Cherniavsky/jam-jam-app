@@ -1,50 +1,37 @@
 import {useEffect, useState} from "react"
 import Loader from "../../../../components_UI/Loaders/Loader"
-import {useDispatch} from "react-redux"
-import {AppDispatch} from "../../../../redux/store"
 import dataAxios from "../../../../server/data.axios"
 import JammersCardList from "../CardList/JammersCardList"
 import {Pagination} from "react-bootstrap"
 import Filter, {IParams} from "../../../../components_UI/Filter/Filter/Filter"
-import {Navigate, useLocation, useNavigate, useParams} from "react-router-dom"
+import {useLocation, useNavigate, useParams} from "react-router-dom"
 import "./CardListPage.css"
 
 function JammersCardListPage() {
   const navigate = useNavigate()
-  const location = useLocation() // Use useLocation hook directly
+  const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
   const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
   const {page}: {page?: string} = useParams()
-
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
-
   const [params, setParams] = useState<IParams | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
 
-  //url from search params set by use navigate
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
     const newUrl = `/jammersList?page=${currentPage}&${queryString}`
 
-    // navigate({
-    //   pathname: "/jammersList",
-    //   search: `?query=${currentPage}&${queryString}`,
-    //   hash: "#hash",
-    // })
     navigate(newUrl)
     navigate(newUrl)
   }, [currentPage, params, navigate])
 
   useEffect(() => {
     setLoading(true)
-
-    // Parse URL parameters and update state
     const searchParams = new URLSearchParams(location.search)
     const urlParams = {
-      // page: parseInt(searchParams.get("page")) || 1,
       country: parseNullOrUndefined(searchParams.get("country")) || "",
       region: parseNullOrUndefined(searchParams.get("region")) || "",
       city: parseNullOrUndefined(searchParams.get("city")) || "",
@@ -53,17 +40,11 @@ function JammersCardListPage() {
       instruments: searchParams.getAll("instruments[]") || [],
     }
 
-    const urlParams2 = {
-      page: searchParams.get("page") || "1",
-    }
-
     function parseNullOrUndefined(value: any) {
       return value === "null" ? null : value || null
     }
 
-    // Set initial currentPage based on the page parameter
-
-    setCurrentPage(Number(urlParams2.page))
+    setCurrentPage(Number(searchParams.get("page") || "1"))
 
     if (
       urlParams.country ||
@@ -74,24 +55,19 @@ function JammersCardListPage() {
       urlParams.instruments.length > 0
     ) {
       setParams(urlParams)
-
       setIfFiltered(true)
     }
 
-    // setIfFiltered(false)
     setLoading(false)
     setGettingUrlParams(false)
-    // ... rest of the code
   }, [])
 
   const convertParamsToQueryString = (params: any) => {
     return Object.keys(params)
       .map((key) => {
         if (Array.isArray(params[key])) {
-          // If the property is an array, format it as an array in the query string
           return params[key].map((value: any) => `${key}[]=${value}`).join("&")
         } else {
-          // If the property is not an array, format it normally
           return `${key}=${params[key]}`
         }
       })
@@ -117,13 +93,11 @@ function JammersCardListPage() {
           const data = await dataAxios.dataFetch(currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
-          console.log("unfiltered rendering")
         } else if (ifFiltered) {
           setLoading(true)
           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
-          console.log("filtered rendering")
         }
 
         setLoading(false)

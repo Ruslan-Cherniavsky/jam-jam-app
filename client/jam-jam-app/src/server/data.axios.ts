@@ -136,7 +136,6 @@ const dataAxios: {
   },
   fetchGenresByIds: async (genreIds) => {
     try {
-      console.log(genreIds)
       const {data} = await axios.patch(
         `http://localhost:3500/genres/getgenresbyids`,
         {genreIds}
@@ -149,7 +148,6 @@ const dataAxios: {
   },
   fetchInstrumentsByIds: async (instrumentIds) => {
     try {
-      console.log(instrumentIds)
       const {data} = await axios.patch(
         `http://localhost:3500/instruments/getinstrumentsbyids`,
         {instrumentIds}

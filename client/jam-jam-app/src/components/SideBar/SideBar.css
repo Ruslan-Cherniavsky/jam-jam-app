@@ -12,13 +12,19 @@
   background-color: #f0f0f0;
 }
 
-/* .sidebar-container {
-  width: 250px;
-  height: 100%;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  background-color: #f8f9fa;
-  padding-top: 20px;
-} */
+.nav-link-custom:active {
+  background-color: #e7e7e7; /* Change the color for the active state */
+  /* Optionally, you can add other styles for the active state */
+}
+.nav-link-custom:active {
+  background-color: #e7e7e7; /* Change the color for the active state */
+  /* Optionally, you can add other styles for the active state */
+}
+
+.nav-custom.active {
+  background-color: #e6e7ec;
+  color: #ffffff;
+}
+.nav-custom:active {
+  background-color: #d4d4d4;
+}

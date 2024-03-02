@@ -1,17 +1,7 @@
 import React from "react"
-import {Link} from "react-router-dom"
-import {Container, Row, Col, Image, Nav} from "react-bootstrap"
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {Link, useLocation} from "react-router-dom"
+import {Image, Nav} from "react-bootstrap"
 import {User as FirebaseUser} from "firebase/auth"
-
-import {
-  faUser,
-  faMusic,
-  faUsers,
-  faPencilAlt,
-  faUserFriends,
-} from "@fortawesome/free-solid-svg-icons"
-import Footer from "../Footer/Footer"
 import {RootState} from "../../redux/store"
 import {useSelector} from "react-redux"
 import "./SideBar.css"
@@ -24,11 +14,19 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
   const userDataDB = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData
   )
+  const {pathname} = useLocation()
+
+  const navItems = [
+    {to: "/my-profile", label: "My Profile"},
+    {to: "/update-profile", label: "Edit Profile"},
+    {to: "/my-friends", label: "My Friends"},
+    {to: "/create-jam/", label: "Create New Jam-Event"},
+    {to: "/created-jams/:jamerId", label: "Created Jam-Events"},
+    {to: "/joined-jams", label: "Joined Jam-Events"},
+  ]
 
   return (
     <>
-      {/* <div className="sidebar-container"> */}
-
       <Image
         style={{
           marginBottom: "9px",
@@ -51,14 +49,13 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{
               color: "gray",
-              // marginBottom: "4px",
-              // marginTop: "10px",
-              // marginLeft: "15px",
-              // fontSize: "20px",
             }}
             to="/my-profile"
-            className="nav-link-custom nav-link link-black">
-            {/* {userDataDB?.userName || user?.email} */}
+            className={
+              pathname === "/my-profile"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
             My Profile
           </Link>
         </Nav.Item>
@@ -67,7 +64,11 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{color: "gray"}}
             to="/update-profile"
-            className="nav-link-custom nav-link link-black">
+            className={
+              pathname === "/update-profile"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
             Edit Profile
           </Link>
         </Nav.Item>
@@ -75,7 +76,12 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{color: "gray"}}
             to="/my-friends"
-            className="nav-link-custom nav-link link-black">
+            className={
+              pathname === "/my-friends"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
+            {" "}
             My Friends
           </Link>
         </Nav.Item>
@@ -89,7 +95,11 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{color: "gray"}}
             to="/create-jam/"
-            className="nav-link-custom nav-link link-black">
+            className={
+              pathname === "/create-jam/"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
             Create New Jam-Event
           </Link>
         </Nav.Item>
@@ -97,7 +107,11 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{color: "gray"}}
             to="/created-jams/:jamerId"
-            className="nav-link-custom nav-link link-black">
+            className={
+              pathname === "/created-jams/:jamerId"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
             Created Jam-Events
           </Link>
         </Nav.Item>
@@ -105,12 +119,15 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{color: "gray"}}
             to="/joined-jams"
-            className="nav-link-custom nav-link link-black">
+            className={
+              pathname === "/joined-jams"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
             Joined Jam-Events
           </Link>
         </Nav.Item>
       </Nav>
-      {/* </div> */}
     </>
   )
 }

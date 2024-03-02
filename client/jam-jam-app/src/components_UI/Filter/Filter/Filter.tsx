@@ -3,19 +3,10 @@ import {Form, Button, Col, Container, Row} from "react-bootstrap"
 import {Country, State, City} from "country-state-city"
 import MultiSelect from "../../MultiSelect/Multiselect"
 import dataAxios from "../../../server/data.axios"
-import {useDispatch, useSelector} from "react-redux"
-import {
-  clearUserDataMongoDB,
-  setUserDataMongoDB,
-} from "../../../redux/reducers/UserDataSliceMongoDB"
-import {setUsersData} from "../../../redux/reducers/JammersDataSliceMongoDB"
 import "./Filter.css"
-import axios from "axios"
 import {useLocation} from "react-router"
 
 type InputChangeEvent = ChangeEvent<HTMLInputElement>
-type SelectChangeEvent = ChangeEvent<HTMLSelectElement>
-type InputChangeTextArea = React.ChangeEvent<HTMLTextAreaElement>
 
 interface FilterProps {
   setIfFilteringCB: Function
@@ -42,6 +33,17 @@ const Filter = (filterProps: FilterProps) => {
   const [genres, setGenres] = useState<Array<Object>>([])
   const [instruments, setInstruments] = useState<Array<Object>>([])
 
+  //----------------------------------------------------------------------------------|
+  // Selected strings example: ["65c37ddbaaf72eecf7ed1a46", "65c38523aaf72eecf7ed1af9"]
+  //----------------------------------------------------------------------------------|
+  // Selected objects exanple:
+  //       {
+  //           "_id": "65c38523aaf72eecf7ed1af9",
+  //           "instrument": "Electric guitar",
+  //           "__v": 0
+  //       }
+  //----------------------------------------------------------------------------------|
+
   const [selectedInstrumentsObjects, setSelectedInstrumentsObjects] = useState<
     Array<Object>
   >([])
@@ -55,14 +57,15 @@ const Filter = (filterProps: FilterProps) => {
   const [selectedGenresStrings, setSelectedGenresStrings] = useState<
     Array<string>
   >([])
-  //-------------------
-
+  //-- CB:
   function selectedGenresCB(genres: Array<string>) {
     setSelectedGenresStrings(genres)
   }
   function selectedInstrumentsCB(instrumrnts: Array<string>) {
     setSelectedInstrumentsStrings(instrumrnts)
   }
+
+  //-------------------
 
   const location = useLocation()
   useEffect(() => {
@@ -82,61 +85,53 @@ const Filter = (filterProps: FilterProps) => {
   }, [])
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search)
-    const urlParams = {
-      country: parseNullOrUndefined(searchParams.get("country")) || "",
-      region: parseNullOrUndefined(searchParams.get("region")) || "",
-      city: parseNullOrUndefined(searchParams.get("city")) || "",
-      isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
-      genres: searchParams.getAll("genres[]") || [],
-      instruments: searchParams.getAll("instruments[]") || [],
-    }
+    const fetchData = async () => {
+      const searchParams = new URLSearchParams(location.search)
+      const urlParams = {
+        country: parseNullOrUndefined(searchParams.get("country")) || "",
+        region: parseNullOrUndefined(searchParams.get("region")) || "",
+        city: parseNullOrUndefined(searchParams.get("city")) || "",
+        isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
+        genres: searchParams.getAll("genres[]") || [],
+        instruments: searchParams.getAll("instruments[]") || [],
+      }
 
-    setFullCountryName(urlParams.country)
-    setSelectedCountry(urlParams.isoCode)
-    setSelectedRegion(urlParams.region)
-    setSelectedCity(urlParams.city)
+      setFullCountryName(urlParams.country)
+      setSelectedCountry(urlParams.isoCode)
+      setSelectedRegion(urlParams.region)
+      setSelectedCity(urlParams.city)
 
-    if (urlParams.genres.length) {
-      const genresFromUrlArray = urlParams.genres
-      // console.log("geners objects from url params", genresFromUrlArray)
+      if (urlParams.genres.length) {
+        try {
+          const currentGenres = await dataAxios.fetchGenresByIds(
+            urlParams.genres
+          )
+          setSelectedGenresObjects(currentGenres.genres)
+          setSelectedGenresStrings(urlParams.genres)
+        } catch (error) {
+          console.error("Error fetching genres:", error)
+        }
+      }
 
-      dataAxios.fetchGenresByIds(genresFromUrlArray).then((currentGenres) => {
-        setSelectedGenresObjects(currentGenres.genres)
-        setSelectedGenresStrings(urlParams.genres)
-
-        // console.log(
-        //   "geners objects from url params with names",
-        //   currentGenres.genres
-        // )
-      })
-    }
-    if (urlParams.instruments.length) {
-      const instrumentsFromUrlArray = urlParams.instruments
-      // console.log("geners objects from url params", instrumentsFromUrlArray)
-
-      dataAxios
-        .fetchInstrumentsByIds(instrumentsFromUrlArray)
-        .then((currentInstruments) => {
+      if (urlParams.instruments.length) {
+        try {
+          const currentInstruments = await dataAxios.fetchInstrumentsByIds(
+            urlParams.instruments
+          )
           setSelectedInstrumentsObjects(currentInstruments.instruments)
           setSelectedInstrumentsStrings(urlParams.instruments)
-
-          // console.log(
-          //   "geners objects from url params with names",
-          //   currentInstruments.instruments
-          // )
-        })
+        } catch (error) {
+          console.error("Error fetching instruments:", error)
+          // Handle the error
+        }
+      }
     }
-
-    // console.log(urlParams.genres)
-    // console.log(urlParams.instruments)
-
-    // setSelectedGenres(urlParams.genres)
-    // setSelectedInstruments(urlParams.instruments)
 
     function parseNullOrUndefined(value: any) {
       return value === "null" ? null : value || null
     }
+
+    fetchData()
   }, [])
 
   const handleCountryChange = (e: InputChangeEvent) => {
@@ -238,7 +233,6 @@ const Filter = (filterProps: FilterProps) => {
 
             <Col xl={2} lg={4} md={4}>
               <Form.Group controlId="regions">
-                {/* <Form.Label>Select Region:</Form.Label> */}
                 <Form.Control
                   style={{marginTop: "22px"}}
                   as="select"
@@ -259,7 +253,6 @@ const Filter = (filterProps: FilterProps) => {
             </Col>
             <Col xl={2} lg={4} md={4}>
               <Form.Group controlId="cities">
-                {/* <Form.Label>Select City:</Form.Label> */}
                 <Form.Control
                   style={{marginTop: "22px"}}
                   as="select"
