@@ -22,6 +22,7 @@ interface UserCardProps {
     city: string
     street: string
     age: number
+    dob: Date
     gender: string
     genres: Array<{_id: string; genre: string; __v: number}>
     instruments: Array<{_id: string; instrument: string; __v: number}>
@@ -55,6 +56,23 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
   }
   const handleEditProfileClick = () => {
     navigate("/update-profile")
+  }
+
+  function calculateAge(birthdate: Date): number {
+    const today = new Date()
+    const birthdateDate = new Date(birthdate)
+
+    let age = today.getFullYear() - birthdateDate.getFullYear()
+    const monthDiff = today.getMonth() - birthdateDate.getMonth()
+
+    if (
+      monthDiff < 0 ||
+      (monthDiff === 0 && today.getDate() < birthdateDate.getDate())
+    ) {
+      age--
+    }
+
+    return age
   }
   return (
     <Container className="mt-4">
@@ -101,7 +119,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
                 {` ${user.country}`} {user.city ? `${","}` : ""}
                 {user.city && `${user.city} `}
               </p>
-              <p>Age: {user.age}</p>
+              <p>Age: {calculateAge(user.dob)}</p>
               <p>Gender: {user.gender}</p>
               <h5>Instruments:</h5>
               <ul>

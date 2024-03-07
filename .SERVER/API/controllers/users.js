@@ -22,6 +22,7 @@ const signup = async (req, res) => {
     oboutMe,
     links,
     role,
+    dob,
   } = req.body
 
   try {
@@ -48,6 +49,7 @@ const signup = async (req, res) => {
       oboutMe: oboutMe,
       role: role,
       links: links,
+      dob: dob,
     })
 
     await user.save()

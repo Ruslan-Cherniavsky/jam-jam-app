@@ -43,6 +43,10 @@ const userSchema = mongoose.Schema({
   //TODO -----
 
   links: [{type: String, min: 5, max: 700}],
+  dob: {
+    type: Date,
+    required: true,
+  },
 
   // friends: [
   //   {

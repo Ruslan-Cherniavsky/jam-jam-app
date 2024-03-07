@@ -21,6 +21,7 @@ export interface UserDataSliceMongoDB {
   instruments: Array<Object>
   links: Array<string>
   oboutMe: string
+  dob: Date
 }
 
 interface UserDataStateMongoDB {

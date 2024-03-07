@@ -12,6 +12,10 @@ import {
 } from "../../../../../redux/reducers/UserDataSliceMongoDB"
 import {Country, State, City} from "country-state-city"
 import ImageUpload from "../ImageUploader/ImageUploader"
+import "./UpdateProfile.css"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
+import ImageUploaderCrop from "../ImageUploader/ImageUploaderCrop"
 
 export default function UpdateProfile({
   userDataDB,
@@ -28,6 +32,9 @@ export default function UpdateProfile({
   const [aboutMe, setAboutMe] = useState(userDataDB?.oboutMe || "")
   const [imageURL, setImageURL] = useState(userDataDB?.img || "")
 
+  const [dob, setDob] = useState(
+    userDataDB?.dob ? new Date(userDataDB?.dob) : null
+  )
   //------------------------- Links ------------------------------------
 
   const [link1, setLinks1] = useState(userDataDB?.links[0] || "")
@@ -216,14 +223,32 @@ export default function UpdateProfile({
         region: selectedRegion,
         city: selectedCity,
         isoCode: selectedCountry,
-        age,
+        // age,
         genres: selectedGenres,
         instruments: selectedInstruments,
         links: [link1, link2, link3],
         oboutMe: aboutMe,
         img: imageURL,
         gender,
+        dob: dob?.toISOString() ?? "", // Handle null case
       }
+
+      if (!dob) {
+        setError("Please select your date of birth.")
+        return
+      }
+
+      const today = new Date()
+      const age = today.getFullYear() - dob.getFullYear()
+      const monthDiff = today.getMonth() - dob.getMonth()
+
+      if (age > 18 || (age === 18 && monthDiff >= 0)) {
+        setError("")
+      } else {
+        setError("You must be 18 years or older to register.")
+        return
+      }
+
       // ------------------- Usernames Validation ------------------------
 
       const usernamesFromDB = await dataAxios.usernamesDataFetch()
@@ -277,8 +302,10 @@ export default function UpdateProfile({
   return (
     <>
       <Container
-        style={{minHeight: "20vh"}}
-        className="d-flex align-items-center justify-content-center">
+        // className="container mt-4"
+        // style={{minHeight: "20vh"}}
+        style={{padding: "0px 0px 20px 0px"}}
+        className="container mt-4">
         <Card>
           <Card.Header>
             {!ifUserHaveValidDataInDB && <h2>Create Profile</h2>}
@@ -290,111 +317,140 @@ export default function UpdateProfile({
             {message && <Alert variant="info">{message}</Alert>}
 
             <Form onSubmit={handleSubmit}>
-              <Row>
-                <Col xl={6} lg={6} md={6} sm={12}>
-                  <div className="w-100" style={{maxWidth: "400px"}}>
-                    <ImageUpload
+              <Row className="d-flex justify-content-center">
+                <Col xl={4} lg={6} md={6} sm={12}>
+                  <ImageUploaderCrop
+                    handleImageURL={handleImageURL}
+                    currentURL={userDataDB?.img}
+                  />
+                  {/* <div className="w-100" style={{maxWidth: "400px"}}> */}
+                  {/* <div style={{width: "400px"}}> */}
+                  {/* <Col md={6}> */}
+                  {/* </Col> */}
+                  {/* <Col> */}
+                  {/* <div style={{height: "400px"}}> */}
+                  {/* <ImageUpload
                       handleImageURL={handleImageURL}
                       currentURL={userDataDB?.img}
+                    /> */}
+                  {/* </div> */}
+                  {/* </Col> */}
+
+                  {/* </div> */}
+                  <br></br>
+
+                  <Form.Group id="userName">
+                    <Form.Label style={{marginTop: "7%"}}>User Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={userName}
+                      onChange={handleUserNameChange}
+                      required
                     />
+                  </Form.Group>
+                  <br></br>
 
-                    <Form.Group id="userName">
-                      <Form.Label style={{marginTop: "7%"}}>
-                        User Name
-                      </Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={userName}
-                        onChange={handleUserNameChange}
-                        required
-                      />
-                    </Form.Group>
+                  <Form.Group id="firstName">
+                    <Form.Label>First Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={firstName}
+                      onChange={handleFirstNameChange}
+                      required
+                    />
+                  </Form.Group>
+                  <br></br>
 
-                    <Form.Group id="firstName">
-                      <Form.Label>First Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={firstName}
-                        onChange={handleFirstNameChange}
-                        required
-                      />
-                    </Form.Group>
+                  <Form.Group id="lastName">
+                    <Form.Label>Last Name</Form.Label>
+                    <Form.Control
+                      type="text"
+                      value={lastName}
+                      onChange={handleLastNameChange}
+                      required
+                    />
+                  </Form.Group>
+                  {/* <hr /> */}
+                  <br></br>
+                  <hr />
+                  {/* TODO--- create reusble component for locations select with CB functions */}
 
-                    <Form.Group id="lastName">
-                      <Form.Label>Last Name</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={lastName}
-                        onChange={handleLastNameChange}
-                        required
-                      />
-                    </Form.Group>
-
-                    {/* TODO--- create reusble component for locations select with CB functions */}
-
-                    <Form.Group controlId="countries">
-                      <Form.Label>Select Country:</Form.Label>
-                      <Form.Control
-                        as="select"
-                        required
-                        onChange={handleCountryChange}
-                        value={selectedCountry || ""}>
-                        <option value="" disabled>
-                          Select country
+                  <Form.Group controlId="countries">
+                    <Form.Label>Select Country:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      required
+                      onChange={handleCountryChange}
+                      value={selectedCountry || ""}>
+                      <option value="" disabled>
+                        Select country
+                      </option>
+                      {Country.getAllCountries().map((country) => (
+                        <option key={country.isoCode} value={country.isoCode}>
+                          {country.name}
                         </option>
-                        {Country.getAllCountries().map((country) => (
-                          <option key={country.isoCode} value={country.isoCode}>
-                            {country.name}
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
+
+                  <br></br>
+
+                  <Form.Group controlId="regions">
+                    <Form.Label>Select Region:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      onChange={handleRegionChange}
+                      value={selectedRegion || ""}>
+                      <option value="" disabled>
+                        Select region
+                      </option>
+                      {State.getStatesOfCountry(selectedCountry || "").map(
+                        (state) => (
+                          <option key={state.isoCode} value={state.isoCode}>
+                            {state.name}
                           </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
-                    <Form.Group controlId="regions">
-                      <Form.Label>Select Region:</Form.Label>
-                      <Form.Control
-                        as="select"
-                        onChange={handleRegionChange}
-                        value={selectedRegion || ""}>
-                        <option value="" disabled>
-                          Select region
-                        </option>
-                        {State.getStatesOfCountry(selectedCountry || "").map(
-                          (state) => (
-                            <option key={state.isoCode} value={state.isoCode}>
-                              {state.name}
-                            </option>
-                          )
-                        )}
-                      </Form.Control>
-                    </Form.Group>
+                        )
+                      )}
+                    </Form.Control>
+                  </Form.Group>
+                  <br></br>
 
-                    <Form.Group controlId="cities">
-                      <Form.Label>Select City:</Form.Label>
-                      <Form.Control
-                        as="select"
-                        onChange={handleCityChange}
-                        value={selectedCity || ""}>
-                        <option value="" disabled>
-                          Select city
+                  <Form.Group controlId="cities">
+                    <Form.Label>Select City:</Form.Label>
+                    <Form.Control
+                      as="select"
+                      onChange={handleCityChange}
+                      value={selectedCity || ""}>
+                      <option value="" disabled>
+                        Select city
+                      </option>
+                      {City.getCitiesOfState(
+                        selectedCountry || "",
+                        selectedRegion || ""
+                      ).map((city) => (
+                        <option key={city.name} value={city.name}>
+                          {city.name}
                         </option>
-                        {City.getCitiesOfState(
-                          selectedCountry || "",
-                          selectedRegion || ""
-                        ).map((city) => (
-                          <option key={city.name} value={city.name}>
-                            {city.name}
-                          </option>
-                        ))}
-                      </Form.Control>
-                    </Form.Group>
+                      ))}
+                    </Form.Control>
+                  </Form.Group>
 
-                    {/* TODO--- --------------------------------------- */}
-                  </div>
+                  {/* <br></br> */}
+
+                  {/* TODO--- --------------------------------------- */}
+                  {/* </div> */}
                 </Col>
 
-                <Col xl={6} lg={6} md={6} sm={12}>
-                  <div className="w-100" style={{maxWidth: "400px"}}>
-                    <Form.Group id="age">
+                <Col xl={4} lg={6} md={6} sm={12}>
+                  <br></br>
+                  <div className="d-block d-md-none">
+                    <hr />
+                  </div>
+
+                  <Row>
+                    {/* <div className="w-100" style={{maxWidth: "400px"}}> */}
+
+                    {/* <Form.Group id="age">
                       <Form.Label>Age</Form.Label>
                       <Form.Select value={age} onChange={handleAgeChange}>
                         <option value="" disabled>
@@ -406,41 +462,73 @@ export default function UpdateProfile({
                           </option>
                         ))}
                       </Form.Select>
-                    </Form.Group>
+                      <br></br>
+                    </Form.Group> */}
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group controlId="datepicker">
+                        <div style={{margin: "0px 10px 0px 0px"}}>
+                          <Form.Label>Birthday</Form.Label>
+                        </div>
 
-                    <Form.Group id="gender">
-                      <Form.Label>Gender</Form.Label>
-                      <Form.Select value={gender} onChange={handleGenderChange}>
-                        <option value="" disabled>
-                          Select gender
-                        </option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </Form.Select>
-                    </Form.Group>
+                        <DatePicker
+                          selected={dob || null}
+                          onChange={(date) => setDob(date)}
+                          className="form-control"
+                          dateFormat="MM/dd/yyyy"
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    {/* <div className="d-block d-lg-none">
+                      <br></br>
+                    </div> */}
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group id="gender">
+                        {/* <br></br> */}
+                        <Form.Label>Gender</Form.Label>
+                        <Form.Select
+                          value={gender}
+                          onChange={handleGenderChange}>
+                          <option value="" disabled>
+                            Select gender
+                          </option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </Form.Select>
+                        <br></br>
+                      </Form.Group>
+                    </Col>
 
                     {genres && userDataDB && (
-                      <MultiSelect
-                        ifRequired={true}
-                        dataArray={genres}
-                        selectionName="genre"
-                        selectedDB={userDataDB?.genres}
-                        selectedCallbackFn={selectedGenresCB}
-                      />
+                      <Col md={12} lg={12} xl={12} xs={12} sm={12}>
+                        <hr />
+                        <MultiSelect
+                          ifRequired={true}
+                          dataArray={genres}
+                          selectionName="genre"
+                          selectedDB={userDataDB?.genres}
+                          selectedCallbackFn={selectedGenresCB}
+                        />
+                      </Col>
                     )}
 
                     {instruments && userDataDB && (
-                      <MultiSelect
-                        ifRequired={true}
-                        dataArray={instruments}
-                        selectionName="instrument"
-                        selectedDB={userDataDB?.instruments}
-                        selectedCallbackFn={selectedInstrumentsCB}
-                      />
+                      <Col md={12} lg={12} xl={12} xs={12} sm={12}>
+                        <br></br>
+                        <MultiSelect
+                          ifRequired={true}
+                          dataArray={instruments}
+                          selectionName="instrument"
+                          selectedDB={userDataDB?.instruments}
+                          selectedCallbackFn={selectedInstrumentsCB}
+                        />
+                      </Col>
                     )}
 
                     <Form.Group id="links1">
+                      <br></br>
+                      <hr />
                       <Form.Label>Social Media Link #1</Form.Label>
                       <Form.Control
                         type="text"
@@ -450,6 +538,7 @@ export default function UpdateProfile({
                     </Form.Group>
 
                     <Form.Group id="links2">
+                      <br></br>
                       <Form.Label>Social Media Link #2</Form.Label>
                       <Form.Control
                         type="text"
@@ -459,6 +548,7 @@ export default function UpdateProfile({
                     </Form.Group>
 
                     <Form.Group id="links3">
+                      <br></br>
                       <Form.Label>Social Media Link #3</Form.Label>
                       <Form.Control
                         type="text"
@@ -468,40 +558,49 @@ export default function UpdateProfile({
                     </Form.Group>
 
                     <Form.Group id="aboutMe">
+                      <br></br>
                       <Form.Label>About Me</Form.Label>
                       <Form.Control
                         value={aboutMe}
+                        style={{height: "306px"}}
                         as="textarea"
                         onChange={handleAboutMeChange}
                       />
                     </Form.Group>
 
                     {ifUserHaveValidDataInDB && (
-                      <Button
-                        variant="outline-dark"
-                        style={{marginTop: "4%"}}
-                        disabled={loading}
-                        className="w-100"
-                        type="submit">
-                        {loading
-                          ? "Updating Profile Card..."
-                          : "Update Profile Card"}
-                      </Button>
+                      <Col>
+                        <br></br>
+                        <Button
+                          variant="outline-dark"
+                          style={{marginTop: "4%"}}
+                          disabled={loading}
+                          className="w-100"
+                          type="submit">
+                          {loading
+                            ? "Updating Profile Card..."
+                            : "Update Profile Card"}
+                        </Button>
+                      </Col>
                     )}
 
                     {!ifUserHaveValidDataInDB && (
-                      <Button
-                        variant="outline-dark"
-                        style={{marginTop: "3%"}}
-                        disabled={loading}
-                        className="w-100"
-                        type="submit">
-                        {loading
-                          ? "Creating Profile Card..."
-                          : "Create Profile Card"}
-                      </Button>
+                      <Col>
+                        <br></br>
+                        <Button
+                          variant="outline-dark"
+                          style={{marginTop: "3%"}}
+                          disabled={loading}
+                          className="w-100"
+                          type="submit">
+                          {loading
+                            ? "Creating Profile Card..."
+                            : "Create Profile Card"}
+                        </Button>
+                      </Col>
                     )}
-                  </div>
+                    {/* </div> */}
+                  </Row>
                 </Col>
               </Row>
             </Form>

@@ -1,5 +1,4 @@
 import React, {useState} from "react"
-import {ProgressBar, Form, Button} from "react-bootstrap"
 import {
   ref as storageRef,
   uploadBytesResumable,
@@ -11,15 +10,15 @@ const storage = getStorage()
 const placeholder =
   "https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg"
 
-const ImageUpload = ({
-  handleImageURL,
-  currentURL,
-}: {
-  handleImageURL: Function
-  currentURL: string | void
-}) => {
+interface ImageUploadProps {
+  handleImageURL: (url: string) => void
+  currentURL?: string | void
+}
+
+const ImageUpload2 = ({handleImageURL, currentURL}: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false)
   const [progress, setProgress] = useState(0)
+  const [error, setError] = useState<string | null>(null)
 
   const [imageURL, setImageURL] = useState(currentURL || "")
 
@@ -46,7 +45,8 @@ const ImageUpload = ({
               handleImageURL(downloadURL)
             })
             .catch((error) => {
-              console.error("Error getting download URL:", error)
+              console.error("Error uploading image:", error)
+              setError("Error uploading image. Please try again.")
             })
           setIsUploading(true)
         }
@@ -58,6 +58,7 @@ const ImageUpload = ({
 
   return (
     <div className="mt-4">
+      {error && <div className="text-danger">{error}</div>}
       <label htmlFor="fileInput" style={{cursor: "pointer"}}>
         <input
           type="file"
@@ -65,16 +66,12 @@ const ImageUpload = ({
           style={{display: "none"}}
           onChange={handleUpload}
         />
+
         <button
           type="button"
           onClick={() => document.getElementById("fileInput")?.click()}
           style={{border: "none", background: "none", padding: 0}}>
           {isUploading && progress > 100 ? (
-            // <ProgressBar
-            //   now={progress}
-            //   label={`${progress.toFixed(2)}%`}
-            //   className="mt-2"
-            // />
             <img
               src={imageURL}
               alt="Upload"
@@ -86,44 +83,12 @@ const ImageUpload = ({
               src={imageURL ? imageURL : currentURL || placeholder}
               alt="Upload"
               className="img-fluid rounded"
-              style={{maxWidth: "250px"}}
             />
           )}
         </button>
       </label>
-
-      {/* <Form.Group controlId="formFile" className="mb-3">
-        <Form.Label>Choose an image to upload:</Form.Label>
-        <Form.Control
-          required={imageURL == ""}
-          type="file"
-          onChange={handleUpload}
-        />
-      </Form.Group> */}
-
-      {/* {isUploading && (
-        <ProgressBar
-          now={progress}
-          label={`${progress.toFixed(2)}%`}
-          className="mt-2"
-        />
-      )} */}
-
-      {/* {imageURL && (
-        <div className="mt-2">
-          <img
-            src={imageURL}
-            alt="Uploaded"
-            className="img-fluid rounded"
-            style={{maxWidth: "250px"}}
-          />
-        </div>
-      )} */}
-      {/* <Button variant="primary" className="mt-2" disabled={isUploading}>
-        Upload Image
-      </Button> */}
     </div>
   )
 }
 
-export default ImageUpload
+export default ImageUpload2
