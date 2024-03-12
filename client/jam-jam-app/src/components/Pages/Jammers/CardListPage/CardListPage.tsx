@@ -2,7 +2,15 @@ import {useEffect, useState} from "react"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import dataAxios from "../../../../server/data.axios"
 import JammersCardList from "../CardList/JammersCardList"
-import {Pagination} from "react-bootstrap"
+import {
+  Button,
+  Col,
+  Container,
+  Form,
+  FormControl,
+  Pagination,
+  Row,
+} from "react-bootstrap"
 import Filter, {IParams} from "../../../../components_UI/Filter/Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
 import "./CardListPage.css"
@@ -11,14 +19,23 @@ function JammersCardListPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
+  const [ifSearching, setIfSearching] = useState(false)
   const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
   const {page}: {page?: string} = useParams()
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
-  const [params, setParams] = useState<IParams | Object | any>({})
+
+  const [searchText, setSearchText] = useState<SearchText | any>({username: ""})
+
+  const [params, setParams] = useState<IParams | SearchText | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
+
+  const MAX_PAGES_DISPLAYED = 9 // Set the maximum number of pages to be displayed
+  interface SearchText {
+    username: string | null
+  }
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
@@ -27,6 +44,23 @@ function JammersCardListPage() {
     navigate(newUrl)
     navigate(newUrl)
   }, [currentPage, params, navigate])
+
+  const handleSearchInput = (event: any) => {
+    const currentSearchText = {
+      ...searchText,
+      username: event.target.value,
+    }
+
+    setSearchText(currentSearchText)
+  }
+
+  const handleSearch = () => {
+    setLoading(true)
+    setIfSearching(true)
+    setIfFiltered(false)
+    setParams({...searchText})
+    setCurrentPage(1)
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -38,6 +72,7 @@ function JammersCardListPage() {
       isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
       genres: searchParams.getAll("genres[]") || [],
       instruments: searchParams.getAll("instruments[]") || [],
+      username: parseNullOrUndefined(searchParams.get("username")) || "",
     }
 
     function parseNullOrUndefined(value: any) {
@@ -58,6 +93,16 @@ function JammersCardListPage() {
       setIfFiltered(true)
     }
 
+    const urlParamsSearch = {
+      username: parseNullOrUndefined(searchParams.get("username")) || "",
+    }
+
+    if (urlParamsSearch.username) {
+      setParams(urlParamsSearch)
+      setIfSearching(true)
+      setSearchText(urlParamsSearch)
+    }
+
     setLoading(false)
     setGettingUrlParams(false)
   }, [])
@@ -75,12 +120,15 @@ function JammersCardListPage() {
   }
 
   function ifFilteringCB(ifFilteringProp: boolean) {
+    setIfSearching(false)
     setIfFiltering(ifFilteringProp)
   }
 
   const fetchFilteredCB = async (params: Object | any) => {
     setLoading(true)
     setParams(params)
+    setSearchText({username: ""})
+    setIfSearching(false)
     setIfFiltered(true)
     setCurrentPage(1)
   }
@@ -88,18 +136,26 @@ function JammersCardListPage() {
   useEffect(() => {
     const fetchJammers = async () => {
       try {
-        if (!ifFiltered && !gettingUrlParams) {
+        if (!ifFiltered && !gettingUrlParams && !ifSearching) {
+          setSearchText({username: ""})
+
           setLoading(true)
           const data = await dataAxios.dataFetch(currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
-        } else if (ifFiltered) {
+        } else if (ifFiltered && !ifSearching) {
+          setSearchText({username: ""})
+
           setLoading(true)
           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
           setTotalPages(data.totalPages)
           setJammers(data.users)
+        } else if (ifSearching) {
+          setLoading(true)
+          const data = await dataAxios.jammersFetchBySearch(params, currentPage)
+          setTotalPages(data.totalPages)
+          setJammers(data.users)
         }
-
         setLoading(false)
       } catch (error) {
         console.error("Error fetching jammers:", error)
@@ -109,6 +165,23 @@ function JammersCardListPage() {
 
     fetchJammers()
   }, [currentPage, gettingUrlParams, params])
+
+  const renderPaginationItems = () => {
+    const startPage = Math.max(
+      1,
+      currentPage - Math.floor(MAX_PAGES_DISPLAYED / 2)
+    )
+    const endPage = Math.min(totalPages, startPage + MAX_PAGES_DISPLAYED - 1)
+
+    return Array.from({length: endPage - startPage + 1}).map((_, index) => (
+      <Pagination.Item
+        key={startPage + index}
+        active={currentPage === startPage + index}
+        onClick={() => handlePageChange(startPage + index - 1)}>
+        {startPage + index}
+      </Pagination.Item>
+    ))
+  }
 
   const handlePageChange = (page: number) => {
     if (page >= 0 && page < totalPages) {
@@ -127,30 +200,105 @@ function JammersCardListPage() {
     <>
       <div className="container mt-4">
         <Filter
+          searching={ifSearching}
           filteredStatusChange={filteredStatusChange}
           setIfFilteringCB={ifFilteringCB}
           fetchFilteredCB={fetchFilteredCB}
         />
-        {jammers.length > 0 && (
-          <Pagination className="my-custom-pagination">
-            <Pagination.Prev
-              onClick={() => handlePageChange(currentPage - 2)}
-              disabled={currentPage === 1}
-            />
-            {Array.from({length: totalPages}).map((_, index) => (
-              <Pagination.Item
-                key={index + 1}
-                active={currentPage === index + 1}
-                onClick={() => handlePageChange(index)}>
-                {index + 1}
-              </Pagination.Item>
-            ))}
-            <Pagination.Next
-              onClick={() => handlePageChange(currentPage)}
-              disabled={currentPage === totalPages}
-            />
-          </Pagination>
-        )}
+
+        <div className="d-none d-xl-block">
+          <Container>
+            <Row>
+              <Col xl={4}>
+                {jammers.length > 0 && (
+                  <Pagination className="my-custom-pagination">
+                    <Pagination.Prev
+                      onClick={() => handlePageChange(currentPage - 2)}
+                      disabled={currentPage === 1}
+                    />
+                    {renderPaginationItems()}
+                    <Pagination.Next
+                      onClick={() => handlePageChange(currentPage)}
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
+                )}
+              </Col>
+
+              <Col xl={2}></Col>
+              {/* <div style={{marginTop: "8px"}}></div> */}
+
+              <Col xl={4}>
+                <Form className="mb-2">
+                  <FormControl
+                    type="text"
+                    placeholder="Search by Username"
+                    className="mr-sm-2"
+                    onChange={handleSearchInput}
+                    value={searchText?.username}
+                  />
+                </Form>
+              </Col>
+              <Col xl={2}>
+                <Button
+                  variant="outline-dark"
+                  disabled={loading}
+                  onClick={handleSearch}
+                  // style={{margin: " 22px 0px 22px 0px"}}
+                  className="w-100">
+                  Search
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+
+        <div className="d-block d-xl-none">
+          <Container>
+            <Row>
+              <Col xl={2}></Col>
+              {/* <div style={{marginTop: "8px"}}></div> */}
+
+              <Col xl={4} md={8} sm={8} xs={8}>
+                <Form className="mb-2">
+                  <FormControl
+                    style={{margin: " 0px 0px 15px 0px"}}
+                    type="text"
+                    placeholder="Search by Username"
+                    className="mr-sm-2"
+                    onChange={handleSearchInput}
+                    value={searchText?.username}
+                  />
+                </Form>
+              </Col>
+              <Col xl={2} md={4} sm={4} xs={4}>
+                <Button
+                  onClick={handleSearch}
+                  variant="outline-dark"
+                  disabled={loading}
+                  style={{margin: " 0px 0px 15px 0px"}}
+                  className="w-100">
+                  Search
+                </Button>
+              </Col>
+              <Col xl={4}>
+                {jammers.length > 0 && (
+                  <Pagination className="my-custom-pagination">
+                    <Pagination.Prev
+                      onClick={() => handlePageChange(currentPage - 2)}
+                      disabled={currentPage === 1}
+                    />
+                    {renderPaginationItems()}
+                    <Pagination.Next
+                      onClick={() => handlePageChange(currentPage)}
+                      disabled={currentPage === totalPages}
+                    />
+                  </Pagination>
+                )}
+              </Col>
+            </Row>
+          </Container>
+        </div>
 
         {jammers && !ifFiltering && !loading ? (
           jammers.length > 0 ? (
@@ -164,6 +312,20 @@ function JammersCardListPage() {
           )
         ) : (
           <Loader />
+        )}
+
+        {jammers.length > 4 && !loading && (
+          <Pagination className="my-custom-pagination">
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 2)}
+              disabled={currentPage === 1}
+            />
+            {renderPaginationItems()}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
         )}
       </div>
     </>

@@ -11,7 +11,6 @@ import {
   setUserDataMongoDB,
 } from "../../../../../redux/reducers/UserDataSliceMongoDB"
 import {Country, State, City} from "country-state-city"
-import ImageUpload from "../ImageUploader/ImageUploader"
 import "./UpdateProfile.css"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
@@ -318,29 +317,23 @@ export default function UpdateProfile({
 
             <Form onSubmit={handleSubmit}>
               <Row className="d-flex justify-content-center">
-                <Col xl={4} lg={6} md={6} sm={12}>
+                <Col xl={4} lg={7} md={6} sm={12}>
                   <ImageUploaderCrop
                     handleImageURL={handleImageURL}
                     currentURL={userDataDB?.img}
                   />
-                  {/* <div className="w-100" style={{maxWidth: "400px"}}> */}
-                  {/* <div style={{width: "400px"}}> */}
-                  {/* <Col md={6}> */}
-                  {/* </Col> */}
-                  {/* <Col> */}
-                  {/* <div style={{height: "400px"}}> */}
-                  {/* <ImageUpload
-                      handleImageURL={handleImageURL}
-                      currentURL={userDataDB?.img}
-                    /> */}
-                  {/* </div> */}
-                  {/* </Col> */}
-
-                  {/* </div> */}
                   <br></br>
+                </Col>
+
+                <Col xl={4} lg={6} md={9} sm={12}>
+                  {/* <br></br> */}
 
                   <Form.Group id="userName">
-                    <Form.Label style={{marginTop: "7%"}}>User Name</Form.Label>
+                    <Form.Label
+                    // style={{marginTop: "7%"}}
+                    >
+                      User Name
+                    </Form.Label>
                     <Form.Control
                       type="text"
                       value={userName}
@@ -372,7 +365,7 @@ export default function UpdateProfile({
                   </Form.Group>
                   {/* <hr /> */}
                   <br></br>
-                  <hr />
+                  {/* <hr /> */}
                   {/* TODO--- create reusble component for locations select with CB functions */}
 
                   <Form.Group controlId="countries">
@@ -392,7 +385,6 @@ export default function UpdateProfile({
                       ))}
                     </Form.Control>
                   </Form.Group>
-
                   <br></br>
 
                   <Form.Group controlId="regions">
@@ -435,38 +427,11 @@ export default function UpdateProfile({
                     </Form.Control>
                   </Form.Group>
 
-                  {/* <br></br> */}
-
-                  {/* TODO--- --------------------------------------- */}
-                  {/* </div> */}
-                </Col>
-
-                <Col xl={4} lg={6} md={6} sm={12}>
                   <br></br>
-                  <div className="d-block d-md-none">
-                    <hr />
-                  </div>
-
                   <Row>
-                    {/* <div className="w-100" style={{maxWidth: "400px"}}> */}
-
-                    {/* <Form.Group id="age">
-                      <Form.Label>Age</Form.Label>
-                      <Form.Select value={age} onChange={handleAgeChange}>
-                        <option value="" disabled>
-                          Select age
-                        </option>
-                        {ageOptions.map((ageOption) => (
-                          <option key={ageOption} value={ageOption}>
-                            {ageOption}
-                          </option>
-                        ))}
-                      </Form.Select>
-                      <br></br>
-                    </Form.Group> */}
                     <Col lg={6} sm={6} xs={6}>
                       <Form.Group controlId="datepicker">
-                        <div style={{margin: "0px 10px 0px 0px"}}>
+                        <div style={{margin: "0px 0px 0px 0px"}}>
                           <Form.Label>Birthday</Form.Label>
                         </div>
 
@@ -479,9 +444,6 @@ export default function UpdateProfile({
                       </Form.Group>
                     </Col>
 
-                    {/* <div className="d-block d-lg-none">
-                      <br></br>
-                    </div> */}
                     <Col lg={6} sm={6} xs={6}>
                       <Form.Group id="gender">
                         {/* <br></br> */}
@@ -499,10 +461,57 @@ export default function UpdateProfile({
                         <br></br>
                       </Form.Group>
                     </Col>
+                  </Row>
+
+                  {/* TODO--- --------------------------------------- */}
+                  {/* </div> */}
+                </Col>
+
+                <Col xl={4} lg={6} md={9} sm={12}>
+                  {/* <br></br> */}
+                  <div className="d-block d-md-none">
+                    <hr />
+                  </div>
+
+                  <Row>
+                    {/* <Col lg={6} sm={6} xs={6}>
+                      <Form.Group controlId="datepicker">
+                        <div style={{margin: "0px 0px 0px 0px"}}>
+                          <Form.Label>Birthday</Form.Label>
+                        </div>
+
+                        <DatePicker
+                          selected={dob || null}
+                          onChange={(date) => setDob(date)}
+                          className="form-control"
+                          dateFormat="MM/dd/yyyy"
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group id="gender">
+                        <Form.Label>Gender</Form.Label>
+                        <Form.Select
+                          value={gender}
+                          onChange={handleGenderChange}>
+                          <option value="" disabled>
+                            Select gender
+                          </option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                          <option value="other">Other</option>
+                        </Form.Select>
+                        <br></br>
+                      </Form.Group>
+                    </Col> */}
+                    <div className="d-none d-lg-block">
+                      <div style={{marginTop: "12px"}}></div>
+                    </div>
 
                     {genres && userDataDB && (
                       <Col md={12} lg={12} xl={12} xs={12} sm={12}>
-                        <hr />
+                        {/* <hr /> */}
                         <MultiSelect
                           ifRequired={true}
                           dataArray={genres}
@@ -512,6 +521,10 @@ export default function UpdateProfile({
                         />
                       </Col>
                     )}
+
+                    <div className="d-none d-md-block">
+                      <div style={{marginTop: "8px"}}></div>
+                    </div>
 
                     {instruments && userDataDB && (
                       <Col md={12} lg={12} xl={12} xs={12} sm={12}>
@@ -526,43 +539,61 @@ export default function UpdateProfile({
                       </Col>
                     )}
 
-                    <Form.Group id="links1">
-                      <br></br>
-                      <hr />
-                      <Form.Label>Social Media Link #1</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={link1}
-                        onChange={handleLinks1Change}
-                      />
-                    </Form.Group>
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group id="links1">
+                        <br></br>
+                        {/* <hr /> */}
+                        <Form.Label>Social Media #1</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={link1}
+                          onChange={handleLinks1Change}
+                        />
+                      </Form.Group>
+                    </Col>
 
-                    <Form.Group id="links2">
-                      <br></br>
-                      <Form.Label>Social Media Link #2</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={link2}
-                        onChange={handleLinks2Change}
-                      />
-                    </Form.Group>
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group id="links2">
+                        <br></br>
+                        <Form.Label>Social Media #2</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={link2}
+                          onChange={handleLinks2Change}
+                        />
+                      </Form.Group>
+                    </Col>
 
-                    <Form.Group id="links3">
-                      <br></br>
-                      <Form.Label>Social Media Link #3</Form.Label>
-                      <Form.Control
-                        type="text"
-                        value={link3}
-                        onChange={handleLinks3Change}
-                      />
-                    </Form.Group>
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group id="links3">
+                        <br></br>
+                        <Form.Label>Social Media #3</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={link3}
+                          onChange={handleLinks3Change}
+                        />
+                      </Form.Group>
+                    </Col>
+
+                    <Col lg={6} sm={6} xs={6}>
+                      <Form.Group id="links4">
+                        <br></br>
+                        <Form.Label>Social Media #4</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={link3}
+                          onChange={handleLinks3Change}
+                        />
+                      </Form.Group>
+                    </Col>
 
                     <Form.Group id="aboutMe">
                       <br></br>
                       <Form.Label>About Me</Form.Label>
                       <Form.Control
                         value={aboutMe}
-                        style={{height: "306px"}}
+                        style={{height: "133px", marginBottom: "17px"}}
                         as="textarea"
                         onChange={handleAboutMeChange}
                       />
@@ -573,7 +604,7 @@ export default function UpdateProfile({
                         <br></br>
                         <Button
                           variant="outline-dark"
-                          style={{marginTop: "4%"}}
+                          style={{marginTop: "14px"}}
                           disabled={loading}
                           className="w-100"
                           type="submit">
@@ -589,7 +620,7 @@ export default function UpdateProfile({
                         <br></br>
                         <Button
                           variant="outline-dark"
-                          style={{marginTop: "3%"}}
+                          style={{marginTop: "14px"}}
                           disabled={loading}
                           className="w-100"
                           type="submit">

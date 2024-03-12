@@ -179,6 +179,33 @@ const getUsersFiltered = async (req, res) => {
   }
 }
 
+const getUsersByUsername = async (req, res) => {
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
+  const searchText = req.query.username
+
+  console.log(searchText)
+
+  try {
+    const totalUsers = await User.countDocuments({
+      userName: {$regex: new RegExp(searchText, "i")},
+    })
+    const totalPages = Math.ceil(totalUsers / perPage)
+
+    const users = await User.find({
+      userName: {$regex: new RegExp(searchText, "i")},
+    })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate("genres instruments")
+
+    return res.json({users, totalPages})
+  } catch (error) {
+    console.error("Error searching users by username:", error)
+    res.status(500).json({error})
+  }
+}
+
 const getUsernames = async (req, res) => {
   try {
     // const users = await User.find()
@@ -278,4 +305,5 @@ module.exports = {
   getAllUsersByGenreId,
   getUsernames,
   getUsersFiltered,
+  getUsersByUsername,
 }

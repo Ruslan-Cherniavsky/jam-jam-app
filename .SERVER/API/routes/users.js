@@ -14,6 +14,7 @@ const {
   getAllUsersByGenreId,
   getUsernames,
   getUsersFiltered,
+  getUsersByUsername,
 } = require("../controllers/users")
 
 router.post("/signup", signup)
@@ -30,6 +31,8 @@ router.post("/login", login)
 router.get("/getallusers", getAllUsers)
 
 router.get("/jammersfetchfiltered", getUsersFiltered)
+
+router.get("/jammersfetchbysearch", getUsersByUsername)
 
 router.get("/getjemerusernames", getUsernames)
 

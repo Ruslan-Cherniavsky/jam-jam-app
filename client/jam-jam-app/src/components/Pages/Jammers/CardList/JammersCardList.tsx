@@ -43,7 +43,7 @@ const JammersCardList: React.FC<JammersCardListProps> = ({jammers}) => {
                   variant="top"
                   src={jammer.img}
                   style={{
-                    maxHeight: "150px",
+                    // maxHeight: "150px",
                     width: "100%",
                     objectFit: "cover",
                   }}
@@ -96,12 +96,6 @@ const JammersCardList: React.FC<JammersCardListProps> = ({jammers}) => {
                       .join(", ") || "- "}
                   </div>
                 </ListGroup>
-                {/* <Button
-                  variant="primary"
-                  className="mt-3"
-                  onClick={() => handleCardClick(jammer._id)}>
-                  View Details
-                </Button> */}
               </Card.Body>
             </Card>
           </div>

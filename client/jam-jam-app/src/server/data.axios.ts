@@ -9,6 +9,10 @@ interface Params {
   instruments: Array<string>
 }
 
+interface SearchText {
+  username: string | null
+}
+
 const dataAxios: {
   dataFetch: (pageNumber: any) => Promise<any>
   jammersFetchFiltered: (params: Params, pageNumber: any) => Promise<any>
@@ -22,6 +26,7 @@ const dataAxios: {
   createUserMongoDB: (email: string) => Promise<any>
   fetchGenresByIds: (genreIds: string[]) => Promise<any>
   fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
+  jammersFetchBySearch: (params: SearchText, pageNumber: any) => Promise<any>
 } = {
   dataFetch: async (pageNumber) => {
     try {
@@ -102,6 +107,19 @@ const dataAxios: {
     try {
       const {data} = await axios.get(
         `http://localhost:3500/users/jammersfetchfiltered?page=${pageNumber}`,
+        {params}
+      )
+
+      return data
+    } catch (err) {
+      console.log(err)
+    }
+  },
+
+  jammersFetchBySearch: async (params, pageNumber) => {
+    try {
+      const {data} = await axios.get(
+        `http://localhost:3500/users/jammersfetchbysearch?page=${pageNumber}`,
         {params}
       )
 

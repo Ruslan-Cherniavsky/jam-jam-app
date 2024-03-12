@@ -12,6 +12,7 @@ interface FilterProps {
   setIfFilteringCB: Function
   fetchFilteredCB: Function
   filteredStatusChange: Function
+  searching: Boolean
 }
 
 export interface IParams {
@@ -66,6 +67,21 @@ const Filter = (filterProps: FilterProps) => {
   }
 
   //-------------------
+
+  // useEffect(() => {
+  //   // if (filterProps.searching) {
+  //   setSelectedCountry("")
+  //   setSelectedRegion("")
+  //   setSelectedCity("")
+  //   setFullCountryName("")
+  //   // setGenres([])
+  //   // setInstruments([])
+  //   setSelectedInstrumentsObjects([])
+  //   setSelectedGenresObjects([])
+  //   setSelectedInstrumentsStrings([])
+  //   setSelectedGenresStrings([])
+  //   // }
+  // }, [filterProps.searching])
 
   const location = useLocation()
   useEffect(() => {
