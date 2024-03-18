@@ -1,8 +1,8 @@
 import React, {ChangeEvent, FormEvent, useEffect, useState} from "react"
 import {Form, Button, Col, Container, Row} from "react-bootstrap"
 import {Country, State, City} from "country-state-city"
-import MultiSelect from "../../MultiSelect/Multiselect"
-import dataAxios from "../../../server/data.axios"
+import MultiSelect from "../../../../components_UI/MultiSelect/Multiselect"
+import dataAxios from "../../../../server/data.axios"
 import "./Filter.css"
 import {useLocation} from "react-router"
 
@@ -67,21 +67,6 @@ const Filter = (filterProps: FilterProps) => {
   }
 
   //-------------------
-
-  // useEffect(() => {
-  //   // if (filterProps.searching) {
-  //   setSelectedCountry("")
-  //   setSelectedRegion("")
-  //   setSelectedCity("")
-  //   setFullCountryName("")
-  //   // setGenres([])
-  //   // setInstruments([])
-  //   setSelectedInstrumentsObjects([])
-  //   setSelectedGenresObjects([])
-  //   setSelectedInstrumentsStrings([])
-  //   setSelectedGenresStrings([])
-  //   // }
-  // }, [filterProps.searching])
 
   const location = useLocation()
   useEffect(() => {

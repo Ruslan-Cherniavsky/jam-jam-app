@@ -237,6 +237,11 @@ export default function UpdateProfile({
         return
       }
 
+      if (imageURL === "") {
+        setError("Please upload your picture.")
+        return
+      }
+
       const today = new Date()
       const age = today.getFullYear() - dob.getFullYear()
       const monthDiff = today.getMonth() - dob.getMonth()

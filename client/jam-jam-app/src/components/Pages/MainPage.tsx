@@ -22,6 +22,9 @@ import UbdateProfilePage from "./User/UpdateProfilePage/Page/UbdateProfilePage"
 import PrivateRouteUpdateProfile from "../Auth/PrivateRoutes/PrivateRouteUpdateProfile"
 import "./MainPage.css"
 import HomePage from "./HomePage/HomePage"
+import MyFriends from "./User/MyFriends/MyFriends"
+import InvitesToJams from "./User/InvitesToJams/InvitesToJams"
+import FriendRequests from "./User/friendRequests/friendRequests"
 
 export default function () {
   const {currentUser} = useAuthContext()
@@ -107,6 +110,27 @@ export default function () {
                 element={
                   <PrivateRouteUpdateProfile>
                     <UbdateProfilePage />
+                  </PrivateRouteUpdateProfile>
+                }></Route>
+              <Route
+                path="/my-friends"
+                element={
+                  <PrivateRouteUpdateProfile>
+                    <MyFriends />
+                  </PrivateRouteUpdateProfile>
+                }></Route>
+              <Route
+                path="/invites-to-jams"
+                element={
+                  <PrivateRouteUpdateProfile>
+                    <InvitesToJams />
+                  </PrivateRouteUpdateProfile>
+                }></Route>
+              <Route
+                path="/friendRequests"
+                element={
+                  <PrivateRouteUpdateProfile>
+                    <FriendRequests />
                   </PrivateRouteUpdateProfile>
                 }></Route>
 

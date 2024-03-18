@@ -21,10 +21,14 @@ const jammersDataSlice = createSlice({
     setUsersDataUpdated: (state) => {
       state.status = !state.status
     },
+    resetUsersData: (state) => {
+      state.data = ""
+    },
   },
 })
 
-export const {setUsersData, setUsersDataUpdated} = jammersDataSlice.actions
+export const {setUsersData, setUsersDataUpdated, resetUsersData} =
+  jammersDataSlice.actions
 export default jammersDataSlice.reducer
 
 // export const selectCount = (state: RootState) => state.vcData.data;

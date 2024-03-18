@@ -1,28 +1,42 @@
 // userSlice.tsx
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
 import {User as FirebaseUser} from "firebase/auth"
-
 export interface UserDataSliceMongoDB {
   _id: string
   email: string
-  userRole: string
-  //---
-  img: string
   userName: string
   firstName: string
   lastName: string
+  country: string
+  isoCode: string
   city: string
   region: string
-  isoCode: string
-  country: string
   age: number
   gender: string
-  genres: Array<Object>
-  instruments: Array<Object>
-  links: Array<string>
+  genres: string[] // Assuming genre IDs are stored as strings
+  instruments: string[] // Assuming instrument IDs are stored as strings
+  img: string
+  references: string
   oboutMe: string
+  links: string[]
   dob: Date
+  reports: Report[]
+  // friendRequests: FriendRequest[]
+  friends: string[] // Assuming friend IDs are stored as strings
+  createdAt: Date
+  role: string
 }
+
+export interface Report {
+  reporter: string // Assuming reporter ID is stored as a string
+  reason: string
+  date: Date
+}
+
+// export interface FriendRequest {
+//   userId: string // Assuming user ID is stored as a string
+//   status: "pending" | "approved" | "rejected"
+// }
 
 interface UserDataStateMongoDB {
   allUserData: UserDataSliceMongoDB | null

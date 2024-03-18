@@ -1,7 +1,4 @@
-import {useEffect, useState} from "react"
-import Loader from "../../../../components_UI/Loaders/Loader"
-import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../CardList/JammersCardList"
+import React, {useEffect, useState} from "react"
 import {
   Button,
   Col,
@@ -11,18 +8,31 @@ import {
   Pagination,
   Row,
 } from "react-bootstrap"
-import Filter, {IParams} from "../Filter/Filter"
-import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./CardListPage.css"
 
-function JammersCardListPage() {
+import {useLocation, useNavigate, useParams} from "react-router-dom"
+import Loader from "../../../../components_UI/Loaders/Loader"
+import {IParams} from "../../Jammers/Filter/Filter"
+import dataAxios from "../../../../server/data.axios"
+import JammersCardList from "../../Jammers/CardList/JammersCardList"
+import {
+  faBackward,
+  faUserPlus,
+  faPlus,
+  faUserFriends,
+} from "@fortawesome/free-solid-svg-icons"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {useSelector} from "react-redux"
+import {RootState} from "../../../../redux/store"
+import {Link} from "react-router-dom"
+
+export default function MyFriends() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
   const [ifSearching, setIfSearching] = useState(false)
   const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
-  const {page}: {page?: string} = useParams()
+  // const {page}: {page?: string} = useParams()
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
@@ -32,14 +42,19 @@ function JammersCardListPage() {
   const [params, setParams] = useState<IParams | SearchText | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
 
+  const userId = useSelector(
+    (state: RootState) => state.userDataMongoDB.allUserData?._id
+  )
+
   const MAX_PAGES_DISPLAYED = 9
+
   interface SearchText {
     username: string | null
   }
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/jammersList?page=${currentPage}&${queryString}`
+    const newUrl = `/my-friends?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -52,14 +67,6 @@ function JammersCardListPage() {
     }
 
     setSearchText(currentSearchText)
-  }
-
-  const handleSearch = () => {
-    setLoading(true)
-    setIfSearching(true)
-    setIfFiltered(false)
-    setParams({...searchText})
-    setCurrentPage(1)
   }
 
   useEffect(() => {
@@ -107,18 +114,6 @@ function JammersCardListPage() {
     setGettingUrlParams(false)
   }, [])
 
-  const convertParamsToQueryString = (params: any) => {
-    return Object.keys(params)
-      .map((key) => {
-        if (Array.isArray(params[key])) {
-          return params[key].map((value: any) => `${key}[]=${value}`).join("&")
-        } else {
-          return `${key}=${params[key]}`
-        }
-      })
-      .join("&")
-  }
-
   function ifFilteringCB(ifFilteringProp: boolean) {
     setIfSearching(false)
     setIfFiltering(ifFilteringProp)
@@ -136,26 +131,35 @@ function JammersCardListPage() {
   useEffect(() => {
     const fetchJammers = async () => {
       try {
-        if (!ifFiltered && !gettingUrlParams && !ifSearching) {
-          setSearchText({username: ""})
+        // if (!ifFiltered && !gettingUrlParams && !ifSearching) {
+        //   setSearchText({username: ""})
 
-          setLoading(true)
-          const data = await dataAxios.dataFetch(currentPage)
-          setTotalPages(data.totalPages)
-          setJammers(data.users)
-        } else if (ifFiltered && !ifSearching) {
-          setSearchText({username: ""})
+        //   setLoading(true)
+        //   const data = await dataAxios.dataFetch(currentPage)
+        //   setTotalPages(data.totalPages)
+        //   setJammers(data.users)
+        // } else if (ifFiltered && !ifSearching) {
+        //   setSearchText({username: ""})
 
+        //   setLoading(true)
+        //   const data = await dataAxios.jammersFetchFiltered(params, currentPage)
+        //   setTotalPages(data.totalPages)
+        //   setJammers(data.users)
+        // } else if (ifSearching) {
+        //   setLoading(true)
+        //   const data = await dataAxios.jammersFetchBySearch(params, currentPage)
+        //   setTotalPages(data.totalPages)
+        //   setJammers(data.users)
+        // }
+        if (userId) {
           setLoading(true)
-          const data = await dataAxios.jammersFetchFiltered(params, currentPage)
-          setTotalPages(data.totalPages)
-          setJammers(data.users)
-        } else if (ifSearching) {
-          setLoading(true)
-          const data = await dataAxios.jammersFetchBySearch(params, currentPage)
-          setTotalPages(data.totalPages)
-          setJammers(data.users)
+
+          const data = await dataAxios.getAllFriendsByUserId(userId)
+          console.log(data)
+          setJammers(data.friends)
+          setLoading(false)
         }
+
         setLoading(false)
       } catch (error) {
         console.error("Error fetching jammers:", error)
@@ -164,7 +168,7 @@ function JammersCardListPage() {
     }
 
     fetchJammers()
-  }, [currentPage, gettingUrlParams, params])
+  }, [currentPage, gettingUrlParams, params, userId])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -196,29 +200,114 @@ function JammersCardListPage() {
     setCurrentPage(1)
   }
 
+  const handleSearch = () => {
+    setLoading(true)
+    setIfSearching(true)
+    setIfFiltered(false)
+    setParams({...searchText})
+    setCurrentPage(1)
+  }
+
+  const convertParamsToQueryString = (params: any) => {
+    return Object.keys(params)
+      .map((key) => {
+        if (Array.isArray(params[key])) {
+          return params[key].map((value: any) => `${key}[]=${value}`).join("&")
+        } else {
+          return `${key}=${params[key]}`
+        }
+      })
+      .join("&")
+  }
+
   return (
     <>
       <div className="container mt-4">
-        <h5
-          style={{
-            backgroundColor: "#f8f9fc",
-            color: "#929292",
-            textAlign: "center",
-            paddingBottom: "6px",
-            paddingTop: "2px",
-            marginBottom: "20px",
-          }}>
-          Browse Jammers
-        </h5>
-        <Filter
-          searching={ifSearching}
-          filteredStatusChange={filteredStatusChange}
-          setIfFilteringCB={ifFilteringCB}
-          fetchFilteredCB={fetchFilteredCB}
-        />
-
+        {/* <br />
+        <br /> */}
         <div className="d-none d-xl-block">
           <Container>
+            <h5
+              style={{
+                backgroundColor: "#f8f9fc",
+                color: "#929292",
+                textAlign: "center",
+                paddingBottom: "6px",
+                paddingTop: "2px",
+                marginBottom: "20px",
+              }}>
+              My Friends
+            </h5>
+
+            <Row>
+              <Col xl={3}>
+                <Button
+                  variant="outline-dark"
+                  // size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: "#BCBCBC",
+                    marginRight: "20px",
+                    marginBottom: "20px",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/jammersList")
+                  }}>
+                  <FontAwesomeIcon
+                    style={{color: "#BCBCBC", marginRight: "12px"}}
+                    icon={faPlus}
+                    className="mr-1"
+                  />{" "}
+                  Browse Jammers
+                </Button>
+              </Col>
+
+              <Col xl={3}>
+                <Button
+                  variant="outline-dark"
+                  // size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: "#BCBCBC",
+                    marginRight: "20px",
+                    marginBottom: "20px",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/friendRequests")
+                  }}>
+                  <FontAwesomeIcon
+                    style={{color: "#BCBCBC", marginRight: "12px"}}
+                    icon={faUserPlus}
+                    className="mr-1"
+                  />{" "}
+                  Friend Requests{" "}
+                </Button>
+              </Col>
+              <Col xl={4} md={8} sm={8} xs={8}>
+                <Form className="mb-2">
+                  <FormControl
+                    style={{margin: " 0px 0px 15px 0px"}}
+                    type="text"
+                    placeholder="Search by Username"
+                    className="mr-sm-2"
+                    onChange={handleSearchInput}
+                    value={searchText?.username}
+                  />
+                </Form>
+              </Col>
+              <Col xl={2} md={4} sm={4} xs={4}>
+                <Button
+                  onClick={handleSearch}
+                  variant="outline-dark"
+                  disabled={loading}
+                  style={{margin: " 0px 0px 15px 0px"}}
+                  className="w-100">
+                  Search
+                </Button>
+              </Col>
+            </Row>
             <Row>
               <Col xl={4}>
                 {jammers.length > 0 && (
@@ -237,7 +326,7 @@ function JammersCardListPage() {
               </Col>
               <Col xl={2}></Col>
 
-              <Col xl={4}>
+              {/* <Col xl={4}>
                 <Form className="mb-2">
                   <FormControl
                     type="text"
@@ -256,14 +345,71 @@ function JammersCardListPage() {
                   className="w-100">
                   Search
                 </Button>
-              </Col>
+              </Col> */}
             </Row>
           </Container>
         </div>
 
         <div className="d-block d-xl-none">
           <Container>
+            <h5
+              style={{
+                backgroundColor: "#f8f9fc",
+                color: "#929292",
+                // textAlign: "center",
+                paddingBottom: "6px",
+                paddingTop: "2px",
+                paddingLeft: "5px",
+                marginBottom: "20px",
+              }}>
+              My Friends
+            </h5>
             <Row>
+              <Col md={6}>
+                <Button
+                  variant="outline-dark"
+                  // size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: "#BCBCBC",
+                    marginRight: "20px",
+                    marginBottom: "20px",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/jammersList")
+                  }}>
+                  <FontAwesomeIcon
+                    style={{color: "#BCBCBC", marginRight: "12px"}}
+                    icon={faPlus}
+                    className="mr-1"
+                  />{" "}
+                  Browse Jammers
+                </Button>
+              </Col>
+
+              <Col md={6}>
+                <Button
+                  variant="outline-dark"
+                  // size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: "#BCBCBC",
+                    marginRight: "20px",
+                    marginBottom: "20px",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/friendRequests")
+                  }}>
+                  <FontAwesomeIcon
+                    style={{color: "#BCBCBC", marginRight: "12px"}}
+                    icon={faUserPlus}
+                    className="mr-1"
+                  />{" "}
+                  Friend Requests{" "}
+                </Button>
+              </Col>
               <Col xl={2}></Col>
 
               <Col xl={4} md={8} sm={8} xs={8}>
@@ -307,7 +453,7 @@ function JammersCardListPage() {
           </Container>
         </div>
 
-        {jammers && !ifFiltering && !loading ? (
+        {jammers.length && !loading ? (
           jammers.length > 0 ? (
             <JammersCardList jammers={jammers} />
           ) : (
@@ -338,5 +484,3 @@ function JammersCardListPage() {
     </>
   )
 }
-
-export default JammersCardListPage

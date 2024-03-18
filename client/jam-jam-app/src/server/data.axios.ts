@@ -9,6 +9,12 @@ interface Params {
   instruments: Array<string>
 }
 
+type SenderId = string // Assuming SenderId is a string representing the ID of the sender
+type ReceiverId = string // Assuming ReceiverId is a string representing the ID of the receiver
+type Status = "pending" | "approved" | "rejected" // Status can only be one of these three strings
+type UserId = string // Assuming UserId is a string representing the ID of a user
+type RequestId = string // As
+
 interface SearchText {
   username: string | null
 }
@@ -27,6 +33,16 @@ const dataAxios: {
   fetchGenresByIds: (genreIds: string[]) => Promise<any>
   fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
   jammersFetchBySearch: (params: SearchText, pageNumber: any) => Promise<any>
+  reportUser: (reportedUserId: any, userId: any, reason: string) => Promise<any>
+  // addToFriends: (jammerId: any, userId: any) => Promise<any>
+  sendFriendRequest: (
+    senderId: SenderId,
+    receiverId: ReceiverId
+  ) => Promise<any>
+  respondToFriendRequest: (requestId: RequestId, status: Status) => Promise<any>
+  getAllFriendRequestsByReceiverId: (receiverId: ReceiverId) => Promise<any>
+  getAllFriendRequestsBySenderId: (senderId: SenderId) => Promise<any>
+  getAllFriendsByUserId: (userId: UserId) => Promise<any>
 } = {
   dataFetch: async (pageNumber) => {
     try {
@@ -174,6 +190,88 @@ const dataAxios: {
       return data
     } catch (err) {
       console.log(err)
+    }
+  },
+  reportUser: async (reportedUserId, userId, reason) => {
+    try {
+      const data = await axios.post(`http://localhost:3500/users/reportuser`, {
+        reportedUserId,
+        userId,
+        reason,
+      })
+
+      return data
+    } catch (err) {
+      console.log(err)
+    }
+  },
+  // addToFriends: async (jammerId, userId) => {
+  //   try {
+  //     const data = await axios.post(`http://localhost:3500/users/addtofriend`, {
+  //       jammerId,
+  //       userId,
+  //     })
+
+  //     return data
+  //   } catch (err) {
+  //     console.log(err)
+  //   }
+  // },
+  sendFriendRequest: async (senderId, receiverId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3500/friends/sendFriendRequest",
+        {senderId, receiverId}
+      )
+      return response
+    } catch (error) {
+      console.error("Error sending friend request:", error)
+      throw error
+    }
+  },
+  respondToFriendRequest: async (requestId, status) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3500/friends/respondToFriendRequest",
+        {requestId, status}
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error responding to friend request:", error)
+      throw error
+    }
+  },
+  getAllFriendRequestsByReceiverId: async (receiverId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/friends/getAllFriendRequestsByReceiverId/${receiverId}`
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error retrieving friend requests by receiver ID:", error)
+      throw error
+    }
+  },
+  getAllFriendRequestsBySenderId: async (senderId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/friends/getAllFriendRequestsBySenderId/${senderId}`
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error retrieving friend requests by senderId ID:", error)
+      throw error
+    }
+  },
+  getAllFriendsByUserId: async (userId) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/friends/getAllFriendsByUserId/${userId}`
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error retrieving friends by user ID:", error)
+      throw error
     }
   },
 }

@@ -1,18 +1,37 @@
-import React from "react"
+import React, {useState} from "react"
 import {Navigate, useParams} from "react-router-dom"
-import {Card, Container, Row, Col, Image, Button} from "react-bootstrap"
+import {
+  Card,
+  Container,
+  Row,
+  Col,
+  Image,
+  Button,
+  Modal,
+  Form,
+  Alert,
+} from "react-bootstrap"
 import SocialMediaLinks from "../../User/UpdateProfilePage/SocialMediaLinks/SocialMediaLinks"
 import {
   faUserPlus,
   faMusic,
   faBackward,
+  faFlag,
+  faEdit,
 } from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {useAuthContext} from "../../../../context/AuthContext"
 import {useNavigate} from "react-router-dom"
+import dataAxios from "../../../../server/data.axios"
+import {RootState} from "../../../../redux/store"
+import {useDispatch, useSelector} from "react-redux"
+import {
+  // FriendRequest,
+  setUserDataMongoDB,
+} from "../../../../redux/reducers/UserDataSliceMongoDB"
 
 interface UserCardProps {
-  user: {
+  jammer: {
     _id: string
     email: string
     userName: string
@@ -36,23 +55,34 @@ interface UserCardProps {
   }
 }
 
-const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
-  // Use useParams to get the user ID from the route
-  const {userId} = useParams<{userId: string}>()
+const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
+  // const {userId} = useParams<{userId: string}>()
   const {currentUser} = useAuthContext()
   const navigate = useNavigate()
+  const [reportReason, setReportReason] = useState<string>("")
+  const [showReportModal, setShowReportModal] = useState<boolean>(false)
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const iconColor = "#BCBCBC" // Specify the desired color here
-  const iconSpacing = "12px" // Specify the desired spacing here
+  const dispatch = useDispatch()
 
-  const handleAddToFriend = () => {
-    // Logic to handle adding user to friend
-    console.log("Adding to friend:", user.userName)
-  }
+  const iconColor = "#BCBCBC"
+  const iconSpacing = "12px"
+
+  const userId = useSelector(
+    (state: RootState) => state.userDataMongoDB.allUserData?._id
+  )
+
+  const currentUserDB = useSelector(
+    (state: RootState) => state.userDataMongoDB.allUserData
+  )
+
+  // const handleAddToFriend = () => {
+  //   console.log("Adding to friend:", jammer.userName)
+  // }
 
   const handleInviteToJam = () => {
-    // Logic to handle inviting user to jam
-    console.log("Inviting to jam:", user.userName)
+    console.log("Inviting to jam:", jammer.userName)
   }
   const handleEditProfileClick = () => {
     navigate("/update-profile")
@@ -74,6 +104,153 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
 
     return age
   }
+
+  const handleSetShowReportModal = () => {
+    setError("")
+    setShowReportModal(false)
+  }
+
+  const handleAddToFriend = async () => {
+    try {
+      const userData = await dataAxios.jemerCardDataFetchByEmail(
+        currentUser?.email
+      )
+      const currentUserDB = userData.user
+
+      // console.log("initializationuser data  -----------", currentUserDB.friends)
+      // Check if the user is already a friend
+      if (currentUserDB?.friends.includes(jammer._id)) {
+        setMessage("User is already in your friends list.")
+        return
+      }
+
+      // console.log(currentUserDB._id)
+
+      const senderId = currentUserDB._id
+
+      const requestsResponseBySenderId =
+        await dataAxios.getAllFriendRequestsBySenderId(senderId)
+
+      // Ensure that the response contains the expected data structure
+      if (
+        !requestsResponseBySenderId ||
+        !requestsResponseBySenderId.friendRequests
+      ) {
+        console.error(
+          "Invalid friend requests response:",
+          requestsResponseBySenderId
+        )
+        return
+      }
+
+      const friendRequestsBySender = requestsResponseBySenderId.friendRequests
+      if (
+        friendRequestsBySender.some(
+          (request: any) =>
+            request.receiverId["_id"] === jammer._id &&
+            request.status === "pending"
+        )
+      ) {
+        setMessage("Friend request already sent.")
+        return
+      }
+
+      const requestsResponseByReceiverId =
+        await dataAxios.getAllFriendRequestsByReceiverId(currentUserDB._id)
+
+      // Ensure that the response contains the expected data structure
+      if (
+        !requestsResponseByReceiverId ||
+        !requestsResponseByReceiverId.friendRequests
+      ) {
+        console.error(
+          "Invalid friend requests response:",
+          requestsResponseByReceiverId
+        )
+        return
+      }
+
+      const friendRequestsByReceiver =
+        requestsResponseByReceiverId.friendRequests
+
+      if (
+        friendRequestsByReceiver.some(
+          (request: any) =>
+            request.senderId["_id"] === jammer._id &&
+            request.status === "pending"
+        )
+      ) {
+        setMessage(
+          "This person has already sent you a friend request. Please check your friend requests."
+        )
+        return
+      }
+
+      // Check if the user is the same as the current user
+      if (jammer._id === currentUserDB?._id) {
+        setMessage("Cannot add yourself as a friend.")
+        return
+      }
+
+      // Proceed to send the friend request
+      // console.log("Adding to friend:", jammer.userName)
+      const response = await dataAxios.sendFriendRequest(
+        currentUserDB?._id,
+        jammer._id
+      )
+
+      // console.log(response)
+
+      if (response.status === 200) {
+        console.log("Friend request sent successfully.")
+        setMessage("Friend request sent successfully.")
+      } else {
+        console.error("Failed to send friend request.")
+        setMessage("Failed to send friend request. Please try again later.")
+      }
+    } catch (error) {
+      console.error("Error adding user to friends:", error)
+      setMessage("Error adding user to friends. Please try again later.")
+    }
+  }
+
+  const handleReport = async () => {
+    try {
+      if (!reportReason.trim()) {
+        // console.error("Report reason is required.")
+        setError("Report reason is required.")
+        // setShowReportModal(false)
+        return
+      }
+      if (reportReason.length > 1000) {
+        setError("Report reason should be less than 1000 characters.")
+        // setShowReportModal(false)
+        return
+      }
+
+      console.log(jammer._id)
+
+      const response = await dataAxios.reportUser(
+        jammer._id,
+        userId,
+        reportReason
+      )
+
+      if (response.status === 200) {
+        // console.log("User reported successfully.")
+        setMessage(
+          "User reported successfully. We will review the report and take appropriate action if necessary."
+        )
+        setShowReportModal(false)
+        setReportReason("")
+      } else {
+        console.error("Failed to report user.")
+      }
+    } catch (error) {
+      console.error("Error reporting user:", error)
+    }
+  }
+
   return (
     <Container className="mt-4">
       <Button
@@ -85,7 +262,6 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
           marginRight: "20px",
           marginBottom: "20px",
         }}
-        // disabled={user?.email === currentUser?.email}
         onClick={() => {
           navigate(-1)
         }}>
@@ -96,111 +272,178 @@ const UserProfileCard: React.FC<UserCardProps> = ({user}) => {
         />{" "}
         Back
       </Button>
+
       <Card>
         <Card.Header>
-          <h2>
-            {user.userName} {user?.email === currentUser?.email && "*(Me)"}
-          </h2>
+          <Row className="align-items-center">
+            <Col xl={8} lg={8} md={6} sm={4} xs={4}>
+              <h2>
+                {jammer.userName}{" "}
+                {jammer?.email === currentUser?.email && "*(Me)"}
+              </h2>
+            </Col>
+            <Col xl={2} lg={2} md={3} sm={4} xs={4}></Col>
+            {jammer?.email !== currentUser?.email && (
+              <Col xl={2} lg={2} md={3} sm={4} xs={4}>
+                <Button
+                  onClick={() => setShowReportModal(true)}
+                  variant="outline-dark"
+                  size="sm"
+                  style={{
+                    borderColor: iconColor,
+                    width: "100%",
+                  }}
+                  disabled={jammer?.email === currentUser?.email}>
+                  <FontAwesomeIcon
+                    style={{color: iconColor, marginRight: iconSpacing}}
+                    icon={faFlag}
+                  />{" "}
+                  Report
+                </Button>
+              </Col>
+            )}
+          </Row>
         </Card.Header>
         <Card.Body>
+          {message && <Alert variant="info">{message}</Alert>}
+
           <Row>
             <Col md={4}>
               <Image
                 style={{margin: "0px 0px 15px 0px"}}
-                src={user.img}
+                src={jammer.img}
                 className="img-fluid"
                 alt="User"
                 fluid
               />
             </Col>
             <Col md={8}>
-              <h3>{`${user.firstName} ${user.lastName}`}</h3>
+              <h3>{`${jammer.firstName} ${jammer.lastName}`}</h3>
               <p>
-                {` ${user.country}`} {user.city ? `${","}` : ""}
-                {user.city && `${user.city} `}
+                {` ${jammer.country}`} {jammer.city ? `${","}` : ""}
+                {jammer.city && `${jammer.city} `}
               </p>
-              <p>Age: {calculateAge(user.dob)}</p>
-              <p>Gender: {user.gender}</p>
+              <p>Age: {calculateAge(jammer.dob)}</p>
+              <p>Gender: {jammer.gender}</p>
               <h5>Instruments:</h5>
               <ul>
-                {user.instruments.map((instrument) => (
+                {jammer.instruments.map((instrument) => (
                   <li key={instrument._id}>{instrument.instrument}</li>
                 ))}
               </ul>
               <h5>Genres:</h5>
               <ul>
-                {user.genres.map((genre) => (
+                {jammer.genres.map((genre) => (
                   <li key={genre._id}>{genre.genre}</li>
                 ))}
               </ul>
             </Col>
           </Row>
 
-          <SocialMediaLinks socialLinks={user.links} />
+          <SocialMediaLinks socialLinks={jammer.links} />
           <hr />
-          {/* <hr /> */}
           <h4>About Me</h4>
-          <p>{user.oboutMe}</p>
+          <p>{jammer.oboutMe}</p>
 
-          <Row>
-            {user?.email !== currentUser?.email && (
-              <Col>
+          {jammer?.email !== currentUser?.email && (
+            <Row>
+              <Col xl={2} lg={4} md={4} sm={6} xs={6}>
                 <Button
                   variant="outline-dark"
                   size="sm"
                   className="mr-2"
                   style={{
                     borderColor: iconColor,
-                    marginRight: "20px",
+                    width: "100%",
                   }}
-                  disabled={user?.email === currentUser?.email}
+                  disabled={jammer?.email === currentUser?.email}
                   onClick={handleAddToFriend}>
                   <FontAwesomeIcon
-                    style={{color: iconColor, marginRight: iconSpacing}}
+                    style={{color: iconColor, marginRight: "1px"}}
                     icon={faUserPlus}
                     className="mr-1"
                   />{" "}
                   Add to Friend
                 </Button>
+              </Col>
+              <Col xl={2} lg={4} md={4} sm={6} xs={6}>
                 <Button
-                  disabled={user?.email === currentUser?.email}
+                  disabled={jammer?.email === currentUser?.email}
                   variant="outline-dark"
                   size="sm"
                   style={{
                     borderColor: iconColor,
+                    width: "100%",
                   }}
                   onClick={handleInviteToJam}>
                   <FontAwesomeIcon
-                    style={{color: iconColor, marginRight: iconSpacing}}
+                    style={{color: iconColor, marginRight: "4px"}}
                     icon={faMusic}
-                    className="mr-1"
+                    className="mr-2"
                   />{" "}
                   Invite to Jam
                 </Button>
               </Col>
-            )}
-
-            <Col>
-              {user?.email === currentUser?.email && (
+            </Row>
+          )}
+          {jammer?.email === currentUser?.email && (
+            <Row>
+              <Col xl={2} lg={4} md={4} sm={6} xs={6}>
                 <Button
                   variant="outline-dark"
                   size="sm"
                   style={{
                     borderColor: iconColor,
+                    width: "100%",
                   }}
                   onClick={handleEditProfileClick}>
                   <FontAwesomeIcon
-                    style={{color: iconColor, marginRight: iconSpacing}}
-                    icon={faMusic}
-                    className="mr-1"
+                    style={{
+                      color: iconColor,
+                      marginRight: "4px",
+                    }}
+                    icon={faEdit}
+                    className="mr-2"
                   />{" "}
                   Edit Profile
                 </Button>
-              )}
-            </Col>
-          </Row>
+              </Col>
+            </Row>
+          )}
         </Card.Body>
       </Card>
+
+      {/* Modal for Report Reason */}
+      <Modal show={showReportModal} onHide={() => handleSetShowReportModal()}>
+        <Modal.Header closeButton>
+          <Modal.Title>Report User</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {error && <Alert variant="danger">{error}</Alert>}
+
+          <Form.Group controlId="reportReason">
+            <Form.Label>Enter report reason:</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              value={reportReason}
+              onChange={(e) => setReportReason(e.target.value)}
+            />
+          </Form.Group>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-dark"
+            size="sm"
+            style={{
+              borderColor: iconColor,
+              // width: "100%",
+            }}
+            onClick={handleReport}>
+            Send Report
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   )
 }

@@ -35,7 +35,7 @@ function ProfilePage() {
 
           <Grid item xl={6} lg={6} md={8} sm={10} xs={12}> */}
       <Col>
-        {jemerDataLocal ? <Profile user={jemerDataLocal} /> : <Loader />}
+        {jemerDataLocal ? <Profile jammer={jemerDataLocal} /> : <Loader />}
       </Col>
 
       {/* </Grid>

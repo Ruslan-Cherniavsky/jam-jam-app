@@ -53,7 +53,7 @@ const signup = async (req, res) => {
     })
 
     await user.save()
-    console.log(user)
+    // console.log(user)
     return res.status(200).json({message: "User Created !"})
   } catch (error) {
     return res.status(500).json({error})
@@ -133,7 +133,7 @@ const getUsersFiltered = async (req, res) => {
   try {
     const queryConditions = {}
 
-    console.log("Params:", params)
+    // console.log("Params:", params)
 
     if (params.genres && params.genres.length > 0) {
       queryConditions.genres = {
@@ -184,7 +184,7 @@ const getUsersByUsername = async (req, res) => {
   const perPage = 12
   const searchText = req.query.username
 
-  console.log(searchText)
+  // console.log(searchText)
 
   try {
     const totalUsers = await User.countDocuments({
@@ -225,10 +225,6 @@ const getAllUsersByGenreId = async (req, res) => {
     if (!genre) {
       return res.status(404).json({message: "Music Genre not found! "})
     }
-    console.log(genre)
-
-    // const users = await User.find(musicalGaner)
-    // return res.status(200).json({users})
   } catch (error) {
     res.status(500).json({error})
   }
@@ -284,13 +280,37 @@ const getJemerCardDataByEmail = async (req, res) => {
 
   try {
     const user = await User.findOne({email}).populate("genres instruments")
-    console.log(user)
+    // console.log(user)
     if (!user) {
       return res.status(404).json({message: "User not found!"})
     }
     return res.status(200).json({user})
   } catch (error) {
     res.status(500).json({error})
+  }
+}
+
+const reportUser = async (req, res) => {
+  try {
+    const {reportedUserId, userId, reason} = req.body
+
+    // Ensure the reported user exists
+    const reportedUser = await User.findById(reportedUserId)
+    if (!reportedUser) {
+      return res.status(404).json({message: "Reported user not found."})
+    }
+
+    // Update the reported user's reports array
+    reportedUser.reports.push({
+      reporter: userId, // Assuming you have user authentication middleware
+      reason,
+    })
+    await reportedUser.save()
+
+    res.status(200).json({message: "User reported successfully."})
+  } catch (error) {
+    console.error(error)
+    res.status(500).json({message: "Internal server error."})
   }
 }
 
@@ -306,4 +326,5 @@ module.exports = {
   getUsernames,
   getUsersFiltered,
   getUsersByUsername,
+  reportUser,
 }

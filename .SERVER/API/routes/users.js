@@ -15,6 +15,8 @@ const {
   getUsernames,
   getUsersFiltered,
   getUsersByUsername,
+  reportUser,
+  getAllFriendRequests,
 } = require("../controllers/users")
 
 router.post("/signup", signup)
@@ -33,6 +35,14 @@ router.get("/getallusers", getAllUsers)
 router.get("/jammersfetchfiltered", getUsersFiltered)
 
 router.get("/jammersfetchbysearch", getUsersByUsername)
+
+router.post("/reportuser", reportUser)
+
+//---
+
+// router.get("/friend-requests/:userId", getAllFriendRequests)
+
+//---
 
 router.get("/getjemerusernames", getUsernames)
 

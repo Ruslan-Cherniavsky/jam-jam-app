@@ -1,10 +1,11 @@
 import React, {useEffect, useState} from "react"
 import {Navbar, Nav, NavDropdown, Col} from "react-bootstrap"
 import {Link, useLocation, useNavigate} from "react-router-dom" // Assuming you're using react-router-dom
-import {useSelector} from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
 import {useAuthContext} from "../../context/AuthContext"
 import {RootState} from "../../redux/store"
 import "./Header.css"
+import {resetUsersData} from "../../redux/reducers/JammersDataSliceMongoDB"
 
 const Header: React.FC = () => {
   const {pathname} = useLocation()
@@ -15,12 +16,14 @@ const Header: React.FC = () => {
   const userName = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?.userName
   )
+  const dispatch = useDispatch()
 
   const navigate = useNavigate()
   async function handleLogOut() {
     setError("")
     try {
       await logout()
+      dispatch(resetUsersData())
 
       navigate("/login")
     } catch (error) {

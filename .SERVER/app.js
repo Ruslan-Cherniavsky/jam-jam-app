@@ -22,14 +22,17 @@ mongoose
     console.log("Conection failed! T___T")
   })
 
-const checkUserAutchData = require("../.SERVER/API/middlewares/checkUserAuthData")
+// const checkUserAutchData = require("../.SERVER/API/middlewares/checkUserAuthData")
 
 const usersRoutes = require("./API/routes/users")
+const friendsRoutes = require("./API/routes/friends")
 const genresRoutes = require("./API/routes/genres")
 const instrumentsRoutes = require("./API/routes/instruments")
 const links = require("./API/routes/links")
 
 app.use("/users", usersRoutes)
+
+app.use("/friends", friendsRoutes)
 
 app.use("/genres", genresRoutes)
 

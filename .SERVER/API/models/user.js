@@ -30,10 +30,39 @@ const userSchema = mongoose.Schema({
       ref: "Genres",
     },
   ],
+
   instruments: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Instruments",
+    },
+  ],
+
+  // friendRequests: [
+  //   {
+  //     userId: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
+  //     status: {
+  //       type: String,
+  //       enum: ["pending", "approved", "rejected"],
+  //       default: "pending",
+  //     },
+  //   },
+  // ],
+
+  friends: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+
+  //------TODO create deferent reports model
+  reports: [
+    {
+      reporter: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      reason: String,
+      date: {
+        type: Date,
+        default: Date.now,
+      },
     },
   ],
 
@@ -45,28 +74,7 @@ const userSchema = mongoose.Schema({
   links: [{type: String, min: 5, max: 700}],
   dob: {
     type: Date,
-    required: true,
   },
-
-  // friends: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "Friends",
-  //   },
-  // ],
-  // jamesCreated: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "Friends",
-  //   },
-  // ],
-  // jamesJoined: [
-  //   {
-  //     type: mongoose.Schema.Types.ObjectId,
-  //     ref: "Friends",
-  //   },
-  // ],
-
   createdAt: {type: Date, immutable: true, default: () => Date.now()},
   role: {type: String, default: "user", required: true},
 })
