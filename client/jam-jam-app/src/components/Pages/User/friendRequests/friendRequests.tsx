@@ -70,6 +70,8 @@ export default function MyFriends() {
   const [params, setParams] = useState<IParams | SearchText | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
 
+  const [reloadPage, setReloadPage] = useState(true)
+
   const CARD_LIST_TYPE = "Friend Requests"
 
   const userId = useSelector(
@@ -250,7 +252,7 @@ export default function MyFriends() {
     }
 
     fetchJammers()
-  }, [currentPage, gettingUrlParams, userId])
+  }, [currentPage, gettingUrlParams, reloadPage, userId])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -275,9 +277,8 @@ export default function MyFriends() {
     }
   }
 
-  const handlePageUpdate = (page: number) => {
-    setCurrentPage(page + 1)
-    setCurrentPage(page - 1)
+  const handlePageUpdate = () => {
+    setReloadPage(!reloadPage)
   }
 
   async function filteredStatusChange() {
@@ -519,7 +520,7 @@ export default function MyFriends() {
         {jammers && !loading ? (
           jammers.length > 0 ? (
             <JammersCardList
-              updateListCB={() => handlePageUpdate(currentPage)}
+              updateListCB={handlePageUpdate}
               cardListType={CARD_LIST_TYPE}
               jammers={jammers}
             />

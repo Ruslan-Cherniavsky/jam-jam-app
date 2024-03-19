@@ -236,6 +236,10 @@ export default function UpdateProfile({
         setError("Please select your date of birth.")
         return
       }
+      if (!aboutMe) {
+        setError("Please write something about yourself.")
+        return
+      }
 
       if (imageURL === "") {
         setError("Please upload your picture.")

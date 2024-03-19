@@ -271,6 +271,28 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                           Unfriend
                         </Button>
                       </Col>
+                      <Col md={6} sm={12} xs={12}>
+                        <Button
+                          size="sm"
+                          style={{
+                            borderColor: "#BCBCBC",
+                            width: "100%",
+                            marginTop: "10px",
+
+                            // marginLeft: "8px",
+                            // marginTop: "8px",
+
+                            // backgroundColor: "white",
+                          }}
+                          variant="outline-dark"
+                          className="confirm-button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleCardClick(jammer._id) // Stop the click event from propagating to the card
+                          }}>
+                          invite to jam
+                        </Button>
+                      </Col>
                     </Row>
                   </div>
                 )}
