@@ -81,11 +81,11 @@ const getAllFriendRequestsByReceiverId = async (req, res) => {
       {path: "receiverId", select: "_id userName"},
     ])
 
-    if (!friendRequests || friendRequests.length === 0) {
-      return res
-        .status(404)
-        .json({message: "No friend requests found for the user."})
-    }
+    // if (!friendRequests || friendRequests.length === 0) {
+    //   return res
+    //     .status(404)
+    //     .json({message: "No friend requests found for the user."})
+    // }
 
     return res.status(200).json({friendRequests})
   } catch (error) {
@@ -139,11 +139,11 @@ const getAllFriendRequestsBySenderId = async (req, res) => {
       {path: "receiverId", select: "_id userName"},
     ])
 
-    if (!friendRequests || friendRequests.length === 0) {
-      return res
-        .status(404)
-        .json({message: "No friend requests found for the user."})
-    }
+    // if (!friendRequests || friendRequests.length === 0) {
+    //   return res
+    //     .status(404)
+    //     .json({message: "No friend requests found for the user."})
+    // }
 
     return res.status(200).json({friendRequests})
   } catch (error) {

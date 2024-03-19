@@ -4,6 +4,7 @@ import {useAuthContext} from "../../../context/AuthContext"
 import {Link, useNavigate} from "react-router-dom"
 import dataAxios from "../../../server/data.axios"
 import Intro from "../Intro/Intro"
+import firebase from "firebase/app"
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -73,8 +74,14 @@ export default function Signup() {
   async function handleGoogleSignup() {
     try {
       setLoading(true)
+
+      if (currentUser) {
+        logout()
+      }
+
       setError("")
       await signInWithGoogle()
+
       navigate("/")
     } catch (error) {
       setError("Failed to sign up with Google")

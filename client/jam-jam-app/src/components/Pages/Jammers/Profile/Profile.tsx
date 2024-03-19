@@ -115,7 +115,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
       const userData = await dataAxios.jemerCardDataFetchByEmail(
         currentUser?.email
       )
-      const currentUserDB = userData.user
+      const currentUserDB = userData.data.user
 
       // console.log("initializationuser data  -----------", currentUserDB.friends)
       // Check if the user is already a friend

@@ -279,7 +279,7 @@ export default function UpdateProfile({
         const updatedUserData = await dataAxios.jemerCardDataFetchByEmail(
           userDataDB?.email
         )
-        dispatch(setUserDataMongoDB(updatedUserData.user))
+        dispatch(setUserDataMongoDB(updatedUserData.data.user))
       }
       if (ifUserHaveValidDataInDB) {
         navigate("/my-profile")

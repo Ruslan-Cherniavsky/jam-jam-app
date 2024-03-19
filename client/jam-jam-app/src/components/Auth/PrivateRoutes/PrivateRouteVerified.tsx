@@ -31,10 +31,10 @@ const PrivateRouteVerified: React.FC<PrivateRouteVerifiedProps> = ({
           .jemerCardDataFetchByEmail(currentUser.email)
           .then((userData: any) => {
             if (
-              !userData.user.userName ||
-              !userData.user.country ||
-              !userData.user.instruments ||
-              !userData.user.genres
+              !userData.data.user.userName ||
+              !userData.data.user.country ||
+              !userData.data.user.instruments ||
+              !userData.data.user.genres
             ) {
               setShouldRedirect(true)
             }

@@ -37,6 +37,7 @@ import {
 
 import {setUserId} from "../redux/reducers/UserDataSlice"
 import {Navigate} from "react-router-dom"
+import {RootState} from "../redux/store"
 
 export interface AuthContextProps {
   currentUser: FirebaseUser | null
@@ -68,7 +69,11 @@ interface AuthProviderProps {
 export function AuthProvider({children}: AuthProviderProps) {
   const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null)
   const [loading, setLoading] = useState(true)
-  const [username, setUsername] = useState<string>("")
+  // const [username, setUsername] = useState<string>("")
+
+  // const userEmail = useSelector(
+  //   (state: RootState) => state.userDataMongoDB.allUserData?.email
+  // )
 
   const dispatch = useDispatch()
   const firebaseUserData = useSelector(selectFirebaseUserData)
@@ -158,26 +163,49 @@ export function AuthProvider({children}: AuthProviderProps) {
   }, [])
 
   useEffect(() => {
-    try {
-      if (currentUser && currentUser.emailVerified) {
-        dataAxios
-          .jemerCardDataFetchByEmail(currentUser.email)
-          .then((userData: any) => {
-            dispatch(setUserDataMongoDB(userData.user))
+    const jammerCardFetch = async () => {
+      try {
+        // if (!userEmail) {
+        //   const response = await dataAxios.createUserMongoDB(currentUser?.email)
+        // }
 
-            // console.log(
-            //   "initializationuser data  -----------",
-            //   userData.user.userName
-            // )
-          })
-      } else {
-        return
+        if (currentUser && currentUser.emailVerified) {
+          const userData = await dataAxios.jemerCardDataFetchByEmail(
+            currentUser.email
+          )
+
+          console.log("the fetch*****************************", userData)
+
+          if (userData.data.user) {
+            dispatch(setUserDataMongoDB(userData.data.user))
+          } else if (userData.data.user === null) {
+            const responseCreateUser = await dataAxios.createUserMongoDB(
+              currentUser.email
+            )
+            const responseFetchByEmail =
+              await dataAxios.jemerCardDataFetchByEmail(currentUser.email)
+            console.log(responseCreateUser)
+            console.log(responseFetchByEmail)
+
+            if (responseFetchByEmail.data.user) {
+              dispatch(setUserDataMongoDB(responseFetchByEmail.data.user))
+            }
+          }
+
+          // console.log(
+          //   "initializationuser data  -----------",
+          //   userData.user.userName
+          // )
+        } else {
+          return
+        }
+
+        setLoading(false)
+      } catch (error) {
+        console.error(error)
       }
-
-      setLoading(false)
-    } catch (error) {
-      console.error(error)
     }
+    jammerCardFetch()
   }, [currentUser, dispatch])
 
   const value: AuthContextProps = {

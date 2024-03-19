@@ -29,7 +29,7 @@ const dataAxios: {
   usernamesDataFetch: () => Promise<any>
   userDataFetch: () => Promise<any>
   userCardDataUpdate: (id: any, payload: object) => Promise<any>
-  createUserMongoDB: (email: string) => Promise<any>
+  createUserMongoDB: (email: string | any) => Promise<any>
   fetchGenresByIds: (genreIds: string[]) => Promise<any>
   fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
   jammersFetchBySearch: (params: SearchText, pageNumber: any) => Promise<any>
@@ -97,7 +97,7 @@ const dataAxios: {
   },
   jemerCardDataFetchByEmail: async (email) => {
     try {
-      const {data} = await axios.get(
+      const data = await axios.get(
         `http://localhost:3500/users/getjemercarddatabyemail/${email}`
       )
 
