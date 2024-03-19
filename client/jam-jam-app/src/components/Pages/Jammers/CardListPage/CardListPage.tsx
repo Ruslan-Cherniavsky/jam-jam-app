@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../CardList/JammersCardList"
+import JammersCardList from "../../../../components_UI/CardList/CardList"
 import {
   Button,
   Col,
@@ -33,6 +33,8 @@ function JammersCardListPage() {
   const [totalPages, setTotalPages] = useState(0)
 
   const MAX_PAGES_DISPLAYED = 9
+  const CARD_LIST_TYPE = "Browse Jammers"
+
   interface SearchText {
     username: string | null
   }
@@ -309,7 +311,11 @@ function JammersCardListPage() {
 
         {jammers && !ifFiltering && !loading ? (
           jammers.length > 0 ? (
-            <JammersCardList jammers={jammers} />
+            <JammersCardList
+              updateListCB={handlePageChange}
+              cardListType={CARD_LIST_TYPE}
+              jammers={jammers}
+            />
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">

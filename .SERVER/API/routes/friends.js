@@ -5,8 +5,10 @@ const {
   sendFriendRequest,
   respondToFriendRequest,
   getAllFriendRequestsByReceiverId,
-  getAllFriendsByUserId,
+  getAllFriendRequestsByReceiverIdPaginate,
+  getAllFriendsByUserIdPaginate,
   getAllFriendRequestsBySenderId,
+  getAllFriendRequestsBySenderIdPaginate,
   deleteFriend,
 } = require("../controllers/friends")
 
@@ -21,13 +23,24 @@ router.get(
   getAllFriendRequestsByReceiverId
 )
 router.get(
+  "/getAllFriendRequestsByReceiverIdPaginate/:receiverId",
+  getAllFriendRequestsByReceiverIdPaginate
+)
+router.get(
   "/getAllFriendRequestsBySenderId/:senderId",
   getAllFriendRequestsBySenderId
 )
+router.get(
+  "/getAllFriendRequestsBySenderIdPaginate/:senderId",
+  getAllFriendRequestsBySenderIdPaginate
+)
 
-router.get("/getAllFriendsByUserId/:userId", getAllFriendsByUserId)
+router.get(
+  "/getAllFriendsByUserIdPaginate/:userId",
+  getAllFriendsByUserIdPaginate
+)
 
-router.delete("/deleteFriend/", deleteFriend)
+router.post("/deleteFriend/", deleteFriend)
 
 // router.get("/friend-requests/:userId", getAllFriendRequests)
 

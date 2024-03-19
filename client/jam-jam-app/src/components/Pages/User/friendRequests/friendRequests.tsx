@@ -43,7 +43,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import {IParams} from "../../Jammers/Filter/Filter"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../Jammers/CardList/JammersCardList"
+import JammersCardList from "../../../../components_UI/CardList/CardList"
 import {
   faBackward,
   faPlus,
@@ -70,34 +70,39 @@ export default function MyFriends() {
   const [params, setParams] = useState<IParams | SearchText | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
 
+  const CARD_LIST_TYPE = "Friend Requests"
+
   const userId = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?._id
   )
 
-  useEffect(() => {
-    setLoading(true)
+  // useEffect(() => {
+  //   setLoading(true)
 
-    console.log(userId)
-    if (typeof userId === "string") {
-      dataAxios.getAllFriendRequestsByReceiverId(userId).then((data: any) => {
-        console.log(data.friendRequests)
+  //   console.log(userId)
+  //   if (typeof userId === "string") {
+  //     dataAxios
+  //       .getAllFriendRequestsByReceiverIdPaginate(userId, currentPage)
+  //       .then((data: any) => {
+  //         console.log(data.friendRequests)
 
-        // setJammers(data.friendRequests)
+  //         // setJammers(data.friendRequests)
 
-        const friendRequests = data.friendRequests.map(
-          (request: any) => request.senderId
-        )
+  //         const friendRequests = data.friendRequests.map(
+  //           (request: any) => request.senderId
+  //         )
 
-        console.log(friendRequests)
+  //         console.log(data)
 
-        setJammers(friendRequests)
+  //         setJammers(friendRequests)
+  //         setTotalPages(data.totalPages)
 
-        // console.log(data.totalPages)
-        // setTotalPages(data.totalPages)
-      })
-      setLoading(false)
-    }
-  }, [userId, currentPage, params])
+  //         // console.log(data.totalPages)
+  //         // setTotalPages(data.totalPages)
+  //       })
+  //     setLoading(false)
+  //   }
+  // }, [userId, currentPage, gettingUrlParams, params])
 
   const MAX_PAGES_DISPLAYED = 9
 
@@ -181,38 +186,71 @@ export default function MyFriends() {
     setCurrentPage(1)
   }
 
-  //   useEffect(() => {
-  //     const fetchJammers = async () => {
-  //       try {
-  //         if (!ifFiltered && !gettingUrlParams && !ifSearching) {
-  //           setSearchText({username: ""})
+  useEffect(() => {
+    const fetchJammers = async () => {
+      try {
+        if (typeof userId === "string" && currentPage) {
+          setLoading(true)
 
-  //           setLoading(true)
-  //           const data = await dataAxios.dataFetch(currentPage)
-  //           setTotalPages(data.totalPages)
-  //           setJammers(data.users)
-  //         } else if (ifFiltered && !ifSearching) {
-  //           setSearchText({username: ""})
+          const data = await dataAxios.getAllFriendRequestsByReceiverIdPaginate(
+            userId,
+            currentPage
+          )
 
-  //           setLoading(true)
-  //           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
-  //           setTotalPages(data.totalPages)
-  //           setJammers(data.users)
-  //         } else if (ifSearching) {
-  //           setLoading(true)
-  //           const data = await dataAxios.jammersFetchBySearch(params, currentPage)
-  //           setTotalPages(data.totalPages)
-  //           setJammers(data.users)
-  //         }
-  //         setLoading(false)
-  //       } catch (error) {
-  //         console.error("Error fetching jammers:", error)
-  //         setLoading(false)
-  //       }
-  //     }
+          // console.log(data.friendRequests)
 
-  //     fetchJammers()
-  //   }, [currentPage, gettingUrlParams, params])
+          if (data.friendRequests.length > 0) {
+            const friendRequestSenders = data.friendRequests.map(
+              (request: any) => request.senderId
+            )
+            setJammers(friendRequestSenders)
+            setTotalPages(data.totalPages)
+          } else {
+            setJammers([])
+            setTotalPages(1)
+            setLoading(false)
+          }
+
+          // dataAxios
+          //   .getAllFriendRequestsByReceiverIdPaginate(userId, currentPage)
+          //   .then((data: any) => {
+          //     console.log(data.friendRequests)
+
+          // setJammers(data.friendRequests)
+
+          // console.log(data.totalPages)
+          // setTotalPages(data.totalPages)
+          // })
+
+          //         if (!ifFiltered && !gettingUrlParams && !ifSearching) {
+          //           setSearchText({username: ""})
+
+          //           setLoading(true)
+          //           const data = await dataAxios.dataFetch(currentPage)
+          //           setTotalPages(data.totalPages)
+          //           setJammers(data.users)
+          //         } else if (ifFiltered && !ifSearching) {
+          //           setSearchText({username: ""})
+
+          //           setLoading(true)
+          //           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
+          //           setTotalPages(data.totalPages)
+          //           setJammers(data.users)
+          //         } else if (ifSearching) {
+          //           setLoading(true)
+          //           const data = await dataAxios.jammersFetchBySearch(params, currentPage)
+          //           setTotalPages(data.totalPages)
+          //           setJammers(data.users)
+        }
+        setLoading(false)
+      } catch (error) {
+        console.error("Error fetching jammers:", error)
+        setLoading(false)
+      }
+    }
+
+    fetchJammers()
+  }, [currentPage, gettingUrlParams, userId])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -235,6 +273,11 @@ export default function MyFriends() {
     if (page >= 0 && page < totalPages) {
       setCurrentPage(page + 1)
     }
+  }
+
+  const handlePageUpdate = (page: number) => {
+    setCurrentPage(page + 1)
+    setCurrentPage(page - 1)
   }
 
   async function filteredStatusChange() {
@@ -473,9 +516,13 @@ export default function MyFriends() {
           </Container>
         </div>
 
-        {jammers.length && !loading ? (
+        {jammers && !loading ? (
           jammers.length > 0 ? (
-            <JammersCardList jammers={jammers} />
+            <JammersCardList
+              updateListCB={() => handlePageUpdate(currentPage)}
+              cardListType={CARD_LIST_TYPE}
+              jammers={jammers}
+            />
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">

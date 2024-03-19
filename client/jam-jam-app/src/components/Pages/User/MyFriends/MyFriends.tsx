@@ -13,7 +13,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import {IParams} from "../../Jammers/Filter/Filter"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../Jammers/CardList/JammersCardList"
+import JammersCardList from "../../../../components_UI/CardList/CardList"
 import {
   faBackward,
   faUserPlus,
@@ -24,6 +24,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {useSelector} from "react-redux"
 import {RootState} from "../../../../redux/store"
 import {Link} from "react-router-dom"
+
+const CARD_LIST_TYPE = "My Friends"
 
 export default function MyFriends() {
   const navigate = useNavigate()
@@ -36,6 +38,7 @@ export default function MyFriends() {
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
+  const [reloadPage, setReloadPage] = useState(true)
 
   const [searchText, setSearchText] = useState<SearchText | any>({username: ""})
 
@@ -151,11 +154,16 @@ export default function MyFriends() {
         //   setTotalPages(data.totalPages)
         //   setJammers(data.users)
         // }
-        if (userId) {
+        if (typeof userId === "string") {
           setLoading(true)
 
-          const data = await dataAxios.getAllFriendsByUserId(userId)
+          const data = await dataAxios.getAllFriendsByUserIdPaginate(
+            userId,
+            currentPage
+          )
           console.log(data)
+          setTotalPages(data.totalPages)
+
           setJammers(data.friends)
           setLoading(false)
         }
@@ -168,7 +176,7 @@ export default function MyFriends() {
     }
 
     fetchJammers()
-  }, [currentPage, gettingUrlParams, params, userId])
+  }, [currentPage, gettingUrlParams, params, userId, reloadPage])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -191,6 +199,10 @@ export default function MyFriends() {
     if (page >= 0 && page < totalPages) {
       setCurrentPage(page + 1)
     }
+  }
+
+  const handlePageUpdate = () => {
+    setReloadPage(!reloadPage)
   }
 
   async function filteredStatusChange() {
@@ -453,9 +465,13 @@ export default function MyFriends() {
           </Container>
         </div>
 
-        {jammers.length && !loading ? (
+        {jammers && !loading ? (
           jammers.length > 0 ? (
-            <JammersCardList jammers={jammers} />
+            <JammersCardList
+              updateListCB={handlePageUpdate}
+              cardListType={CARD_LIST_TYPE}
+              jammers={jammers}
+            />
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">

@@ -12,7 +12,7 @@ interface Params {
 type SenderId = string // Assuming SenderId is a string representing the ID of the sender
 type ReceiverId = string // Assuming ReceiverId is a string representing the ID of the receiver
 type Status = "pending" | "approved" | "rejected" // Status can only be one of these three strings
-type UserId = string // Assuming UserId is a string representing the ID of a user
+type UserId = string | any // Assuming UserId is a string representing the ID of a user
 type RequestId = string // As
 
 interface SearchText {
@@ -41,8 +41,20 @@ const dataAxios: {
   ) => Promise<any>
   respondToFriendRequest: (requestId: RequestId, status: Status) => Promise<any>
   getAllFriendRequestsByReceiverId: (receiverId: ReceiverId) => Promise<any>
+  getAllFriendRequestsByReceiverIdPaginate: (
+    receiverId: ReceiverId,
+    pageNumber: any
+  ) => Promise<any>
+  getAllFriendRequestsBySenderIdPaginate: (
+    receiverId: ReceiverId,
+    pageNumber: any
+  ) => Promise<any>
   getAllFriendRequestsBySenderId: (senderId: SenderId) => Promise<any>
-  getAllFriendsByUserId: (userId: UserId) => Promise<any>
+  getAllFriendsByUserIdPaginate: (
+    userId: UserId,
+    pageNumber: any
+  ) => Promise<any>
+  deleteFriend: (userId: string, friendId: string) => Promise<any>
 } = {
   dataFetch: async (pageNumber) => {
     try {
@@ -205,23 +217,24 @@ const dataAxios: {
       console.log(err)
     }
   },
-  // addToFriends: async (jammerId, userId) => {
-  //   try {
-  //     const data = await axios.post(`http://localhost:3500/users/addtofriend`, {
-  //       jammerId,
-  //       userId,
-  //     })
 
-  //     return data
-  //   } catch (err) {
-  //     console.log(err)
-  //   }
-  // },
   sendFriendRequest: async (senderId, receiverId) => {
     try {
       const response = await axios.post(
         "http://localhost:3500/friends/sendFriendRequest",
         {senderId, receiverId}
+      )
+      return response
+    } catch (error) {
+      console.error("Error sending friend request:", error)
+      throw error
+    }
+  },
+  deleteFriend: async (userId, friendId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3500/friends/deleteFriend",
+        {userId, friendId}
       )
       return response
     } catch (error) {
@@ -235,7 +248,7 @@ const dataAxios: {
         "http://localhost:3500/friends/respondToFriendRequest",
         {requestId, status}
       )
-      return response.data
+      return response
     } catch (error) {
       console.error("Error responding to friend request:", error)
       throw error
@@ -245,6 +258,17 @@ const dataAxios: {
     try {
       const response = await axios.get(
         `http://localhost:3500/friends/getAllFriendRequestsByReceiverId/${receiverId}`
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error retrieving friend requests by receiver ID:", error)
+      throw error
+    }
+  },
+  getAllFriendRequestsByReceiverIdPaginate: async (receiverId, pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/friends/getAllFriendRequestsByReceiverIdPaginate/${receiverId}?page=${pageNumber}`
       )
       return response.data
     } catch (error) {
@@ -263,10 +287,21 @@ const dataAxios: {
       throw error
     }
   },
-  getAllFriendsByUserId: async (userId) => {
+  getAllFriendRequestsBySenderIdPaginate: async (senderId, pageNumber) => {
     try {
       const response = await axios.get(
-        `http://localhost:3500/friends/getAllFriendsByUserId/${userId}`
+        `http://localhost:3500/friends/getAllFriendRequestsBySenderIdPaginate/${senderId}?page=${pageNumber}`
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error retrieving friend requests by senderId ID:", error)
+      throw error
+    }
+  },
+  getAllFriendsByUserIdPaginate: async (userId, pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/friends/getAllFriendsByUserIdPaginate/${userId}?page=${pageNumber}`
       )
       return response.data
     } catch (error) {
