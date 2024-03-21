@@ -51,10 +51,9 @@ const deleteGenresById = async (req, res) => {
 }
 
 const getGenresByIds = async (req, res) => {
-  const genreIds = req.body.genreIds // Assuming the array of genre IDs is in the request body
+  const genreIds = req.body.genreIds
   console.log(genreIds)
   try {
-    // Convert array of strings to array of mongoose ObjectIds
     const objectIdArray = genreIds.map((id) => mongoose.Types.ObjectId(id))
 
     const genres = await Genres.find({_id: {$in: objectIdArray}})

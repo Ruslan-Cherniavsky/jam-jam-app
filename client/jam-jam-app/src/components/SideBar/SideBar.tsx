@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 import {Link, useLocation} from "react-router-dom"
-import {Button, Col, Collapse, Image, Nav, Row} from "react-bootstrap"
+import {Collapse, Image, Nav} from "react-bootstrap"
 import {User as FirebaseUser} from "firebase/auth"
 import {RootState} from "../../redux/store"
 import {useSelector} from "react-redux"
@@ -56,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           <Link
             style={{
               color: "gray",
-              flex: 1, // Ensure the link takes up remaining space
+              flex: 1,
             }}
             to="/my-profile"
             className={
@@ -66,39 +66,6 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
             }>
             My Profile
           </Link>
-
-          {/* <div
-            // variant="outline-dark"
-            style={{
-              borderColor: iconColor,
-              backgroundColor: "red",
-              width: "fit-content",
-              marginLeft: "auto", // Push the icon to the far right
-            }}
-            // size="sm"
-            onClick={() => setOpen(!open)}
-            // aria-controls="example-collapse-text"
-            aria-expanded={open}>
-            {open ? (
-              <FontAwesomeIcon
-                style={{
-                  color: iconColor,
-                  marginRight: "4px",
-                }}
-                icon={faArrowAltCircleDown}
-                className="mr-2"
-              />
-            ) : (
-              <FontAwesomeIcon
-                style={{
-                  color: iconColor,
-                  marginRight: "4px",
-                }}
-                icon={faArrowAltCircleUp}
-                className="mr-2"
-              />
-            )}
-          </div> */}
 
           <Link
             style={{color: "gray"}}
@@ -115,18 +82,6 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
           </Collapse>
         </Nav.Item>
 
-        {/* <Nav.Item>
-          <Link
-            style={{color: "gray"}}
-            to="/update-profile"
-            className={
-              pathname === "/update-profile"
-                ? "nav-link-custom nav-link link-black nav-custom active"
-                : "nav-link-custom nav-link link-black nav-custom"
-            }>
-            Edit Profile
-          </Link>
-        </Nav.Item> */}
         <hr
           style={{
             color: "gray",
@@ -152,7 +107,7 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
             style={{color: "gray"}}
             to="/friendRequests"
             className={
-              pathname === "/friendRequests"
+              pathname === "/friend-requests"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>
@@ -191,18 +146,13 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
             Invites to Jams
           </Link>
         </Nav.Item>
-        {/* <hr
-          style={{
-            color: "gray",
-            marginLeft: "16px",
-          }}
-        /> */}
+
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/create-jam/"
+            to="/created-jams/:jamerId"
             className={
-              pathname === "/create-jam/"
+              pathname === "/created-jams/:jamerId"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>
@@ -212,9 +162,9 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/created-jams/:jamerId"
+            to="/create-jam/:jamerId"
             className={
-              pathname === "/created-jams/:jamerId"
+              pathname === "/create-jam/:jamerId"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>

@@ -42,6 +42,4 @@ router.get(
 
 router.post("/deleteFriend/", deleteFriend)
 
-// router.get("/friend-requests/:userId", getAllFriendRequests)
-
 module.exports = router

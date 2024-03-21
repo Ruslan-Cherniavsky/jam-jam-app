@@ -3,10 +3,24 @@
 .home-container {
   margin-top: 15px;
   background-color: #f8f9fa; /* Set a background color if needed */
-  padding: 20px;
   border: 1px solid;
   border-radius: 8px;
   border-color: rgb(221, 221, 221);
+}
+
+@media (max-width: 576px) {
+  .home-container {
+    padding: 0px; /* Apply padding only on small displays (sm and below) */
+    margin: 0px 0px 0px 0px !important;
+    background-color: #ffffff;
+    border-color: #ffffff;
+  }
+}
+
+@media (min-width: 577px) {
+  .home-container {
+    padding: 20px; /* Reset padding for larger displays (md, lg, xl, xxl) */
+  }
 }
 
 .home-section {

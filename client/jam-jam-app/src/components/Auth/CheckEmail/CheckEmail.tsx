@@ -1,7 +1,6 @@
 import {useEffect, useState} from "react"
 import {Card, Alert, Button} from "react-bootstrap"
 import {Link, useNavigate} from "react-router-dom"
-import {auth} from "../../../services/firebaseConfig"
 import {useAuthContext} from "../../../context/AuthContext"
 
 export default function CheckEmail() {
@@ -49,7 +48,7 @@ export default function CheckEmail() {
         <div className="authDiv w-100">
           <Card>
             <Card.Body>
-              <h2 className="text-center mb-4">Check your email</h2>
+              <h3 className="text-center mb-3">Check your email</h3>
               {error ? <Alert variant="danger">{error}</Alert> : null}
 
               {!error || message ? (

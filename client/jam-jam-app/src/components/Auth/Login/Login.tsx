@@ -59,7 +59,7 @@ export default function Login() {
       await signInWithGoogle()
       navigate("/")
     } catch (error) {
-      console.error("Failed to log in with Google", error)
+      console.error("Failed to log in with Google")
       setError("Failed to log in with Google. Please try again.")
     } finally {
       setLoading(false)
@@ -68,18 +68,13 @@ export default function Login() {
 
   return (
     <>
-      {/* <div className="authContainer ">
-      <div className="authDiv w-100"> */}
-
       <Container>
         <Row>
-          <Col sm={0} md={3} lg={3} xl={3} xxl={4}></Col>
+          <Col md={3} lg={3} xl={3} xxl={4}></Col>
           <Col style={{paddingTop: "0px"}}>
-            {" "}
-            {/* <h2 className="text-center">Welcome to </h2> */}
             <Intro />
           </Col>
-          <Col sm={0} md={3} lg={3} xl={3} xxl={4}></Col>
+          <Col md={3} lg={3} xl={3} xxl={4}></Col>
         </Row>
         <Row>
           <Col className="d-none d-md-block" xs={5} sm={5} md={3} lg={4}>
@@ -129,7 +124,7 @@ export default function Login() {
                       </Button>
                     </Form>
                     <div className="w-100 text-center mt-2">
-                      Forgot password?{" "}
+                      Forgot password?
                       <Link to="/forgot-password">Password reset</Link>
                     </div>
                     <div className="w-100 text-center mt-2">

@@ -3,7 +3,7 @@ const app = express()
 
 const morgan = require("morgan")
 const cors = require("cors")
-const verifyToken = require("./API/middlewares/checkAuth")
+// const verifyToken = require("./API/middlewares/checkAuth")
 
 app.use(morgan("dev"))
 app.use(cors({origin: "*"}))
@@ -22,8 +22,6 @@ mongoose
     console.log("Conection failed! T___T")
   })
 
-// const checkUserAutchData = require("../.SERVER/API/middlewares/checkUserAuthData")
-
 const usersRoutes = require("./API/routes/users")
 const friendsRoutes = require("./API/routes/friends")
 const genresRoutes = require("./API/routes/genres")
@@ -39,7 +37,6 @@ app.use("/genres", genresRoutes)
 app.use("/instruments", instrumentsRoutes)
 0
 app.use("/links", links)
-// --TODO create firebase auth  !
 
 // app.use(verifyToken);
 

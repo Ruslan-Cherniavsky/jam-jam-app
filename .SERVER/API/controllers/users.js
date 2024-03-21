@@ -1,115 +1,10 @@
 const mongoose = require("mongoose")
 const User = require("../models/user")
 const Genres = require("../models/genres")
-const jwt = require("jsonwebtoken")
-const md5 = require("md5")
-
-const signup = async (req, res) => {
-  const {
-    email,
-    userName,
-    firstName,
-    lastName,
-    country,
-    city,
-    street,
-    age,
-    gender,
-    genres,
-    instruments,
-    img,
-    references,
-    oboutMe,
-    links,
-    role,
-    dob,
-  } = req.body
-
-  try {
-    const users = await User.find({email})
-    if (users.length >= 1) {
-      return res.status(409).json({message: "Email exists!"})
-    }
-
-    const user = new User({
-      _id: new mongoose.Types.ObjectId(),
-      email: email,
-      userName: userName,
-      firstName: firstName,
-      lastName: lastName,
-      country: country,
-      city: city,
-      street: street,
-      age: age,
-      gender: gender,
-      genres: genres,
-      instruments: instruments,
-      img: img,
-      references: references,
-      oboutMe: oboutMe,
-      role: role,
-      links: links,
-      dob: dob,
-    })
-
-    await user.save()
-    // console.log(user)
-    return res.status(200).json({message: "User Created !"})
-  } catch (error) {
-    return res.status(500).json({error})
-  }
-}
-
-const login = async (req, res) => {
-  const {email, password} = req.body
-  try {
-    const users = await User.find({email})
-    if (users.length === 0) {
-      return res.status(401).json({message: "Auth failed!"})
-    }
-    const [user] = users
-
-    if (user.password !== md5(password)) {
-      return res.status(404).json({message: "Auth failed!"})
-    }
-
-    const token = jwt.sign(
-      {
-        _id: user._id,
-        userName: user.userName,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        country: user.country,
-        city: user.city,
-        musicalGaners: user.musicalGaners,
-        musicalInstruments: user.musicalInstruments,
-        street: user.street,
-        role: user.role,
-      },
-      process.env.JWT_KEY,
-      {expiresIn: "50H"}
-    )
-
-    return res.status(200).json({message: "Auth success!", token: token})
-  } catch (error) {
-    return res.status(500).json({error})
-  }
-}
-
-// const getAllUsers = async (req, res) => {
-//   try {
-//     // const users = await User.find()
-//     const users = await User.find().populate("genres instruments")
-//     return res.status(200).json({users})
-//   } catch (error) {
-//     res.status(500).json({error})
-//   }
-// }
 
 const getAllUsers = async (req, res) => {
-  const page = parseInt(req.query.page) || 1 // Get the requested page from query parameters
-  const perPage = 12 // Set the number of users per page
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
 
   try {
     const totalUsers = await User.countDocuments()
@@ -127,13 +22,11 @@ const getAllUsers = async (req, res) => {
 }
 
 const getUsersFiltered = async (req, res) => {
-  const page = parseInt(req.query.page) || 1 // Get the requested page from query parameters
-  const perPage = 12 // Set the number of users per page
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
   const params = req.query
   try {
     const queryConditions = {}
-
-    // console.log("Params:", params)
 
     if (params.genres && params.genres.length > 0) {
       queryConditions.genres = {
@@ -159,7 +52,6 @@ const getUsersFiltered = async (req, res) => {
       queryConditions.city = params.city
     }
 
-    // Check if there are any conditions specified
     if (Object.keys(queryConditions).length === 0) {
       return res.status(400).json({error: "No search conditions provided."})
     }
@@ -184,8 +76,6 @@ const getUsersByUsername = async (req, res) => {
   const perPage = 12
   const searchText = req.query.username
 
-  // console.log(searchText)
-
   try {
     const totalUsers = await User.countDocuments({
       userName: {$regex: new RegExp(searchText, "i")},
@@ -208,7 +98,6 @@ const getUsersByUsername = async (req, res) => {
 
 const getUsernames = async (req, res) => {
   try {
-    // const users = await User.find()
     const usernames = await User.find({}, "userName")
     return res.status(200).json({usernames})
   } catch (error) {
@@ -280,10 +169,7 @@ const getJemerCardDataByEmail = async (req, res) => {
 
   try {
     const user = await User.findOne({email}).populate("genres instruments")
-    // console.log(user)
-    // if (!user) {
-    //   return res.status(404).json({message: "User not found!"})
-    // }
+
     return res.status(200).json({user})
   } catch (error) {
     res.status(500).json({error})
@@ -294,15 +180,13 @@ const reportUser = async (req, res) => {
   try {
     const {reportedUserId, userId, reason} = req.body
 
-    // Ensure the reported user exists
     const reportedUser = await User.findById(reportedUserId)
     if (!reportedUser) {
       return res.status(404).json({message: "Reported user not found."})
     }
 
-    // Update the reported user's reports array
     reportedUser.reports.push({
-      reporter: userId, // Assuming you have user authentication middleware
+      reporter: userId,
       reason,
     })
     await reportedUser.save()
@@ -315,8 +199,6 @@ const reportUser = async (req, res) => {
 }
 
 module.exports = {
-  signup,
-  login,
   getAllUsers,
   deleteUserById,
   getJemerCardDataById,

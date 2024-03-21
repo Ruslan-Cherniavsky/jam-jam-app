@@ -276,15 +276,15 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
       <Card>
         <Card.Header>
           <Row className="align-items-center">
-            <Col xl={8} lg={8} md={6} sm={4} xs={4}>
+            <Col xl={10} lg={10} md={8} sm={8} xs={8}>
               <h2>
                 {jammer.userName}{" "}
                 {jammer?.email === currentUser?.email && "*(Me)"}
               </h2>
             </Col>
-            <Col xl={2} lg={2} md={3} sm={4} xs={4}></Col>
+            {/* <Col xl={2} lg={2} md={3} sm={4} xs={4}></Col> */}
             {jammer?.email !== currentUser?.email && (
-              <Col xl={2} lg={2} md={3} sm={4} xs={4}>
+              <Col xl={2} lg={2} md={4} sm={4} xs={4}>
                 <Button
                   onClick={() => setShowReportModal(true)}
                   variant="outline-dark"
@@ -295,7 +295,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
                   }}
                   disabled={jammer?.email === currentUser?.email}>
                   <FontAwesomeIcon
-                    style={{color: iconColor, marginRight: iconSpacing}}
+                    style={{color: iconColor, marginRight: "4px"}}
                     icon={faFlag}
                   />{" "}
                   Report
@@ -444,6 +444,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
           </Button>
         </Modal.Footer>
       </Modal>
+      <br></br>
     </Container>
   )
 }

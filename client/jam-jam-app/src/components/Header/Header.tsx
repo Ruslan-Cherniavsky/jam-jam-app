@@ -1,4 +1,3 @@
-import React, {useEffect, useState} from "react"
 import {Navbar, Nav, NavDropdown, Col} from "react-bootstrap"
 import {Link, useLocation, useNavigate} from "react-router-dom" // Assuming you're using react-router-dom
 import {useDispatch, useSelector} from "react-redux"
@@ -10,7 +9,6 @@ import {resetUsersData} from "../../redux/reducers/JammersDataSliceMongoDB"
 const Header: React.FC = () => {
   const {pathname} = useLocation()
 
-  const [error, setError] = useState<string>("")
   const {currentUser, logout} = useAuthContext()
 
   const userName = useSelector(
@@ -20,31 +18,23 @@ const Header: React.FC = () => {
 
   const navigate = useNavigate()
   async function handleLogOut() {
-    setError("")
     try {
       await logout()
       dispatch(resetUsersData())
 
       navigate("/login")
     } catch (error) {
-      setError("Failed to log out")
-      console.log("Failed to log out")
+      console.error("Failed to log out", error)
     }
   }
 
   return (
-    <Navbar bg="light" expand="lg">
-      {/* Your logo, brand, etc. */}
-
+    <Navbar bg="light" expand="md">
       <Col className="d-block d-md-none" sm={4} xs={4}></Col>
 
-      <Navbar.Brand
-        className="d-block d-md-none"
-        // style={{marginLeft: "28px"}}
-        as={Link}
-        to="/">
+      <Navbar.Brand className="d-block d-md-none" as={Link} to="/">
         <img
-          style={{width: "90px"}}
+          style={{width: "90px", marginBottom: "4px", marginLeft: "14px"}}
           src="https://firebasestorage.googleapis.com/v0/b/jam-jam-development.appspot.com/o/images%2Fw3.png?alt=media&token=60b1d871-47bc-41a2-b075-03daebb1d92b"
           alt=""
         />
@@ -52,7 +42,7 @@ const Header: React.FC = () => {
 
       <Navbar.Brand
         className="d-none d-md-block"
-        style={{marginLeft: "28px"}}
+        style={{marginLeft: "28px", marginBottom: "4px"}}
         as={Link}
         to="/">
         <img
@@ -75,7 +65,7 @@ const Header: React.FC = () => {
             className={
               pathname === "/jammersList" ? "nav-custom active" : "nav-custom"
             }>
-            Jammers
+            Explore Jammers
           </Nav.Link>
           <Nav.Link
             style={{paddingLeft: "5px"}}
@@ -84,12 +74,17 @@ const Header: React.FC = () => {
             className={
               pathname === "/jam-events" ? "nav-custom active" : "nav-custom"
             }>
-            Jams-Events
+            Explore Jams
           </Nav.Link>
 
           {currentUser?.emailVerified && (
             <div className="d-block d-md-none">
-              {" "}
+              <hr
+                style={{
+                  color: "gray",
+                  marginLeft: "6px",
+                }}
+              />{" "}
               <Nav.Link
                 style={{paddingLeft: "5px"}}
                 as={Link}
@@ -112,6 +107,12 @@ const Header: React.FC = () => {
                 }>
                 Edit Profile
               </Nav.Link>
+              <hr
+                style={{
+                  color: "gray",
+                  marginLeft: "6px",
+                }}
+              />
               <Nav.Link
                 style={{paddingLeft: "5px"}}
                 as={Link}
@@ -126,26 +127,20 @@ const Header: React.FC = () => {
               <Nav.Link
                 style={{paddingLeft: "5px"}}
                 as={Link}
-                to="/create-jam"
+                to="/friend-requests"
                 className={
-                  pathname === "/create-jam"
-                    ? "nav-custom active"
+                  pathname === "/friend-requests"
+                    ? "active nav-custom"
                     : "nav-custom"
                 }>
-                Create New Jam-Event
+                Friend Requests
               </Nav.Link>
-              <Nav.Link
-                style={{paddingLeft: "5px"}}
-                as={Link}
-                to="/created-jams/:jamerId"
-                className={
-                  pathname === "//created-jams/:jamerId"
-                    ? "nav-custom active"
-                    : "nav-custom"
-                }>
-                Created Jam-Events
-              </Nav.Link>
-              <NavDropdown.Divider />
+              <hr
+                style={{
+                  color: "gray",
+                  marginLeft: "6px",
+                }}
+              />
               <Nav.Link
                 style={{paddingLeft: "5px"}}
                 as={Link}
@@ -155,15 +150,47 @@ const Header: React.FC = () => {
                     ? "nav-custom active"
                     : "nav-custom"
                 }>
-                Joined Jam-Events
+                Joined Jams
+              </Nav.Link>
+              <Nav.Link
+                style={{paddingLeft: "5px"}}
+                as={Link}
+                to="/invites-to-jams"
+                className={
+                  pathname === "/invites-to-jams"
+                    ? "nav-custom active"
+                    : "nav-custom"
+                }>
+                Invites to Jams
+              </Nav.Link>
+              <NavDropdown.Divider />
+              <Nav.Link
+                style={{paddingLeft: "5px"}}
+                as={Link}
+                to="/created-jams/:jamerId"
+                className={
+                  pathname === "/created-jams/:jamerId"
+                    ? "nav-custom active"
+                    : "nav-custom"
+                }>
+                Hosted Jams
+              </Nav.Link>
+              <Nav.Link
+                style={{paddingLeft: "5px"}}
+                as={Link}
+                to="/create-jam/:jamerId"
+                className={
+                  pathname === "/create-jam/:jamerId"
+                    ? "nav-custom active"
+                    : "nav-custom"
+                }>
+                Host Jam
               </Nav.Link>
               <Nav.Link
                 onClick={handleLogOut}
                 style={{paddingLeft: "5px"}}
                 className={
-                  pathname === "/joined-jams"
-                    ? "nav-custom active"
-                    : "nav-custom"
+                  pathname === "/s" ? "nav-custom active" : "nav-custom"
                 }>
                 Log out
               </Nav.Link>
@@ -172,7 +199,7 @@ const Header: React.FC = () => {
         </Nav>
 
         <Col></Col>
-        <div className="d-none d-lg-block">
+        <div className="d-none d-md-block">
           <Nav>
             {currentUser && currentUser.emailVerified ? (
               <NavDropdown

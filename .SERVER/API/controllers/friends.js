@@ -1,4 +1,4 @@
-const mongoose = require("mongoose")
+// const mongoose = require("mongoose")
 const User = require("../models/user")
 const FriendRequest = require("../models/friends")
 
@@ -38,7 +38,6 @@ const respondToFriendRequest = async (req, res) => {
     }
 
     if (status === "approved") {
-      // Add users to each other's friend lists
       await Promise.all([
         User.findByIdAndUpdate(request.senderId, {
           $push: {friends: request.receiverId},
@@ -54,9 +53,6 @@ const respondToFriendRequest = async (req, res) => {
       await FriendRequest.findByIdAndDelete(requestId)
     }
 
-    // request.status = status
-    // await request.save()
-
     return res
       .status(200)
       .json({message: "Friend request responded successfully.", request})
@@ -69,10 +65,7 @@ const respondToFriendRequest = async (req, res) => {
 const getAllFriendRequestsByReceiverId = async (req, res) => {
   const {receiverId} = req.params
 
-  // console.log(receiverId)
   try {
-    // Find all friend requests where the receiverId matches
-
     const friendRequests = await FriendRequest.find({receiverId}).populate([
       {
         path: "senderId",
@@ -98,12 +91,9 @@ const getAllFriendRequestsByReceiverIdPaginate = async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const perPage = 8 // TODO ---- change it to 12
 
-  // console.log(receiverId)
   try {
     const totalUsers = await FriendRequest.find({receiverId}).countDocuments()
     const totalPages = Math.ceil(totalUsers / perPage)
-
-    // Find all friend requests where the receiverId matches
 
     const friendRequests = await FriendRequest.find({receiverId})
       .skip((page - 1) * perPage)
@@ -133,7 +123,6 @@ const getAllFriendRequestsBySenderId = async (req, res) => {
   const {senderId} = req.params
 
   try {
-    // Find all friend requests where the receiverId matches
     const friendRequests = await FriendRequest.find({senderId}).populate([
       {path: "senderId", select: "_id userName"},
       {path: "receiverId", select: "_id userName"},
@@ -155,12 +144,11 @@ const getAllFriendRequestsBySenderId = async (req, res) => {
 const getAllFriendRequestsBySenderIdPaginate = async (req, res) => {
   const {senderId} = req.params
   const page = parseInt(req.query.page) || 1
-  const perPage = 8 // TODO ---- change it to 12
+  const perPage = 12
   try {
     const totalUsers = await FriendRequest.find({receiverId}).countDocuments()
     const totalPages = Math.ceil(totalUsers / perPage)
 
-    // Find all friend requests where the receiverId matches
     const friendRequests = await FriendRequest.find({senderId})
       .skip((page - 1) * perPage)
       .limit(perPage)
@@ -185,7 +173,7 @@ const getAllFriendRequestsBySenderIdPaginate = async (req, res) => {
 const getAllFriendsByUserIdPaginate = async (req, res) => {
   const {userId} = req.params
   const page = parseInt(req.query.page) || 1
-  const perPage = 8 // TODO ---- change it to 12
+  const perPage = 12
 
   try {
     const user = await User.findById(userId).populate({

@@ -271,7 +271,7 @@ export default function MyFriends() {
                     icon={faPlus}
                     className="mr-1"
                   />{" "}
-                  Browse Jammers
+                  Explore Jammers
                 </Button>
               </Col>
 
@@ -287,7 +287,7 @@ export default function MyFriends() {
                     width: "100%",
                   }}
                   onClick={() => {
-                    navigate("/friendRequests")
+                    navigate("/friend-requests")
                   }}>
                   <FontAwesomeIcon
                     style={{color: "#BCBCBC", marginRight: "12px"}}
@@ -412,7 +412,7 @@ export default function MyFriends() {
                     width: "100%",
                   }}
                   onClick={() => {
-                    navigate("/friendRequests")
+                    navigate("/friend-requests")
                   }}>
                   <FontAwesomeIcon
                     style={{color: "#BCBCBC", marginRight: "12px"}}

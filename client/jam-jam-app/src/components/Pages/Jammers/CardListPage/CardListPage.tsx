@@ -210,7 +210,7 @@ function JammersCardListPage() {
             paddingTop: "2px",
             marginBottom: "20px",
           }}>
-          Browse Jammers
+          Explore Jammers
         </h5>
         <Filter
           searching={ifSearching}

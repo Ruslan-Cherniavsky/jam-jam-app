@@ -4,7 +4,6 @@ import {useAuthContext} from "../../../context/AuthContext"
 import {Link, useNavigate} from "react-router-dom"
 import dataAxios from "../../../server/data.axios"
 import Intro from "../Intro/Intro"
-import firebase from "firebase/app"
 
 export default function Signup() {
   const navigate = useNavigate()
@@ -96,8 +95,6 @@ export default function Signup() {
         <Row>
           <Col sm={0} md={3} lg={3} xl={3} xxl={4}></Col>
           <Col style={{paddingTop: "0px"}}>
-            {" "}
-            {/* <h2 className="text-center">Welcome to </h2> */}
             <Intro />
           </Col>
           <Col sm={0} md={3} lg={3} xl={3} xxl={4}></Col>
@@ -117,7 +114,7 @@ export default function Signup() {
               <div className="authDiv w-100">
                 <Card>
                   <Card.Body>
-                    <h2 className="text-center mb-4">Sign up</h2>
+                    <h3 className="text-center mb-4">Sign up</h3>
                     {error && <Alert variant="danger">{error}</Alert>}
                     <Form onSubmit={handleSubmit}>
                       <Form.Group id="email">

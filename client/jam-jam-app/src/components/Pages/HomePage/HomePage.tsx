@@ -6,8 +6,6 @@ import {Container, Row, Col, Button} from "react-bootstrap"
 import "./HomePage.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {
-  faInstagram,
-  faFacebook,
   faGithub,
   faLinkedin,
   faPatreon,
@@ -32,6 +30,7 @@ const HomePage = () => {
                   />
                   <br></br>
                   <br></br>
+                  <Col className="d-block d-md-none" sm={12} md={12}></Col>
 
                   <p>
                     Introducing Jam-Jam – your ultimate destination for musical
@@ -55,9 +54,8 @@ const HomePage = () => {
             </div>
           </Col>
 
-          <Col xs={12} lg={6} className="home-section">
+          <Col sm={12} lg={6} xl={6} className="home-section">
             <div className="home-content">
-              {/* <img alt="Jammers" className="section-image" /> */}
               <h2>Jammers</h2>
               <p>Your go-to platform for music collaboration</p>
               <Link to="/jammersList">
@@ -66,11 +64,8 @@ const HomePage = () => {
             </div>
           </Col>
 
-          {/* Jam Events Section */}
-
           <Col xs={12} lg={6} className="home-section">
             <div className="home-content">
-              {/* <img alt="Jam Events" className="section-image" /> */}
               <h2>Jam Events</h2>
               <p>Join and create memorable musical experiences</p>
               <Link to="/jam-events">
@@ -78,28 +73,22 @@ const HomePage = () => {
               </Link>
             </div>
           </Col>
-
-          {/* Discover and Collaborate Section */}
         </Row>
-
-        {/* <div className="home-content-2"> */}
 
         <Row className="home-section">
           <div className="home-content-2">
             <Row>
-              <Col md={5} lg={5} className="home-section">
+              <Col sm={12} lg={5} xl={5} className="home-section">
                 <img
                   className="homeImages rounded"
                   src="https://firebasestorage.googleapis.com/v0/b/jam-jam-development.appspot.com/o/images%2FOIG3.FsYMOE.UYxcE8y---3.jpg?alt=media&token=47fd9469-c9a4-44e4-a9a9-8ee3c70b3483"
                   alt=""
                 />
               </Col>
-              <Col xs={7} lg={7}>
+              <Col sm={12} lg={7} xl={7}>
                 <br></br>
                 <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
+
                 <h4 className="text-center">Create and Join Jam Events</h4>
                 <br></br>
 
@@ -137,10 +126,7 @@ const HomePage = () => {
         <Row className="home-section">
           <div className="home-content-2">
             <Row>
-              <Col xs={7} lg={7}>
-                <br></br>
-                <br></br>
-                <br></br>
+              <Col sm={12} lg={7} xl={7}>
                 <br></br>
                 <br></br>
 
@@ -173,7 +159,7 @@ const HomePage = () => {
                   </li>
                 </ul>
               </Col>
-              <Col md={5} lg={5} className="home-section">
+              <Col sm={12} lg={5} xl={5} className="home-section">
                 <img
                   className="homeImages rounded"
                   src="https://firebasestorage.googleapis.com/v0/b/jam-jam-development.appspot.com/o/images%2FOIG4.w8FvX2.png?alt=media&token=b85c6463-b594-40f5-8b68-4da027d50e65"
@@ -183,27 +169,25 @@ const HomePage = () => {
             </Row>
           </div>
         </Row>
-        {/* </div> */}
 
         <Row className="home-section">
           <div className="home-content-2">
             <Row>
-              <Col md={5} lg={5} className="home-section">
+              <Col sm={12} lg={5} xl={5} className="home-section">
                 <img
                   className="homeImages rounded"
                   src="https://firebasestorage.googleapis.com/v0/b/jam-jam-development.appspot.com/o/images%2FOIG2888679.png?alt=media&token=97855e14-9034-4a12-b15e-325d8b42603e"
                   alt=""
                 />
               </Col>
-              <Col xs={7} lg={7}>
+              <Col sm={12} lg={7} xl={7} className="home-section">
                 <br></br>
                 <br></br>
-                <br></br>
-                <br></br>
-                <br></br>
+
                 <h4 className="text-center">
                   Advanced Search for Jammers and Jam Sessions
                 </h4>
+                <br></br>
                 <br></br>
                 <ul>
                   <li>
@@ -268,36 +252,11 @@ const HomePage = () => {
         </Row>
 
         <Row>
-          {/* <Col xs={0} md={0} lg={2} xl={3}></Col> */}
-
           <Col xs={12} md={12} lg={12} xl={12} className="home-section ">
             <div className="home-content-5">
-              {/* <h3>Contact</h3> */}
-              {/* <a
-                href="https://www.instagram.com/your_instagram_handle"
-                target="_blank"
-                rel="noopener noreferrer">
-                <FontAwesomeIcon
-                  size="3x"
-                  className="mr-2"
-                  style={{color: "#BCBCBC", margin: "15px"}}
-                  icon={faInstagram}
-                />
-              </a>
-              <a
-                href="https://www.instagram.com/your_instagram_handle"
-                target="_blank"
-                rel="noopener noreferrer">
-                <FontAwesomeIcon
-                  size="3x"
-                  className="mr-2"
-                  style={{color: "#BCBCBC", margin: "15px"}}
-                  icon={faFacebook}
-                />
-              </a> */}
               <a href="nalsurion@gmail.com">
                 <FontAwesomeIcon
-                  size="3x"
+                  size="2x"
                   className="mr-2"
                   style={{color: "#BCBCBC", margin: "15px"}}
                   icon={faEnvelope}
@@ -308,7 +267,7 @@ const HomePage = () => {
                 target="_blank"
                 rel="noopener noreferrer">
                 <FontAwesomeIcon
-                  size="3x"
+                  size="2x"
                   className="mr-2"
                   style={{color: "#BCBCBC", margin: "15px"}}
                   icon={faGithub}
@@ -319,7 +278,7 @@ const HomePage = () => {
                 target="_blank"
                 rel="noopener noreferrer">
                 <FontAwesomeIcon
-                  size="3x"
+                  size="2x"
                   className="mr-2"
                   style={{color: "#BCBCBC", margin: "15px"}}
                   icon={faLinkedin}
@@ -327,7 +286,7 @@ const HomePage = () => {
               </a>
               <a href="nalsurion@gmail.com">
                 <FontAwesomeIcon
-                  size="3x"
+                  size="2x"
                   className="mr-2"
                   style={{color: "#BCBCBC", margin: "15px"}}
                   icon={faPatreon}
@@ -336,7 +295,6 @@ const HomePage = () => {
               <p>&copy; 2024 Ruslan Cherniavsky. All Rights Reserved.</p>
             </div>
           </Col>
-          {/* <Col xs={0} md={0} lg={2} xl={3}></Col> */}
         </Row>
       </Container>
     </div>

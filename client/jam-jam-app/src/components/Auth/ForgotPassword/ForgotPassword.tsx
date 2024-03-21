@@ -33,8 +33,6 @@ export default function ForgotPassword() {
         <Row>
           <Col sm={0} md={3} lg={3} xl={3} xxl={4}></Col>
           <Col style={{paddingTop: "0px"}}>
-            {" "}
-            {/* <h2 className="text-center">Welcome to </h2> */}
             <Intro />
           </Col>
           <Col sm={0} md={3} lg={3} xl={3} xxl={4}></Col>
@@ -54,7 +52,7 @@ export default function ForgotPassword() {
               <div className="authDiv w-100">
                 <Card>
                   <Card.Body>
-                    <h2 className="text-center mb-4">Password Reset</h2>
+                    <h3 className="text-center mb-3">Password Reset</h3>
                     {error && <Alert variant="danger">Error {error}</Alert>}
                     {message && <Alert variant="info"> {message}</Alert>}
                     <Form onSubmit={handleSubmit}>

@@ -1,33 +1,3 @@
-// import React, {useEffect} from "react"
-// import dataAxios from "../../../../server/data.axios"
-// import {useDispatch, useSelector} from "react-redux"
-// import {RootState} from "../../../../redux/store"
-
-// export default function FriendRequests() {
-//   const userId = useSelector(
-//     (state: RootState) => state.userDataMongoDB.allUserData?._id
-//   )
-//   console.log(userId)
-
-//   //   const dispatch = useDispatch()
-
-//   useEffect(() => {
-//     if (typeof userId == "string")
-//       dataAxios.getAllFriendRequests(userId).then((data: any) => {
-//         // console.log(data.data.friendRequests)
-
-//         const friendRequests = data.data.friendRequests.map(
-//           (request: any) => request.userId
-//         )
-//         console.log(friendRequests)
-
-//         return friendRequests
-//       })
-//   }, [userId])
-
-//   return <div>Friend requests</div>
-// }
-
 import React, {useEffect, useState} from "react"
 import {
   Button,
@@ -78,34 +48,6 @@ export default function MyFriends() {
     (state: RootState) => state.userDataMongoDB.allUserData?._id
   )
 
-  // useEffect(() => {
-  //   setLoading(true)
-
-  //   console.log(userId)
-  //   if (typeof userId === "string") {
-  //     dataAxios
-  //       .getAllFriendRequestsByReceiverIdPaginate(userId, currentPage)
-  //       .then((data: any) => {
-  //         console.log(data.friendRequests)
-
-  //         // setJammers(data.friendRequests)
-
-  //         const friendRequests = data.friendRequests.map(
-  //           (request: any) => request.senderId
-  //         )
-
-  //         console.log(data)
-
-  //         setJammers(friendRequests)
-  //         setTotalPages(data.totalPages)
-
-  //         // console.log(data.totalPages)
-  //         // setTotalPages(data.totalPages)
-  //       })
-  //     setLoading(false)
-  //   }
-  // }, [userId, currentPage, gettingUrlParams, params])
-
   const MAX_PAGES_DISPLAYED = 9
 
   interface SearchText {
@@ -114,7 +56,7 @@ export default function MyFriends() {
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/friendRequests?page=${currentPage}&${queryString}`
+    const newUrl = `/friend-requests?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -212,37 +154,6 @@ export default function MyFriends() {
             setTotalPages(1)
             setLoading(false)
           }
-
-          // dataAxios
-          //   .getAllFriendRequestsByReceiverIdPaginate(userId, currentPage)
-          //   .then((data: any) => {
-          //     console.log(data.friendRequests)
-
-          // setJammers(data.friendRequests)
-
-          // console.log(data.totalPages)
-          // setTotalPages(data.totalPages)
-          // })
-
-          //         if (!ifFiltered && !gettingUrlParams && !ifSearching) {
-          //           setSearchText({username: ""})
-
-          //           setLoading(true)
-          //           const data = await dataAxios.dataFetch(currentPage)
-          //           setTotalPages(data.totalPages)
-          //           setJammers(data.users)
-          //         } else if (ifFiltered && !ifSearching) {
-          //           setSearchText({username: ""})
-
-          //           setLoading(true)
-          //           const data = await dataAxios.jammersFetchFiltered(params, currentPage)
-          //           setTotalPages(data.totalPages)
-          //           setJammers(data.users)
-          //         } else if (ifSearching) {
-          //           setLoading(true)
-          //           const data = await dataAxios.jammersFetchBySearch(params, currentPage)
-          //           setTotalPages(data.totalPages)
-          //           setJammers(data.users)
         }
         setLoading(false)
       } catch (error) {
@@ -344,7 +255,7 @@ export default function MyFriends() {
                     icon={faPlus}
                     className="mr-1"
                   />{" "}
-                  Browse Jammers
+                  Explore Jammers
                 </Button>
               </Col>
 

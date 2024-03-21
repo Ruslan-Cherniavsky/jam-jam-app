@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState, FormEvent} from "react"
 import {Form, Button, Card, Alert} from "react-bootstrap"
 import {Link, useNavigate} from "react-router-dom"
 import {useAuthContext} from "../../../context/AuthContext"
-import MultiSelect from "../../../components_UI/MultiSelect/Multiselect"
 
 interface UpdateProfileProps {}
 

@@ -14,7 +14,7 @@ const PrivateRouteVerified: React.FC<PrivateRouteVerifiedProps> = ({
   children,
 }: PrivateRouteVerifiedProps) => {
   const {currentUser} = useAuthContext()
-  const dispatch = useDispatch()
+  // const dispatch = useDispatch()
 
   const userName = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?.userName
@@ -22,10 +22,8 @@ const PrivateRouteVerified: React.FC<PrivateRouteVerifiedProps> = ({
   const [shouldRedirect, setShouldRedirect] = useState(false)
 
   useEffect(() => {
-    // Check if required fields are missing in userDataDB
     if (!userName) {
-      // if username undefind check if username exist in database
-      console.log("working**********fetch to riderection")
+      // console.log("working**********fetch to riderection")
       if (currentUser && currentUser.emailVerified) {
         dataAxios
           .jemerCardDataFetchByEmail(currentUser.email)
