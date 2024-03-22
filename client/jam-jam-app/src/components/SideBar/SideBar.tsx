@@ -105,7 +105,7 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/friendRequests"
+            to="/friend-requests"
             className={
               pathname === "/friend-requests"
                 ? "nav-link-custom nav-link link-black nav-custom active"
