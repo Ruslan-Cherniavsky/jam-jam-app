@@ -150,9 +150,9 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/created-jams/:jamerId"
+            to="/created-jams/"
             className={
-              pathname === "/created-jams/:jamerId"
+              pathname === "/created-jams/"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>
@@ -162,9 +162,9 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/create-jam/:jamerId"
+            to="/create-jam/"
             className={
-              pathname === "/create-jam/:jamerId"
+              pathname === "/create-jam/"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>

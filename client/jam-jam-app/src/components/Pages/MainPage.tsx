@@ -7,7 +7,6 @@ import PrivateRouteVerified from "../Auth/PrivateRoutes/PrivateRouteVerified"
 import JammersCardListPage from "./Jammers/CardListPage/CardListPage"
 import JamerCardPage from "./Jammers/ProfilePage/ProfilePage"
 import {CreateJamEvent} from "./User/CreateJam/CreateJam"
-import {CreatedJamEvents} from "./User/CreatedJamEvents/CreatedJamEvents"
 import Signup from "../Auth/Signup/Signup"
 import ForgotPassword from "../Auth/ForgotPassword/ForgotPassword"
 import Login from "../Auth/Login/Login"
@@ -22,6 +21,7 @@ import HomePage from "./HomePage/HomePage"
 import MyFriends from "./User/MyFriends/MyFriends"
 import InvitesToJams from "./User/InvitesToJams/InvitesToJams"
 import FriendRequests from "./User/friendRequests/friendRequests"
+import {CreatedJams} from "./User/CreatedJams/CreatedJams"
 
 export default function () {
   const {currentUser} = useAuthContext()
@@ -62,17 +62,17 @@ export default function () {
                 }></Route>
 
               <Route
-                path="/created-jams/:jamerId"
+                path="/created-jams/"
                 element={
                   <PrivateRouteVerified>
-                    <CreatedJamEvents />
+                    <CreateJamEvent />
                   </PrivateRouteVerified>
                 }></Route>
               <Route
                 path="/create-jam/"
                 element={
                   <PrivateRouteVerified>
-                    <CreateJamEvent />
+                    <CreatedJams />
                   </PrivateRouteVerified>
                 }></Route>
 

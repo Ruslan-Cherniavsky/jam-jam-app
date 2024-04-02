@@ -281,28 +281,6 @@ export default function MyFriends() {
                   My Friends{" "}
                 </Button>
               </Col>
-              {/* <Col xl={4} md={8} sm={8} xs={8}> */}
-              {/* <Form className="mb-2">
-                  <FormControl
-                    style={{margin: " 0px 0px 15px 0px"}}
-                    type="text"
-                    placeholder="Search by Username"
-                    className="mr-sm-2"
-                    onChange={handleSearchInput}
-                    value={searchText?.username}
-                  />
-                </Form> */}
-              {/* </Col> */}
-              {/* <Col xl={2} md={4} sm={4} xs={4}>
-                <Button
-                  onClick={handleSearch}
-                  variant="outline-dark"
-                  disabled={loading}
-                  style={{margin: " 0px 0px 15px 0px"}}
-                  className="w-100">
-                  Search
-                </Button>
-              </Col> */}
             </Row>
             <Row>
               <Col xl={4}>
@@ -385,30 +363,7 @@ export default function MyFriends() {
                   My Friends{" "}
                 </Button>
               </Col>
-              {/* <Col md={3}></Col> */}
 
-              {/* <Col xl={4} md={8} sm={8} xs={8}>
-                <Form className="mb-2">
-                  <FormControl
-                    style={{margin: " 0px 0px 15px 0px"}}
-                    type="text"
-                    placeholder="Search by Username"
-                    className="mr-sm-2"
-                    onChange={handleSearchInput}
-                    value={searchText?.username}
-                  />
-                </Form>
-              </Col>
-              <Col xl={2} md={4} sm={4} xs={4}>
-                <Button
-                  onClick={handleSearch}
-                  variant="outline-dark"
-                  disabled={loading}
-                  style={{margin: " 0px 0px 15px 0px"}}
-                  className="w-100">
-                  Search
-                </Button>
-              </Col> */}
               <Col xl={4}>
                 {jammers.length > 0 && (
                   <Pagination className="my-custom-pagination">

@@ -25,10 +25,6 @@ import {useNavigate} from "react-router-dom"
 import dataAxios from "../../../../server/data.axios"
 import {RootState} from "../../../../redux/store"
 import {useDispatch, useSelector} from "react-redux"
-import {
-  // FriendRequest,
-  setUserDataMongoDB,
-} from "../../../../redux/reducers/UserDataSliceMongoDB"
 
 interface UserCardProps {
   jammer: {
@@ -55,6 +51,24 @@ interface UserCardProps {
   }
 }
 
+interface FriendRequest {
+  __v: number
+  _id: string
+  receiverId: ReceiverId | null
+  senderId: SenderId | null
+  status: string
+}
+
+interface SenderId {
+  _id: string
+  userName: string
+}
+
+interface ReceiverId {
+  _id: string
+  userName: string
+}
+
 const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
   // const {userId} = useParams<{userId: string}>()
   const {currentUser} = useAuthContext()
@@ -72,14 +86,6 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
   const userId = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?._id
   )
-
-  const currentUserDB = useSelector(
-    (state: RootState) => state.userDataMongoDB.allUserData
-  )
-
-  // const handleAddToFriend = () => {
-  //   console.log("Adding to friend:", jammer.userName)
-  // }
 
   const handleInviteToJam = () => {
     console.log("Inviting to jam:", jammer.userName)
@@ -117,21 +123,15 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
       )
       const currentUserDB = userData.data.user
 
-      // console.log("initializationuser data  -----------", currentUserDB.friends)
-      // Check if the user is already a friend
       if (currentUserDB?.friends.includes(jammer._id)) {
         setMessage("User is already in your friends list.")
         return
       }
 
-      // console.log(currentUserDB._id)
-
       const senderId = currentUserDB._id
-
       const requestsResponseBySenderId =
         await dataAxios.getAllFriendRequestsBySenderId(senderId)
 
-      // Ensure that the response contains the expected data structure
       if (
         !requestsResponseBySenderId ||
         !requestsResponseBySenderId.friendRequests
@@ -146,19 +146,16 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
       const friendRequestsBySender = requestsResponseBySenderId.friendRequests
       if (
         friendRequestsBySender.some(
-          (request: any) =>
-            request.receiverId["_id"] === jammer._id &&
+          (request: FriendRequest) =>
+            request.receiverId?._id === jammer._id &&
             request.status === "pending"
         )
       ) {
         setMessage("Friend request already sent.")
         return
       }
-
       const requestsResponseByReceiverId =
         await dataAxios.getAllFriendRequestsByReceiverId(currentUserDB._id)
-
-      // Ensure that the response contains the expected data structure
       if (
         !requestsResponseByReceiverId ||
         !requestsResponseByReceiverId.friendRequests
@@ -175,9 +172,8 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
 
       if (
         friendRequestsByReceiver.some(
-          (request: any) =>
-            request.senderId["_id"] === jammer._id &&
-            request.status === "pending"
+          (request: FriendRequest) =>
+            request.senderId?._id === jammer._id && request.status === "pending"
         )
       ) {
         setMessage(
@@ -186,20 +182,15 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
         return
       }
 
-      // Check if the user is the same as the current user
       if (jammer._id === currentUserDB?._id) {
         setMessage("Cannot add yourself as a friend.")
         return
       }
 
-      // Proceed to send the friend request
-      // console.log("Adding to friend:", jammer.userName)
       const response = await dataAxios.sendFriendRequest(
         currentUserDB?._id,
         jammer._id
       )
-
-      // console.log(response)
 
       if (response.status === 200) {
         console.log("Friend request sent successfully.")
@@ -217,14 +208,11 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
   const handleReport = async () => {
     try {
       if (!reportReason.trim()) {
-        // console.error("Report reason is required.")
         setError("Report reason is required.")
-        // setShowReportModal(false)
         return
       }
       if (reportReason.length > 1000) {
         setError("Report reason should be less than 1000 characters.")
-        // setShowReportModal(false)
         return
       }
 
@@ -237,7 +225,6 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
       )
 
       if (response.status === 200) {
-        // console.log("User reported successfully.")
         setMessage(
           "User reported successfully. We will review the report and take appropriate action if necessary."
         )
@@ -413,7 +400,6 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
         </Card.Body>
       </Card>
 
-      {/* Modal for Report Reason */}
       <Modal show={showReportModal} onHide={() => handleSetShowReportModal()}>
         <Modal.Header closeButton>
           <Modal.Title>Report User</Modal.Title>
@@ -437,7 +423,6 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
             size="sm"
             style={{
               borderColor: iconColor,
-              // width: "100%",
             }}
             onClick={handleReport}>
             Send Report

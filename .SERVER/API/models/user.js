@@ -38,17 +38,6 @@ const userSchema = mongoose.Schema({
     },
   ],
 
-  // friendRequests: [
-  //   {
-  //     userId: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
-  //     status: {
-  //       type: String,
-  //       enum: ["pending", "approved", "rejected"],
-  //       default: "pending",
-  //     },
-  //   },
-  // ],
-
   friends: [{type: mongoose.Schema.Types.ObjectId, ref: "User"}],
 
   //------TODO create deferent reports model

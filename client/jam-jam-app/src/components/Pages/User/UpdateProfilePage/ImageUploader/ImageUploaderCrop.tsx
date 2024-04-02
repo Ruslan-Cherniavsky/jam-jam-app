@@ -8,7 +8,7 @@ import {getStorage} from "firebase/storage"
 
 import Cropper, {ReactCropperElement} from "react-cropper"
 import "cropperjs/dist/cropper.css"
-import {Button, Col, Container, Row} from "react-bootstrap"
+import {Button, Container} from "react-bootstrap"
 
 const storage = getStorage()
 const placeholder =
@@ -33,7 +33,7 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
   const cropperRef = useRef<ReactCropperElement>(null)
 
   const onCrop = async (event: any) => {
-    event.preventDefault() // Prevent the default form submission behavior
+    event.preventDefault()
     setError("")
 
     console.log("croped")
@@ -151,7 +151,7 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
       setIsUploading(true)
       const file = event.target.files[0]
 
-      const allowedFormats = ["image/jpeg", "image/png"] // Add or remove formats as needed
+      const allowedFormats = ["image/jpeg", "image/png"]
       if (!allowedFormats.includes(file.type)) {
         setLoading(false)
         setIsUploading(false)
@@ -159,7 +159,7 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
         return
       }
 
-      const maxSizeInBytes = 5 * 1024 * 1024 // 5 MB as an example, adjust as needed
+      const maxSizeInBytes = 5 * 1024 * 1024
       if (file.size > maxSizeInBytes) {
         setLoading(false)
         setIsUploading(false)
@@ -173,7 +173,7 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
 
       const reader = new FileReader()
       reader.onload = () => {
-        setImagePreview(reader.result as string) // Set preview directly from the FileReader result
+        setImagePreview(reader.result as string)
       }
       reader.readAsDataURL(file)
       setLoading(false)
@@ -186,11 +186,8 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
     <>
       {error && <div className="text-danger">{error}</div>}
 
-      {/* <Col md={3} lg={3}> */}
-
       <div style={{display: isUploading ? "none" : "block"}}>
         <img
-          // className="img-fluid rounded"
           className="w-100"
           src={imageURL || placeholder}
           style={{width: "300px"}}
@@ -203,9 +200,8 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
           src={imagePreview || placeholder}
           style={{width: "300px"}}
           className="w-100"
-          // Cropper.js options
           initialAspectRatio={1 / 1}
-          aspectRatio={1 / 1} // Set the aspectRatio to make it unchangeable
+          aspectRatio={1 / 1}
           guides={false}
           crop={onCrop}
           ref={cropperRef}
@@ -238,7 +234,6 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
           disabled={loading}
           className="w-100"
           type="button"
-          // className="btn btn-success mt-2" // Add Bootstrap button classes
           onClick={onCrop}>
           Crop
         </Button>

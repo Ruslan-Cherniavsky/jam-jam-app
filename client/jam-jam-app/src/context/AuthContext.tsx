@@ -33,11 +33,7 @@ import {
   setFirebaseUserData,
   selectFirebaseUserData,
   clearFirebaseUserData,
-} from "../redux/reducers/FirbaseUserDataSlice" // Import your user slice
-
-import {setUserId} from "../redux/reducers/UserDataSlice"
-import {Navigate} from "react-router-dom"
-import {RootState} from "../redux/store"
+} from "../redux/reducers/FirbaseUserDataSlice"
 
 export interface AuthContextProps {
   currentUser: FirebaseUser | null

@@ -9,11 +9,11 @@ interface Params {
   instruments: Array<string>
 }
 
-type SenderId = string // Assuming SenderId is a string representing the ID of the sender
-type ReceiverId = string // Assuming ReceiverId is a string representing the ID of the receiver
-type Status = "pending" | "approved" | "rejected" // Status can only be one of these three strings
-type UserId = string | any // Assuming UserId is a string representing the ID of a user
-type RequestId = string // As
+type SenderId = string
+type ReceiverId = string
+type Status = "pending" | "approved" | "rejected"
+type UserId = string | any
+type RequestId = string
 
 interface SearchText {
   username: string | null
@@ -34,7 +34,6 @@ const dataAxios: {
   fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
   jammersFetchBySearch: (params: SearchText, pageNumber: any) => Promise<any>
   reportUser: (reportedUserId: any, userId: any, reason: string) => Promise<any>
-  // addToFriends: (jammerId: any, userId: any) => Promise<any>
   sendFriendRequest: (
     senderId: SenderId,
     receiverId: ReceiverId

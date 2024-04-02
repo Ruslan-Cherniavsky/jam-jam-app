@@ -1,7 +1,5 @@
 import * as React from "react"
-import Grid from "@mui/material/Grid"
 import Loader from "../../../../components_UI/Loaders/Loader"
-import Box from "@mui/material/Box"
 import {useParams} from "react-router-dom"
 import dataAxios from "../../../../server/data.axios"
 import Profile from "../Profile/Profile"

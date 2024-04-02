@@ -33,7 +33,7 @@ function JammersCardListPage() {
   const [totalPages, setTotalPages] = useState(0)
 
   const MAX_PAGES_DISPLAYED = 9
-  const CARD_LIST_TYPE = "Browse Jammers"
+  const CARD_LIST_TYPE = "Explore Jammers"
 
   interface SearchText {
     username: string | null

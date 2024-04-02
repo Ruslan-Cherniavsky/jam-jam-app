@@ -9,17 +9,12 @@ import {
   Row,
 } from "react-bootstrap"
 
-import {useLocation, useNavigate, useParams} from "react-router-dom"
+import {useLocation, useNavigate} from "react-router-dom"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import {IParams} from "../../Jammers/Filter/Filter"
 import dataAxios from "../../../../server/data.axios"
 import JammersCardList from "../../../../components_UI/CardList/CardList"
-import {
-  faBackward,
-  faUserPlus,
-  faPlus,
-  faUserFriends,
-} from "@fortawesome/free-solid-svg-icons"
+import {faUserPlus, faPlus} from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {useSelector} from "react-redux"
 import {RootState} from "../../../../redux/store"
@@ -134,26 +129,6 @@ export default function MyFriends() {
   useEffect(() => {
     const fetchJammers = async () => {
       try {
-        // if (!ifFiltered && !gettingUrlParams && !ifSearching) {
-        //   setSearchText({username: ""})
-
-        //   setLoading(true)
-        //   const data = await dataAxios.dataFetch(currentPage)
-        //   setTotalPages(data.totalPages)
-        //   setJammers(data.users)
-        // } else if (ifFiltered && !ifSearching) {
-        //   setSearchText({username: ""})
-
-        //   setLoading(true)
-        //   const data = await dataAxios.jammersFetchFiltered(params, currentPage)
-        //   setTotalPages(data.totalPages)
-        //   setJammers(data.users)
-        // } else if (ifSearching) {
-        //   setLoading(true)
-        //   const data = await dataAxios.jammersFetchBySearch(params, currentPage)
-        //   setTotalPages(data.totalPages)
-        //   setJammers(data.users)
-        // }
         if (typeof userId === "string") {
           setLoading(true)
 
@@ -337,27 +312,6 @@ export default function MyFriends() {
                 )}
               </Col>
               <Col xl={2}></Col>
-
-              {/* <Col xl={4}>
-                <Form className="mb-2">
-                  <FormControl
-                    type="text"
-                    placeholder="Search by Username"
-                    className="mr-sm-2"
-                    onChange={handleSearchInput}
-                    value={searchText?.username}
-                  />
-                </Form>
-              </Col>
-              <Col xl={2}>
-                <Button
-                  variant="outline-dark"
-                  disabled={loading}
-                  onClick={handleSearch}
-                  className="w-100">
-                  Search
-                </Button>
-              </Col> */}
             </Row>
           </Container>
         </div>

@@ -26,7 +26,6 @@ const firebaseDataSlice = createSlice({
 export const {setFirebaseUserData, clearFirebaseUserData} =
   firebaseDataSlice.actions
 
-// Selector function to get user data from the state
 export const selectFirebaseUserData = (state: {
   firebaseUserData: FirebaseUser
 }) => state.firebaseUserData

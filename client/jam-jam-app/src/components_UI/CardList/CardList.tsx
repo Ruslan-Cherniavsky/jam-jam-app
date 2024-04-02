@@ -5,7 +5,6 @@ import ListGroup from "react-bootstrap/ListGroup"
 import "bootstrap/dist/css/bootstrap.min.css"
 import Button from "react-bootstrap/Button"
 import "./CardList.css"
-import Loader from "../Loaders/Loader"
 import {Col, Row} from "react-bootstrap"
 import {useSelector} from "react-redux"
 import {RootState} from "../../redux/store"
@@ -76,9 +75,6 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
           (request: any) => request.senderId._id === currentJammerId
         )
 
-        // console.log(currentJammerId)
-        // console.log(friendRequest)
-
         const response = await dataAxios.respondToFriendRequest(
           friendRequest,
           "approved"
@@ -89,8 +85,6 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
         }
         updateListCB()
       }
-
-      // setSelectedUserId(jammerId)
     } catch (error) {
       console.error("Error confirming friend request :", error)
     }
@@ -103,27 +97,19 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
       if (userId) {
         const data = await dataAxios.getAllFriendRequestsByReceiverId(userId)
 
-        // console.log(data.friendRequests)
-
         const friendRequest = data.friendRequests.filter(
           (request: any) => request.senderId._id === currentJammerId
         )
-
-        // console.log(currentJammerId)
-        // console.log(friendRequest)
 
         const response = await dataAxios.respondToFriendRequest(
           friendRequest,
           "rejected"
         )
-        // console.log(response)
         if (response.status === 200) {
           console.log(`new friend ${jemmerUsername} rejected succesful`)
         }
         updateListCB()
       }
-
-      // setSelectedUserId(jammerId)
     } catch (error) {
       console.error("Error confirming friend request :", error)
     }
@@ -143,7 +129,6 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                 <Card.Img
                   src={jammer.img}
                   style={{
-                    // maxHeight: "150px",
                     width: "100%",
                     objectFit: "cover",
                   }}
@@ -198,6 +183,8 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                   </div>
                 </ListGroup>
 
+                {cardListType === "Explore Jammers" && <p></p>}
+
                 {cardListType === "Friend Requests" && (
                   <div className="friendRequestsCont">
                     <Row>
@@ -208,17 +195,12 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                             borderColor: "#BCBCBC",
                             width: "100%",
                             marginTop: "10px",
-
-                            // marginLeft: "8px",
-                            // marginTop: "8px",
-
-                            // backgroundColor: "white",
                           }}
                           variant="outline-dark"
                           className="confirm-button"
                           onClick={(e) => {
-                            e.stopPropagation() // Stop the click event from propagating to the card
-                            handleConfirmRequest(jammer._id, jammer.userName) // Call your function to confirm the friend request
+                            e.stopPropagation()
+                            handleConfirmRequest(jammer._id, jammer.userName)
                           }}>
                           Confirm
                         </Button>
@@ -229,16 +211,13 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                             borderColor: "#BCBCBC",
                             width: "100%",
                             marginTop: "10px",
-                            // marginRight: "8px",
-                            // marginTop: "8px",
-                            // backgroundColor: "white",
                           }}
                           size="sm"
                           variant="outline-dark"
                           className="reject-button"
                           onClick={(e) => {
-                            e.stopPropagation() // Stop the click event from propagating to the card
-                            handleRejectRequest(jammer._id, jammer.userName) // Call your function to reject the friend request
+                            e.stopPropagation()
+                            handleRejectRequest(jammer._id, jammer.userName)
                           }}>
                           Reject
                         </Button>
@@ -256,17 +235,12 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                             borderColor: "#BCBCBC",
                             width: "100%",
                             marginTop: "10px",
-
-                            // marginLeft: "8px",
-                            // marginTop: "8px",
-
-                            // backgroundColor: "white",
                           }}
                           variant="outline-dark"
                           className="confirm-button"
                           onClick={(e) => {
-                            e.stopPropagation() // Stop the click event from propagating to the card
-                            handleUnfriend(jammer._id, jammer.userName) // Call your function to confirm the friend request
+                            e.stopPropagation()
+                            handleUnfriend(jammer._id, jammer.userName)
                           }}>
                           Unfriend
                         </Button>
@@ -278,17 +252,12 @@ const JammersCardList: React.FC<JammersCardListProps> = ({
                             borderColor: "#BCBCBC",
                             width: "100%",
                             marginTop: "10px",
-
-                            // marginLeft: "8px",
-                            // marginTop: "8px",
-
-                            // backgroundColor: "white",
                           }}
                           variant="outline-dark"
                           className="confirm-button"
                           onClick={(e) => {
                             e.stopPropagation()
-                            handleCardClick(jammer._id) // Stop the click event from propagating to the card
+                            handleCardClick(jammer._id)
                           }}>
                           invite to jam
                         </Button>

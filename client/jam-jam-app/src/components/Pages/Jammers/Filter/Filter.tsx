@@ -123,7 +123,6 @@ const Filter = (filterProps: FilterProps) => {
           setSelectedInstrumentsStrings(urlParams.instruments)
         } catch (error) {
           console.error("Error fetching instruments:", error)
-          // Handle the error
         }
       }
     }

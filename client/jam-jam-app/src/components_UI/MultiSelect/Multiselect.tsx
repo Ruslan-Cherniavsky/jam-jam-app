@@ -46,7 +46,6 @@ export default function MultiSelect(props: SelectProps | null) {
       target: {value},
     } = event
 
-    // id of selection:
     const idArray: Array<string> = []
     props?.dataArray.map(
       (selection: any) =>
@@ -54,8 +53,6 @@ export default function MultiSelect(props: SelectProps | null) {
         idArray.push(selection._id)
     )
     props?.selectedCallbackFn(idArray)
-
-    //string names:
     const idArrayDefault: Array<string> = []
 
     props?.selectedDB.map(
