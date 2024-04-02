@@ -1,0 +1,30 @@
+/* Sidebar.css */
+
+.nav-link-custom {
+  color: gray;
+  transition: background-color 0.3s;
+  background-color: transparent;
+  /* margin-bottom: 1%; */
+  /* font-size: 23px; */
+}
+
+.nav-link-custom:hover {
+  background-color: #f0f0f0;
+}
+
+.nav-link-custom:active {
+  background-color: #e7e7e7; /* Change the color for the active state */
+  /* Optionally, you can add other styles for the active state */
+}
+.nav-link-custom:active {
+  background-color: #e7e7e7; /* Change the color for the active state */
+  /* Optionally, you can add other styles for the active state */
+}
+
+.nav-custom.active {
+  background-color: #e6e7ec;
+  color: #ffffff;
+}
+.nav-custom:active {
+  background-color: #d4d4d4;
+}

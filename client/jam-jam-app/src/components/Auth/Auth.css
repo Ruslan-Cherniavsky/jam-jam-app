@@ -1,0 +1,13 @@
+.authContainer {
+  padding-top: 30px;
+  display: flex;
+  justify-content: center;
+}
+
+.authDiv {
+  max-width: 400px;
+}
+
+.intro_image {
+  width: 100%;
+}

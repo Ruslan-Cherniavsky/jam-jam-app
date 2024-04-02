@@ -1,0 +1,25 @@
+/* .mainPageContainer {
+  width: 100%;
+} */
+body {
+  overflow-y: scroll;
+}
+
+.sidebar-container {
+  /* margin-top: 55px; */
+  padding-bottom: 400px;
+  padding-right: 30px;
+  width: auto;
+  height: 100%;
+  /* position: fixed; */
+  top: 0;
+  left: 5;
+  bottom: 0;
+  background-color: #f8f9fa;
+  padding-top: 20px;
+  background: linear-gradient(
+    to bottom,
+    #f8f9fa,
+    #ffffff
+  ); /* Gradient from gray to white */
+}
