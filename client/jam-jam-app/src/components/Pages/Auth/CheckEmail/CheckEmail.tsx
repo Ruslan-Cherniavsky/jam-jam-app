@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import {Card, Alert, Button} from "react-bootstrap"
 import {Link, useNavigate} from "react-router-dom"
-import {useAuthContext} from "../../../context/AuthContext"
+import {useAuthContext} from "../../../../context/AuthContext"
 
 export default function CheckEmail() {
   const {sendCurrentEmailVerification, currentUser} = useAuthContext()

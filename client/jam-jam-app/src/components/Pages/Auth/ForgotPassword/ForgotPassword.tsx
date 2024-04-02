@@ -1,6 +1,6 @@
 import React, {FormEvent, useRef, useState} from "react"
 import {Form, Button, Card, Alert, Col, Container, Row} from "react-bootstrap"
-import {useAuthContext} from "../../../context/AuthContext"
+import {useAuthContext} from "../../../../context/AuthContext"
 import {Link} from "react-router-dom"
 import Intro from "../Intro/Intro"
 

@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import UpdateProfileFirebase from "../../../../Auth/UpdateProfileFirebase/UpdateProfileFirebase"
+import UpdateProfileFirebase from "../../../Auth/UpdateProfileFirebase/UpdateProfileFirebase"
 import UpdateProfile from "../UpdateProfile/UpdateProfile"
 import {useAuthContext} from "../../../../../context/AuthContext"
 import {useSelector} from "react-redux"

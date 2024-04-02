@@ -1,10 +1,10 @@
 import React, {ReactNode, useEffect, useState} from "react"
 import {Navigate} from "react-router-dom"
-import {useAuthContext} from "../../../context/AuthContext"
+import {useAuthContext} from "../../../../context/AuthContext"
 import {useDispatch, useSelector} from "react-redux"
-import {RootState} from "../../../redux/store"
-import dataAxios from "../../../server/data.axios"
-import {setUserDataMongoDB} from "../../../redux/reducers/UserDataSliceMongoDB"
+import {RootState} from "../../../../redux/store"
+import dataAxios from "../../../../server/data.axios"
+import {setUserDataMongoDB} from "../../../../redux/reducers/UserDataSliceMongoDB"
 
 interface PrivateRouteVerifiedProps {
   children: ReactNode

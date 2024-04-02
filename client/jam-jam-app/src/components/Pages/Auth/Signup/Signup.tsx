@@ -1,8 +1,8 @@
 import {useRef, useState, FormEvent} from "react"
 import {Form, Button, Card, Alert, Container, Row, Col} from "react-bootstrap"
-import {useAuthContext} from "../../../context/AuthContext"
+import {useAuthContext} from "../../../../context/AuthContext"
 import {Link, useNavigate} from "react-router-dom"
-import dataAxios from "../../../server/data.axios"
+import dataAxios from "../../../../server/data.axios"
 import Intro from "../Intro/Intro"
 
 export default function Signup() {
