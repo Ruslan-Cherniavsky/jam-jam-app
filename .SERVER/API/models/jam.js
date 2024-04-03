@@ -1,7 +1,6 @@
 const mongoose = require("mongoose")
 
 const jamSchema = mongoose.Schema({
-  _id: mongoose.Schema.Types.ObjectId,
   img: {type: String},
   jamName: {type: String, maxlength: 30},
   hostedBy: {type: mongoose.Schema.Types.ObjectId, ref: "User"},
