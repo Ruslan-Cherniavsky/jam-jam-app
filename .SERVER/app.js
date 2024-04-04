@@ -28,6 +28,7 @@ const genresRoutes = require("./API/routes/genres")
 const instrumentsRoutes = require("./API/routes/instruments")
 const links = require("./API/routes/links")
 const jams = require("./API/routes/jams")
+const jamRequests = require("./API/routes/jamRequests")
 
 app.use("/users", usersRoutes)
 
@@ -40,6 +41,8 @@ app.use("/instruments", instrumentsRoutes)
 app.use("/links", links)
 
 app.use("/jams", jams)
+
+app.use("/jamrequests", jamRequests)
 
 // app.use(verifyToken);
 

@@ -11,9 +11,9 @@ const {
   reportJam,
   getAllJamsByHostedById,
   getJamByJamName,
+  getAllJamsByJammerId,
 } = require("../controllers/jams")
 
-// POST endpoint to create a new Jam
 router.post("/create", createJam)
 router.get("/getalljams", getAllJams)
 router.get("/getalljams-paginate", getAllJamsWithPagination)
@@ -24,5 +24,6 @@ router.delete("/deletebyid/:jamid", deleteJamById)
 router.post("/reportjam/", reportJam)
 router.get("/getalljamsbyhostedbyid/:userId", getAllJamsByHostedById)
 router.get("/getjambyjamname", getJamByJamName)
+router.get("/getjambyjammerid/:userId", getAllJamsByJammerId)
 
 module.exports = router

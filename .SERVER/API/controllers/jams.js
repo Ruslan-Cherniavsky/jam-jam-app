@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const Jam = require("../models/jam")
+const User = require("../models/user")
 
 const createJam = async (req, res) => {
   try {
@@ -15,6 +16,8 @@ const createJam = async (req, res) => {
       type,
       entrance,
       tune,
+      jamTime,
+      status,
       jamDescription,
       genres,
       sharedInstruments,
@@ -35,6 +38,8 @@ const createJam = async (req, res) => {
       type,
       entrance,
       tune,
+      jamTime,
+      status,
       jamDescription,
       genres,
       sharedInstruments,
@@ -67,6 +72,10 @@ const getJamById = async (req, res) => {
   const jamId = req.params.jamid
 
   try {
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid jam ID"})
+    }
+
     const jam = await Jam.findById(jamId).populate(
       "hostedBy genres sharedInstruments jammers.instrument audience reports.reporter"
     )
@@ -86,6 +95,10 @@ const updateJam = async (req, res) => {
   const jamId = req.params.jamid
 
   try {
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid jam ID"})
+    }
+
     const jam = await Jam.findById(jamId)
 
     if (!jam) {
@@ -93,6 +106,7 @@ const updateJam = async (req, res) => {
     }
 
     await Jam.updateOne({_id: jamId}, req.body)
+    await jam.save()
 
     return res.status(200).json({message: "Jam updated"})
   } catch (error) {
@@ -105,6 +119,10 @@ const deleteJamById = async (req, res) => {
   const jamId = req.params.jamId
 
   try {
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid jam ID"})
+    }
+
     const jam = await Jam.findById(jamId)
 
     if (!jam) {
@@ -223,6 +241,15 @@ const getAllJamsByHostedById = async (req, res) => {
   const userId = req.params.userId
 
   try {
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({error: "Invalid user ID"})
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({message: "User not found."})
+    }
+
     const queryConditions = {hostedBy: userId}
 
     const totalJams = await Jam.countDocuments(queryConditions)
@@ -256,14 +283,41 @@ const getJamByJamName = async (req, res) => {
     })
       .skip((page - 1) * perPage)
       .limit(perPage)
-      .populate(
-        "hostedBy genres sharedInstruments jammers.instrument audience reports.reporter"
-      )
+    // .populate(
+    //   "hostedBy genres sharedInstruments jammers.instrument audience reports.reporter"
+    // )
 
     return res.json({jams, totalPages})
   } catch (error) {
     console.error("Error searching jams by jam name:", error)
     res.status(500).json({error: "Internal server error."})
+  }
+}
+
+const getAllJamsByJammerId = async (req, res) => {
+  const userId = req.params.userId
+  const page = parseInt(req.query.page) || 1
+  const perPage = 10 // Adjust as needed
+
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({error: "Invalid user ID"})
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({message: "User not found."})
+    }
+    const totalCount = await Jam.countDocuments({"jammers.jammersId": userId})
+    const totalPages = Math.ceil(totalCount / perPage)
+
+    const jams = await Jam.find({"jammers.jammersId": userId})
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+    res.status(200).json({jams, totalPages})
+  } catch (error) {
+    console.error("Error fetching jams by jammer ID:", error)
+    res.status(500).json({error: "Internal server error"})
   }
 }
 
@@ -301,4 +355,5 @@ module.exports = {
   reportJam,
   getAllJamsByHostedById,
   getJamByJamName,
+  getAllJamsByJammerId,
 }

@@ -12,6 +12,8 @@ const jamSchema = mongoose.Schema({
   type: {type: String},
   entrance: {type: String},
   tune: {type: String},
+  jamTime: {type: Number},
+  ifCanceled: {type: Boolean, default: false},
   jamDescription: {type: String, maxlength: 700},
   genres: [{type: mongoose.Schema.Types.ObjectId, ref: "Genres"}],
   sharedInstruments: [
