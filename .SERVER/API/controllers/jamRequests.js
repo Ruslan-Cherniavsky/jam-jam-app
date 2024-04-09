@@ -5,6 +5,83 @@ const User = require("../models/user")
 const JamRequests = require("../models/jamRequests")
 const Instruments = require("../models/instruments")
 
+//-----------------------------------------------------------|
+//                                                           |
+//              Postman tests / admin function:
+//                                                           |
+//-----------------------------------------------------------|
+
+//---Get all jam requests
+
+const getAllJamRequests = async (req, res) => {
+  try {
+    const jamRequests = await JamRequests.find()
+    if (!jamRequests || jamRequests.length === 0) {
+      return res.status(404).json({message: "No Jam Requests found"})
+    }
+
+    return res.status(200).json({jamRequests})
+  } catch (error) {
+    console.error("Error getting all Jam Requests requests:", error)
+    return res.status(500).json({message: "Internal Server Error"})
+  }
+}
+
+//---Get all jam requests paginate
+
+const getAllJamRequestsPaginate = async (req, res) => {
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
+
+  try {
+    const totalJamRequests = await JamRequests.countDocuments()
+    const totalPages = Math.ceil(totalJamRequests / perPage)
+
+    const jamRequests = await JamRequests.find()
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+
+    if (!jamRequests || jamRequests.length === 0) {
+      return res.status(404).json({message: "No jam requests found"})
+    }
+
+    return res.status(200).json({jamRequests, totalPages})
+  } catch (error) {
+    console.error("Error getting all jam requests:", error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
+//---Delete jam request by id
+
+const deleteJamRequestsById = async (req, res) => {
+  const jamRequestId = req.params.jamRequestId
+
+  console.log(jamRequestId)
+  try {
+    const jamRequests = await JamRequests.findById(jamRequestId)
+
+    if (!jamRequests) {
+      return res.status(404).json({message: "Jam Requests not found!"})
+    }
+    await JamRequests.deleteOne({_id: jamRequestId})
+    return res
+      .status(200)
+      .json({message: `Jam Requests id: ${jamRequestId} Deleted`})
+  } catch (error) {
+    console.error("Error deleting Jam Request:", error)
+    return res.status(500).json({message: "Internal Server Error"})
+  }
+}
+
+//-----------------------------------------------------------|
+//                                                           |
+//                     Send Jam Request:
+//                                                           |
+//-----------------------------------------------------------|
+
+//-------Send Jam Request (user sending request for user):
+
 const sendJamRequest = async (req, res) => {
   const {senderId, receiverId, jamId, instrumentId} = req.body
 
@@ -44,7 +121,7 @@ const sendJamRequest = async (req, res) => {
     //------
 
     const isInstrument = jam.jammers.some(
-      (jammer) => jammer.instrument === instrumentId
+      (jammer) => jammer.instrument.toString() === instrumentId
     )
     if (!isInstrument) {
       return res
@@ -55,7 +132,7 @@ const sendJamRequest = async (req, res) => {
     const isJammer = jam.jammers.some(
       (jammer) =>
         jammer.jammersId.includes(senderId) &&
-        jammer.instrument === instrumentId
+        jammer.instrument.toString() === instrumentId
     )
     if (isJammer) {
       return res
@@ -65,8 +142,8 @@ const sendJamRequest = async (req, res) => {
 
     const isJammersNumberValid = jam.jammers.some(
       (jammer) =>
-        jammer.maxNumberOfJammers < jammer.jammersId.length &&
-        jammer.instrument === instrumentId
+        jammer.maxNumberOfJammers > jammer.jammersId.length &&
+        jammer.instrument.toString() === instrumentId
     )
 
     if (!isJammersNumberValid) {
@@ -102,6 +179,8 @@ const sendJamRequest = async (req, res) => {
     return res.status(500).json({message: "Internal Server Error"})
   }
 }
+
+//--------Send Jam Request for friend (user sending request for friend):
 
 const sendToFriendJamRequest = async (req, res) => {
   const {senderId, receiverId, jamId, instrumentId} = req.body
@@ -149,8 +228,13 @@ const sendToFriendJamRequest = async (req, res) => {
     //------
 
     const isInstrument = jam.jammers.some(
-      (jammer) => jammer.instrument === instrumentId
+      (jammer) => jammer.instrument.toString() === instrumentId
     )
+
+    // const isInstrument = jam.jammers.some(
+    //   (jammer) => jammer.instrument === instrumentId
+    // )
+
     if (!isInstrument) {
       return res
         .status(400)
@@ -160,7 +244,7 @@ const sendToFriendJamRequest = async (req, res) => {
     const isJammer = jam.jammers.some(
       (jammer) =>
         jammer.jammersId.includes(receiverId) &&
-        jammer.instrument === instrumentId
+        jammer.instrument.toString() === instrumentId
     )
     if (isJammer) {
       return res
@@ -170,8 +254,8 @@ const sendToFriendJamRequest = async (req, res) => {
 
     const isJammersNumberValid = jam.jammers.some(
       (jammer) =>
-        jammer.maxNumberOfJammers < jammer.jammersId.length &&
-        jammer.instrument === instrumentId
+        jammer.maxNumberOfJammers > jammer.jammersId.length &&
+        jammer.instrument.toString() === instrumentId
     )
 
     if (!isJammersNumberValid) {
@@ -211,7 +295,11 @@ const sendToFriendJamRequest = async (req, res) => {
   }
 }
 
-//------------
+//-----------------------------------------------------------|
+//                                                           |
+//            Respond To Jam Requests (user & friend):
+//                                                           |
+//-----------------------------------------------------------|
 
 const respondToJamRequest = async (req, res) => {
   const {requestId, status} = req.body
@@ -277,8 +365,8 @@ const respondToJamRequest = async (req, res) => {
     if (status === "approved") {
       const isJammersNumberValid = jam.jammers.some(
         (jammer) =>
-          jammer.maxNumberOfJammers < jammer.jammersId.length &&
-          jammer.instrument === request.instrumentId
+          jammer.maxNumberOfJammers > jammer.jammersId.length &&
+          jammer.instrument.toString() === request.instrumentId
       )
 
       if (!isJammersNumberValid) {
@@ -313,14 +401,150 @@ const respondToJamRequest = async (req, res) => {
         request,
       })
     }
-
-    return res.status(200).json({
-      message: "Jam request responded successfully.",
-      request,
-    })
   } catch (error) {
     console.error("Error responding to jam request:", error)
     return res.status(500).json({message: "Internal Server Error"})
+  }
+}
+
+//-----------------------------------------------------------|
+//                                                           |
+//                     Invites To Jam :
+//                                                           |
+//-----------------------------------------------------------|
+
+//---Get all invites to jam by reciver Id:
+
+const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
+  // const receiverId = req.params.receiverId
+  const {receiverId, senderId} = req.body
+
+  if (senderId === receiverId) {
+    return res
+      .status(404)
+      .json({message: "receiverId and senderId must be deferent"})
+  }
+
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
+
+  try {
+    const totalJamRequests = await JamRequests.countDocuments({receiverId})
+    const totalPages = Math.ceil(totalJamRequests / perPage)
+
+    const jamRequests = await JamRequests.find({receiverId})
+      .populate("senderId", "_id userName")
+      .populate("receiverId", "_id userName")
+      .populate("jamId")
+      // .populate("instrumentId")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+
+    if (!jamRequests || jamRequests.length === 0) {
+      return res.status(404).json({message: "No jam requests found"})
+    }
+
+    return res.status(200).json({jamRequests, totalPages})
+  } catch (error) {
+    console.error("Error getting all jam requests:", error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
+//--- my requestts to join other james:
+
+const getAllJamRequestsByReceiverIdAndSenderIdPaginate = async (req, res) => {
+  // const receiverId = req.params.receiverId
+  const {receiverId, senderId} = req.body
+
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
+
+  if (senderId != receiverId) {
+    return res.status(404).json({message: "receiverId and senderId must match"})
+  }
+
+  try {
+    const totalJamRequests = await JamRequests.countDocuments({receiverId})
+    const totalPages = Math.ceil(totalJamRequests / perPage)
+
+    const jamRequests = await JamRequests.find({receiverId})
+      .populate("senderId", "_id userName")
+      .populate("receiverId", "_id userName")
+      .populate("jamId")
+      // .populate("instrumentId")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+
+    if (!jamRequests || jamRequests.length === 0) {
+      return res.status(404).json({message: "No jam requests found"})
+    }
+
+    return res.status(200).json({jamRequests, totalPages})
+  } catch (error) {
+    console.error("Error getting all jam requests:", error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
+//-----------------------------------------------------------|
+//                                                           |
+//                     Requests To Jam:
+//                                                           |
+//-----------------------------------------------------------|
+
+//----other jammers requests to join my james
+
+//-----Get all jammers from jam requests by hosted ids from jams
+
+const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
+  const page = parseInt(req.query.page) || 1
+  const perPage = 12
+  // const userId = req.params.userId
+  const {userId} = req.body // Corrected to use req.body
+
+  try {
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json({error: "Invalid user ID"})
+    }
+
+    const user = await User.findById(userId)
+    if (!user) {
+      return res.status(404).json({message: "User not found."})
+    }
+
+    // console.log(userId)
+
+    const jamsWithUserAsHost = await Jam.find({hostedBy: userId}).lean()
+    if (!jamsWithUserAsHost || jamsWithUserAsHost.length === 0) {
+      return res.status(404).json({message: "User has not hosted any jams."})
+    }
+
+    const totalJamRequests = await JamRequests.countDocuments({}).populate({
+      path: "jamId",
+      match: {hostedBy: userId}, // Filter based on the hostedBy field of the referenced jam
+    })
+
+    const totalPages = Math.ceil(totalJamRequests / perPage)
+
+    const jamRequests = await JamRequests.find({})
+      .populate({
+        path: "jamId",
+        match: {hostedBy: userId}, // Filter based on the hostedBy field of the referenced jam
+      })
+      // .populate("senderId receiverId")
+      .populate("receiverId senderId")
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+
+    if (!jamRequests || jamRequests.length === 0) {
+      return res.status(404).json({message: "No jam requests found"})
+    }
+
+    return res.status(200).json({jamRequests, totalPages})
+  } catch (error) {
+    console.error("Error getting all jam requests:", error)
+    return res.status(500).json({error: "Internal Server Error"})
   }
 }
 
@@ -328,4 +552,14 @@ module.exports = {
   sendJamRequest,
   sendToFriendJamRequest,
   respondToJamRequest,
+
+  getAllJamRequests,
+  getAllJamRequestsPaginate,
+
+  getAllJamRequestsByReceiverIdPaginate,
+  getAllJamRequestsByReceiverIdAndSenderIdPaginate,
+
+  deleteJamRequestsById,
+
+  getAllJammersFromJamRequestsByHostedIdPaginate,
 }

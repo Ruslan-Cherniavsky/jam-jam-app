@@ -2,7 +2,7 @@ const mongoose = require("mongoose")
 
 const jamRequestSchema = mongoose.Schema({
   jamId: {type: mongoose.Schema.Types.ObjectId, ref: "Jam"},
-  instrument: {type: mongoose.Schema.Types.ObjectId, ref: "Instrument"},
+  instrumentId: {type: mongoose.Schema.Types.ObjectId, ref: "Instruments"},
   senderId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
