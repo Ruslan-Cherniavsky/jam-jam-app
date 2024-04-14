@@ -13,7 +13,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import {IParams} from "../../Jammers/Filter/Filter"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../../../components_UI/CardList/CardList"
+import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList"
 import {
   faBackward,
   faPlus,
@@ -21,7 +21,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {RootState} from "../../../../redux/store"
-import {useSelector} from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
+import {
+  setFriendRequestsNumber,
+  setJamRequestsNumber,
+} from "../../../../redux/reducers/UserNotifications"
 
 export default function MyFriends() {
   const navigate = useNavigate()
@@ -41,6 +45,8 @@ export default function MyFriends() {
   const [totalPages, setTotalPages] = useState(0)
 
   const [reloadPage, setReloadPage] = useState(true)
+
+  const dispatch = useDispatch()
 
   const CARD_LIST_TYPE = "Friend Requests"
 
@@ -136,19 +142,26 @@ export default function MyFriends() {
         if (typeof userId === "string" && currentPage) {
           setLoading(true)
 
-          const data = await dataAxios.getAllFriendRequestsByReceiverIdPaginate(
-            userId,
-            currentPage
+          const dataPaginate =
+            await dataAxios.getAllFriendRequestsByReceiverIdPaginate(
+              userId,
+              currentPage
+            )
+
+          const dataAll = await dataAxios.getAllFriendRequestsByReceiverId(
+            userId
           )
 
-          // console.log(data.friendRequests)
+          console.log(dataAll.friendRequests.length)
 
-          if (data.friendRequests.length > 0) {
-            const friendRequestSenders = data.friendRequests.map(
+          dispatch(setFriendRequestsNumber(dataAll.friendRequests.length))
+
+          if (dataPaginate.friendRequests.length > 0) {
+            const friendRequestSenders = dataPaginate.friendRequests.map(
               (request: any) => request.senderId
             )
             setJammers(friendRequestSenders)
-            setTotalPages(data.totalPages)
+            setTotalPages(dataPaginate.totalPages)
           } else {
             setJammers([])
             setTotalPages(1)
@@ -393,7 +406,7 @@ export default function MyFriends() {
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
-                <p>Jammers not found =(</p>
+                <p>You don't have Friend Requests.</p>
               </div>
             </div>
           )

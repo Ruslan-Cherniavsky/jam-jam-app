@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList"
+import JammersCardList from "../../../../components_UI/CardList_Jams/CardList"
 import {
   Button,
   Col,
@@ -11,37 +11,48 @@ import {
   Pagination,
   Row,
 } from "react-bootstrap"
-import Filter, {IParams} from "../Filter/Filter"
+import Filter, {IParams} from "../../Jammers/Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
 import "./CardListPage.css"
 
-function JamsCardListPage() {
+function JammersCardListPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
   const [ifSearching, setIfSearching] = useState(false)
-  const [jammers, setJammers] = useState([])
+  const [jams, setJams] = useState([])
   const [loading, setLoading] = useState(true)
   const {page}: {page?: string} = useParams()
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
 
-  const [searchText, setSearchText] = useState<SearchText | any>({username: ""})
+  const [searchText, setSearchText] = useState<SearchText | any>({jamName: ""})
 
-  const [params, setParams] = useState<IParams | SearchText | Object | any>({})
+  const [params, setParams] = useState<IJamParams | SearchText | Object | any>(
+    {}
+  )
   const [totalPages, setTotalPages] = useState(0)
 
   const MAX_PAGES_DISPLAYED = 9
-  const CARD_LIST_TYPE = "Explore Jammers"
+  const CARD_LIST_TYPE = "Explore Jams"
 
   interface SearchText {
-    username: string | null
+    jamName: string | null
+  }
+
+  interface IJamParams {
+    country: string
+    region: string
+    city: string
+    isoCode: string
+    genres: []
+    sharedInstruments: []
   }
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/jammersList?page=${currentPage}&${queryString}`
+    const newUrl = `/jam-events?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -50,7 +61,7 @@ function JamsCardListPage() {
   const handleSearchInput = (event: any) => {
     const currentSearchText = {
       ...searchText,
-      username: event.target.value,
+      jamName: event.target.value,
     }
 
     setSearchText(currentSearchText)
@@ -136,27 +147,37 @@ function JamsCardListPage() {
   }
 
   useEffect(() => {
-    const fetchJammers = async () => {
+    const fetchJams = async () => {
       try {
         if (!ifFiltered && !gettingUrlParams && !ifSearching) {
           setSearchText({username: ""})
 
           setLoading(true)
-          const data = await dataAxios.dataFetch(currentPage)
+          const data = await dataAxios.getAllJamsPaginate(currentPage)
           setTotalPages(data.totalPages)
-          setJammers(data.users)
+          setJams(data.jams)
+
+          //Todo -------------------->>>>
         } else if (ifFiltered && !ifSearching) {
           setSearchText({username: ""})
 
           setLoading(true)
-          const data = await dataAxios.jammersFetchFiltered(params, currentPage)
+          const data = await dataAxios.getAllFilteredJamsPaginate(
+            params,
+            currentPage
+          )
+          console.log(data)
+
           setTotalPages(data.totalPages)
-          setJammers(data.users)
+          setJams(data.jams)
         } else if (ifSearching) {
           setLoading(true)
-          const data = await dataAxios.jammersFetchBySearch(params, currentPage)
+          const data = await dataAxios.getAllJamsPaginateBySearch(
+            params,
+            currentPage
+          )
           setTotalPages(data.totalPages)
-          setJammers(data.users)
+          setJams(data.jams)
         }
         setLoading(false)
       } catch (error) {
@@ -165,7 +186,7 @@ function JamsCardListPage() {
       }
     }
 
-    fetchJammers()
+    fetchJams()
   }, [currentPage, gettingUrlParams, params])
 
   const renderPaginationItems = () => {
@@ -210,7 +231,7 @@ function JamsCardListPage() {
             paddingTop: "2px",
             marginBottom: "20px",
           }}>
-          Explore Jammers
+          Explore Jams
         </h5>
         <Filter
           searching={ifSearching}
@@ -223,7 +244,7 @@ function JamsCardListPage() {
           <Container>
             <Row>
               <Col xl={4}>
-                {jammers.length > 0 && (
+                {jams.length > 0 && (
                   <Pagination className="my-custom-pagination">
                     <Pagination.Prev
                       onClick={() => handlePageChange(currentPage - 2)}
@@ -243,10 +264,10 @@ function JamsCardListPage() {
                 <Form className="mb-2">
                   <FormControl
                     type="text"
-                    placeholder="Search by Username"
+                    placeholder="Search by jamName"
                     className="mr-sm-2"
                     onChange={handleSearchInput}
-                    value={searchText?.username}
+                    value={searchText?.jamName}
                   />
                 </Form>
               </Col>
@@ -273,10 +294,10 @@ function JamsCardListPage() {
                   <FormControl
                     style={{margin: " 0px 0px 15px 0px"}}
                     type="text"
-                    placeholder="Search by Username"
+                    placeholder="Search by Jam Name"
                     className="mr-sm-2"
                     onChange={handleSearchInput}
-                    value={searchText?.username}
+                    value={searchText?.jamName}
                   />
                 </Form>
               </Col>
@@ -291,7 +312,7 @@ function JamsCardListPage() {
                 </Button>
               </Col>
               <Col xl={4}>
-                {jammers.length > 0 && (
+                {jams.length > 0 && (
                   <Pagination className="my-custom-pagination">
                     <Pagination.Prev
                       onClick={() => handlePageChange(currentPage - 2)}
@@ -309,12 +330,12 @@ function JamsCardListPage() {
           </Container>
         </div>
 
-        {jammers && !ifFiltering && !loading ? (
-          jammers.length > 0 ? (
+        {jams && !ifFiltering && !loading ? (
+          jams.length > 0 ? (
             <JammersCardList
               updateListCB={handlePageChange}
               cardListType={CARD_LIST_TYPE}
-              jammers={jammers}
+              jams={jams}
             />
           ) : (
             <div className="container mt-4">
@@ -327,7 +348,7 @@ function JamsCardListPage() {
           <Loader />
         )}
 
-        {jammers.length > 4 && !loading && (
+        {jams.length > 4 && !loading && (
           <Pagination className="my-custom-pagination">
             <Pagination.Prev
               onClick={() => handlePageChange(currentPage - 2)}
@@ -345,4 +366,4 @@ function JamsCardListPage() {
   )
 }
 
-export default JamsCardListPage
+export default JammersCardListPage

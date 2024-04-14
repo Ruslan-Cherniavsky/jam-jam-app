@@ -1,11 +1,13 @@
 import {configureStore} from "@reduxjs/toolkit"
 import firebaseDataSlice from "./reducers/FirbaseUserDataSlice"
 import userDataSliceMongoDB from "./reducers/UserDataSliceMongoDB"
+import userNotificationsSlice from "./reducers/UserNotifications"
 
 const store = configureStore({
   reducer: {
     userDataMongoDB: userDataSliceMongoDB,
     firbaseUser: firebaseDataSlice,
+    userNotifications: userNotificationsSlice,
   },
 })
 

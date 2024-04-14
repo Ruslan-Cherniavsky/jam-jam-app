@@ -4,18 +4,18 @@ const router = express.Router()
 const {
   sendJamRequest,
   respondToJamRequest,
-  sendToFriendJamRequest,
+  inviteToJam,
   getAllJamRequests,
   getAllJamRequestsPaginate,
   getAllJamRequestsByReceiverIdPaginate,
   deleteJamRequestsById,
   getAllJammersFromJamRequestsByHostedIdPaginate,
 
-  getAllJamRequestsByReceiverIdAndSenderIdPaginate,
+  // getAllJamRequestsByReceiverIdAndSenderIdPaginate,
 } = require("../controllers/jamRequests")
 
 router.post("/sendjamrequest", sendJamRequest)
-router.post("/sendtofriendjamrequest", sendToFriendJamRequest)
+router.post("/invitetojam", inviteToJam)
 router.post("/respondtojamrequest", respondToJamRequest)
 
 router.get("/getalljamrequests", getAllJamRequests)
@@ -34,8 +34,8 @@ router.get(
 )
 
 router.get(
-  "/getalljamrequestsbyreceiveridandsenderidpaginate",
-  getAllJamRequestsByReceiverIdAndSenderIdPaginate
+  "/getalljamrequestsbyreceiveridandsenderidpaginate"
+  // getAllJamRequestsByReceiverIdAndSenderIdPaginate
 )
 
 module.exports = router

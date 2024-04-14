@@ -14,6 +14,10 @@ const Header: React.FC = () => {
     (state: RootState) => state.userDataMongoDB.allUserData?.userName
   )
 
+  const friendRequestsNumber = useSelector(
+    (state: RootState) => state.userNotifications.friendRequestsNumber
+  )
+
   const navigate = useNavigate()
   async function handleLogOut() {
     try {
@@ -130,7 +134,10 @@ const Header: React.FC = () => {
                     ? "active nav-custom"
                     : "nav-custom"
                 }>
-                Friend Requests
+                Friend Requests{" "}
+                <p style={{color: "red", display: "inline"}}>
+                  {friendRequestsNumber > 0 && friendRequestsNumber}
+                </p>
               </Nav.Link>
               <hr
                 style={{

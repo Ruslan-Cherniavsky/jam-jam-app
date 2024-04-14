@@ -5,6 +5,7 @@ import {useDispatch, useSelector} from "react-redux"
 import {RootState} from "../../../../redux/store"
 import dataAxios from "../../../../server/data.axios"
 import {setUserDataMongoDB} from "../../../../redux/reducers/UserDataSliceMongoDB"
+import {setFriendRequestsNumber} from "../../../../redux/reducers/UserNotifications"
 
 interface PrivateRouteVerifiedProps {
   children: ReactNode
@@ -15,6 +16,7 @@ const PrivateRouteVerified: React.FC<PrivateRouteVerifiedProps> = ({
 }: PrivateRouteVerifiedProps) => {
   const {currentUser} = useAuthContext()
   // const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
   const userName = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?.userName
@@ -40,6 +42,24 @@ const PrivateRouteVerified: React.FC<PrivateRouteVerifiedProps> = ({
       }
     } else {
       setShouldRedirect(false)
+      if (currentUser && currentUser.emailVerified) {
+        dataAxios
+          .jemerCardDataFetchByEmail(currentUser.email)
+          .then((userData: any) => {
+            if (userData.data.user._id) {
+              dataAxios
+                .getAllFriendRequestsByReceiverId(userData.data.user._id)
+                .then((dataAll: any) => {
+                  dispatch(
+                    setFriendRequestsNumber(dataAll.friendRequests.length)
+                  )
+                })
+
+              //dataAxios.jams requests + dispatch
+              //dataAxios.jams invates + dispatch
+            }
+          })
+      }
     }
   }, [userName])
 

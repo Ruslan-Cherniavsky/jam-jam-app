@@ -16,6 +16,8 @@ const Instruments = require("../models/instruments")
 const getAllJamRequests = async (req, res) => {
   try {
     const jamRequests = await JamRequests.find()
+      .populate("senderId", "_id userName")
+      .populate("receiverId", "_id userName")
     if (!jamRequests || jamRequests.length === 0) {
       return res.status(404).json({message: "No Jam Requests found"})
     }
@@ -80,7 +82,7 @@ const deleteJamRequestsById = async (req, res) => {
 //                                                           |
 //-----------------------------------------------------------|
 
-//-------Send Jam Request (user sending request for user):
+//-------Send Jam Request (user sending request for explored jam):
 
 const sendJamRequest = async (req, res) => {
   const {senderId, receiverId, jamId, instrumentId} = req.body
@@ -180,9 +182,9 @@ const sendJamRequest = async (req, res) => {
   }
 }
 
-//--------Send Jam Request for friend (user sending request for friend):
+//--------user host jam inviting other user to his own jam:
 
-const sendToFriendJamRequest = async (req, res) => {
+const inviteToJam = async (req, res) => {
   const {senderId, receiverId, jamId, instrumentId} = req.body
 
   try {
@@ -210,6 +212,11 @@ const sendToFriendJamRequest = async (req, res) => {
         .json({message: "senderId and receiverId have to be difirent"})
     }
 
+    const jamsWithUserAsHost = await Jam.find({hostedBy: senderId}).lean()
+    if (!jamsWithUserAsHost || jamsWithUserAsHost.length === 0) {
+      return res.status(404).json({message: "User has not hosted any jams."})
+    }
+
     const receiver = await User.findById(receiverId)
     if (!receiver) {
       return res.status(404).json({message: "Receiver not found!"})
@@ -225,15 +232,9 @@ const sendToFriendJamRequest = async (req, res) => {
       return res.status(404).json({message: "Instrument not found!"})
     }
 
-    //------
-
     const isInstrument = jam.jammers.some(
       (jammer) => jammer.instrument.toString() === instrumentId
     )
-
-    // const isInstrument = jam.jammers.some(
-    //   (jammer) => jammer.instrument === instrumentId
-    // )
 
     if (!isInstrument) {
       return res
@@ -261,8 +262,6 @@ const sendToFriendJamRequest = async (req, res) => {
     if (!isJammersNumberValid) {
       return res.status(400).json({message: "This jammer roles is full"})
     }
-
-    //-----
 
     const existingRequest = await JamRequests.findOne({
       senderId,
@@ -297,9 +296,14 @@ const sendToFriendJamRequest = async (req, res) => {
 
 //-----------------------------------------------------------|
 //                                                           |
-//            Respond To Jam Requests (user & friend):
+//                  Respond To Jam Requests
 //                                                           |
 //-----------------------------------------------------------|
+
+//----can see onley user that hosted jam
+
+//-----response to jam requests(invites) from getAllJamRequestsByReceiverIdPaginate (jame hosts that invites you to his james)
+//-----and getAllJammersFromJamRequestsByHostedIdPaginate response to other james ewquests that ask yiu to join yore hosted jam
 
 const respondToJamRequest = async (req, res) => {
   const {requestId, status} = req.body
@@ -414,10 +418,15 @@ const respondToJamRequest = async (req, res) => {
 //-----------------------------------------------------------|
 
 //---Get all invites to jam by reciver Id:
+// reciver id is user id, sender id is jam host, that send you jam request
+// this function is for get all jam requests that sendet to you by other jame hosts, and not by yourself
 
 const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
-  // const receiverId = req.params.receiverId
   const {receiverId, senderId} = req.body
+
+  if (!senderId || !mongoose.isValidObjectId(senderId)) {
+    return res.status(404).json({message: "invalid sender Id"})
+  }
 
   if (senderId === receiverId) {
     return res
@@ -432,11 +441,22 @@ const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
     const totalJamRequests = await JamRequests.countDocuments({receiverId})
     const totalPages = Math.ceil(totalJamRequests / perPage)
 
-    const jamRequests = await JamRequests.find({receiverId})
+    // const jamRequests = await JamRequests.find({receiverId})
+    //   .populate("senderId", "_id userName")
+    //   .populate("receiverId", "_id userName")
+    //   .populate("jamId")
+    //   .populate("instrumentId")
+    //   .skip((page - 1) * perPage)
+    //   .limit(perPage)
+
+    const jamRequests = await JamRequests.find({
+      receiverId,
+      senderId: {$ne: receiverId},
+    })
       .populate("senderId", "_id userName")
       .populate("receiverId", "_id userName")
       .populate("jamId")
-      // .populate("instrumentId")
+      .populate("instrumentId")
       .skip((page - 1) * perPage)
       .limit(perPage)
 
@@ -451,41 +471,54 @@ const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
   }
 }
 
-//--- my requestts to join other james:
+//--- my requestts to otjer jame hosts to join ther jams: (not relevans)
 
-const getAllJamRequestsByReceiverIdAndSenderIdPaginate = async (req, res) => {
-  // const receiverId = req.params.receiverId
-  const {receiverId, senderId} = req.body
+// const getAllJamRequestsByReceiverIdAndSenderIdPaginate = async (req, res) => {
+//   const {receiverId, senderId} = req.body
 
-  const page = parseInt(req.query.page) || 1
-  const perPage = 12
+//   const page = parseInt(req.query.page) || 1
+//   const perPage = 12
 
-  if (senderId != receiverId) {
-    return res.status(404).json({message: "receiverId and senderId must match"})
-  }
+//   if (senderId != receiverId) {
+//     return res.status(404).json({message: "receiverId and senderId must match"})
+//   }
 
-  try {
-    const totalJamRequests = await JamRequests.countDocuments({receiverId})
-    const totalPages = Math.ceil(totalJamRequests / perPage)
+//   try {
+//     const totalJamRequests = await JamRequests.countDocuments({
+//       receiverId: senderId,
+//       senderId: senderId,
+//     })
+//     const totalPages = Math.ceil(totalJamRequests / perPage)
 
-    const jamRequests = await JamRequests.find({receiverId})
-      .populate("senderId", "_id userName")
-      .populate("receiverId", "_id userName")
-      .populate("jamId")
-      // .populate("instrumentId")
-      .skip((page - 1) * perPage)
-      .limit(perPage)
+//     // const jamRequests = await JamRequests.find({receiverId})
+//     //   .populate("senderId", "_id userName")
+//     //   .populate("receiverId", "_id userName")
+//     //   .populate("jamId")
+//     //   .populate("instrumentId")
+//     //   .skip((page - 1) * perPage)
+//     //   .limit(perPage)
 
-    if (!jamRequests || jamRequests.length === 0) {
-      return res.status(404).json({message: "No jam requests found"})
-    }
+//     const jamRequests = await JamRequests.find({
+//       receiverId: senderId,
+//       senderId: senderId,
+//     })
+//       .populate("senderId", "_id userName")
+//       .populate("receiverId", "_id userName")
+//       .populate("jamId")
+//       .populate("instrumentId")
+//       .skip((page - 1) * perPage)
+//       .limit(perPage)
 
-    return res.status(200).json({jamRequests, totalPages})
-  } catch (error) {
-    console.error("Error getting all jam requests:", error)
-    return res.status(500).json({error: "Internal Server Error"})
-  }
-}
+//     if (!jamRequests || jamRequests.length === 0) {
+//       return res.status(404).json({message: "No jam requests found"})
+//     }
+
+//     return res.status(200).json({jamRequests, totalPages})
+//   } catch (error) {
+//     console.error("Error getting all jam requests:", error)
+//     return res.status(500).json({error: "Internal Server Error"})
+//   }
+// }
 
 //-----------------------------------------------------------|
 //                                                           |
@@ -496,6 +529,8 @@ const getAllJamRequestsByReceiverIdAndSenderIdPaginate = async (req, res) => {
 //----other jammers requests to join my james
 
 //-----Get all jammers from jam requests by hosted ids from jams
+
+//----this function will need a map on client side, in map you need to take onley users my reciverId and instruments names from jam requests
 
 const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
   const page = parseInt(req.query.page) || 1
@@ -520,20 +555,24 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
       return res.status(404).json({message: "User has not hosted any jams."})
     }
 
-    const totalJamRequests = await JamRequests.countDocuments({}).populate({
+    const totalJamRequests = await JamRequests.countDocuments({
+      senderId: {$ne: userId},
+    }).populate({
       path: "jamId",
-      match: {hostedBy: userId}, // Filter based on the hostedBy field of the referenced jam
+      match: {hostedBy: userId},
     })
 
     const totalPages = Math.ceil(totalJamRequests / perPage)
 
-    const jamRequests = await JamRequests.find({})
+    const jamRequests = await JamRequests.find({senderId: {$ne: userId}})
       .populate({
         path: "jamId",
-        match: {hostedBy: userId}, // Filter based on the hostedBy field of the referenced jam
+        select: "_id jamName",
+        match: {hostedBy: userId},
       })
-      // .populate("senderId receiverId")
-      .populate("receiverId senderId")
+      .populate("instrumentId")
+      .populate({path: "senderId", select: "_id userName"})
+      .populate({path: "receiverId"})
       .skip((page - 1) * perPage)
       .limit(perPage)
 
@@ -550,14 +589,14 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
 
 module.exports = {
   sendJamRequest,
-  sendToFriendJamRequest,
+  inviteToJam,
   respondToJamRequest,
 
   getAllJamRequests,
   getAllJamRequestsPaginate,
 
   getAllJamRequestsByReceiverIdPaginate,
-  getAllJamRequestsByReceiverIdAndSenderIdPaginate,
+  // getAllJamRequestsByReceiverIdAndSenderIdPaginate,
 
   deleteJamRequestsById,
 

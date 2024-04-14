@@ -18,10 +18,16 @@ type RequestId = string
 interface SearchText {
   username: string | null
 }
+interface SearchText {
+  jamName: string | null
+}
 
 const dataAxios: {
   dataFetch: (pageNumber: any) => Promise<any>
-  jammersFetchFiltered: (params: Params, pageNumber: any) => Promise<any>
+  getAllJamsPaginate: (pageNumber: any) => Promise<any>
+  getAllFilteredJamsPaginate: (params: Params, pageNumber: any) => Promise<any>
+  getAllJamsPaginateBySearch: (params: Params, pageNumber: any) => Promise<any>
+  jammersFetchFiltered: (params: SearchText, pageNumber: any) => Promise<any>
   genresFetch: () => Promise<any>
   instrumentsFetch: () => Promise<any>
   jemerCardDataFetch: (id: any) => Promise<any>
@@ -271,7 +277,7 @@ const dataAxios: {
       )
       return response.data
     } catch (error) {
-      console.error("Error retrieving friend requests by receiver ID:", error)
+      console.error(error)
       throw error
     }
   },
@@ -282,7 +288,7 @@ const dataAxios: {
       )
       return response.data
     } catch (error) {
-      console.error("Error retrieving friend requests by senderId ID:", error)
+      console.error(error)
       throw error
     }
   },
@@ -304,7 +310,46 @@ const dataAxios: {
       )
       return response.data
     } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+
+  //---------------------james
+
+  getAllJamsPaginate: async (pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jams/getalljams-paginate?page=${pageNumber}`
+      )
+      return response.data
+    } catch (error) {
       console.error("Error retrieving friends by user ID:", error)
+      throw error
+    }
+  },
+  getAllFilteredJamsPaginate: async (params, pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jams/getalljams-paginate-filtered?page=${pageNumber}`,
+        {params}
+      )
+      return response.data
+    } catch (error) {
+      console.error(error)
+      throw error
+    }
+  },
+  getAllJamsPaginateBySearch: async (params, pageNumber) => {
+    console.log(params)
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jams/getjambyjamname?page=${pageNumber}`,
+        {params}
+      )
+      return response.data
+    } catch (error) {
+      console.error(error)
       throw error
     }
   },

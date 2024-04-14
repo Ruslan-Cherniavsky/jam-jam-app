@@ -17,9 +17,15 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({user}) => {
   const [open, setOpen] = useState(false)
+
   const userDataDB = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData
   )
+
+  const friendRequestsNumber = useSelector(
+    (state: RootState) => state.userNotifications.friendRequestsNumber
+  )
+
   const {pathname} = useLocation()
   const iconColor = "#BCBCBC"
 
@@ -111,9 +117,11 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>
-            {" "}
-            Friend Requests
-          </Link>
+            Friend Requests{"   "}
+            <p style={{color: "red", display: "inline"}}>
+              {friendRequestsNumber > 0 && friendRequestsNumber}
+            </p>
+          </Link>{" "}
         </Nav.Item>
         <hr
           style={{

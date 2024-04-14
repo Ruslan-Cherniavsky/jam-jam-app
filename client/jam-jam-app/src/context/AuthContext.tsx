@@ -34,6 +34,7 @@ import {
   selectFirebaseUserData,
   clearFirebaseUserData,
 } from "../redux/reducers/FirbaseUserDataSlice"
+import {setFriendRequestsNumber} from "../redux/reducers/UserNotifications"
 
 export interface AuthContextProps {
   currentUser: FirebaseUser | null
@@ -172,7 +173,7 @@ export function AuthProvider({children}: AuthProviderProps) {
 
           console.log("the fetch*****************************", userData)
 
-          if (userData.data.user) {
+          if (userData?.data.user) {
             dispatch(setUserDataMongoDB(userData.data.user))
           } else if (userData.data.user === null) {
             const responseCreateUser = await dataAxios.createUserMongoDB(
