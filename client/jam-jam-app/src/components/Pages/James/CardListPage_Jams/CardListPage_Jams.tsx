@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../../../components_UI/CardList_Jams/CardList"
+import JammersCardList from "../../../../components_UI/CardList_Jams/CardList_Jams"
 import {
   Button,
   Col,
@@ -11,9 +11,16 @@ import {
   Pagination,
   Row,
 } from "react-bootstrap"
-import Filter, {IParams} from "../../Jammers/Filter/Filter"
+import Filter, {IParams} from "../Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./CardListPage.css"
+import "./CardListPage_Jams.css"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {
+  faCalendarCheck,
+  faEnvelopeOpenText,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons"
+import {faNode} from "@fortawesome/free-brands-svg-icons"
 
 function JammersCardListPage() {
   const navigate = useNavigate()
@@ -26,6 +33,7 @@ function JammersCardListPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
+  const [value, setValue] = useState([3])
 
   const [searchText, setSearchText] = useState<SearchText | any>({jamName: ""})
 
@@ -46,6 +54,8 @@ function JammersCardListPage() {
     region: string
     city: string
     isoCode: string
+    jamDateFrom: any
+    jamDateTo: any
     genres: []
     sharedInstruments: []
   }
@@ -83,6 +93,8 @@ function JammersCardListPage() {
       region: parseNullOrUndefined(searchParams.get("region")) || "",
       city: parseNullOrUndefined(searchParams.get("city")) || "",
       isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
+      jamDateTo: parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
+      jamDateFrom: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
       genres: searchParams.getAll("genres[]") || [],
       instruments: searchParams.getAll("instruments[]") || [],
       username: parseNullOrUndefined(searchParams.get("username")) || "",
@@ -99,6 +111,8 @@ function JammersCardListPage() {
       urlParams.city ||
       urlParams.region ||
       urlParams.isoCode ||
+      urlParams.jamDateFrom ||
+      urlParams.jamDateTo ||
       urlParams.genres.length > 0 ||
       urlParams.instruments.length > 0
     ) {
@@ -107,10 +121,10 @@ function JammersCardListPage() {
     }
 
     const urlParamsSearch = {
-      username: parseNullOrUndefined(searchParams.get("username")) || "",
+      jamName: parseNullOrUndefined(searchParams.get("jamName")) || "",
     }
 
-    if (urlParamsSearch.username) {
+    if (urlParamsSearch.jamName) {
       setParams(urlParamsSearch)
       setIfSearching(true)
       setSearchText(urlParamsSearch)
@@ -219,6 +233,11 @@ function JammersCardListPage() {
     setCurrentPage(1)
   }
 
+  const handleChange = (val: any) => {
+    console.log(val)
+    setValue(val)
+  }
+
   return (
     <>
       <div className="container mt-4">
@@ -233,6 +252,120 @@ function JammersCardListPage() {
           }}>
           Explore Jams
         </h5>
+        <Container className="selectContainer border rounded">
+          <Row>
+            {/* <Col md={4}>
+              <ToggleButtonGroup
+                type="checkbox"
+                className="w-100"
+                style={{marginBottom: "20px"}}
+                value={value}
+                onChange={handleChange}>
+                <ToggleButton id="tbg-btn-1" value={1} variant="outline-dark">
+                  <FontAwesomeIcon
+                    style={{
+                      color: "#BCBCBC",
+                      marginRight: "12px",
+                    }}
+                    icon={faMap}
+                    className="mr-1"
+                  />{" "}
+                  {value[1] === 1 ? " Cards Vew" : "Map Vew"}
+                </ToggleButton>
+          
+              </ToggleButtonGroup>
+            </Col> */}
+
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                onClick={() => {
+                  navigate("/jam-events")
+                }}
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                className="w-100">
+                <FontAwesomeIcon
+                  style={{
+                    color: "#BCBCBC",
+                    marginRight: "3px",
+                  }}
+                  icon={faPlus}
+                  className="mr-1"
+                />
+                Explore Jams
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                onClick={() => {
+                  navigate("/joined-jams")
+                }}
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                className="w-100">
+                <FontAwesomeIcon
+                  style={{
+                    color: "#BCBCBC",
+                    marginRight: "9px",
+                  }}
+                  icon={faCalendarCheck}
+                  className="mr-1"
+                />
+                Joined Jams
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                onClick={handleSearch}
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                className="w-100">
+                <FontAwesomeIcon
+                  style={{
+                    color: "#BCBCBC",
+                    marginRight: "8px",
+                  }}
+                  icon={faEnvelopeOpenText}
+                  className="mr-1"
+                />
+                Jam Invites
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                disabled={loading}
+                onClick={handleSearch}
+                className="w-100">
+                Host Jam
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                disabled={loading}
+                onClick={handleSearch}
+                className="w-100">
+                Hosted Jams
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                disabled={loading}
+                onClick={handleSearch}
+                className="w-100">
+                Jam Requests
+              </Button>
+            </Col>
+          </Row>
+        </Container>
         <Filter
           searching={ifSearching}
           filteredStatusChange={filteredStatusChange}
@@ -264,7 +397,7 @@ function JammersCardListPage() {
                 <Form className="mb-2">
                   <FormControl
                     type="text"
-                    placeholder="Search by jamName"
+                    placeholder="Search By Jam Name"
                     className="mr-sm-2"
                     onChange={handleSearchInput}
                     value={searchText?.jamName}
@@ -294,7 +427,7 @@ function JammersCardListPage() {
                   <FormControl
                     style={{margin: " 0px 0px 15px 0px"}}
                     type="text"
-                    placeholder="Search by Jam Name"
+                    placeholder="Search By Jam Name"
                     className="mr-sm-2"
                     onChange={handleSearchInput}
                     value={searchText?.jamName}
@@ -340,7 +473,7 @@ function JammersCardListPage() {
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
-                <p>Jammers not found =(</p>
+                <p>Jams not found =(</p>
               </div>
             </div>
           )

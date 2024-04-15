@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList"
+import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList_Jammers"
 import {
   Button,
   Col,
@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap"
 import Filter, {IParams} from "../Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./CardListPage.css"
+import "./CardListPage_Jammers.css"
 
 function JamsCardListPage() {
   const navigate = useNavigate()

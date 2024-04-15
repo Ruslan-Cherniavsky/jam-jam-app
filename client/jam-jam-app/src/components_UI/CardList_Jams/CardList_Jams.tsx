@@ -4,7 +4,7 @@ import Card from "react-bootstrap/Card"
 import ListGroup from "react-bootstrap/ListGroup"
 import "bootstrap/dist/css/bootstrap.min.css"
 import Button from "react-bootstrap/Button"
-import "./CardList.css"
+import "./CardList_Jams.css"
 import {Col, Row} from "react-bootstrap"
 import {useSelector} from "react-redux"
 import {RootState} from "../../redux/store"
@@ -12,7 +12,7 @@ import dataAxios from "../../server/data.axios"
 
 import {useNavigate} from "react-router-dom"
 
-interface Jam {
+export interface Jam {
   _id: string
   img: string
   jamName: string
@@ -247,12 +247,11 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
                     {jam.genres.map((genres: any) => genres.genre).join(", ") ||
                       "- "}
                   </div>
+                  {/* {cardListType === "Explore Jams" && <p></p>} */}
                   <div>
                     Creator: <a>{jam?.hostedBy?.userName || " "}</a>
                   </div>
                 </ListGroup>
-
-                {cardListType === "Explore Jammers" && <p></p>}
 
                 {cardListType === "Friend Requests" && (
                   <div className="friendRequestsCont">

@@ -227,6 +227,39 @@ const getJamsFiltered = async (req, res) => {
 
     //----
 
+    // if (params.jamDate) {
+    //   queryConditions.jamDate = params.jamDate
+    // }
+
+    if (params.jamDateFrom && params.jamDateTo) {
+      // Extract the date portion from the jamDate string
+
+      const dateFromOnly = new Date(params.jamDateFrom)
+        .toISOString()
+        .split("T")[0]
+
+      const dateToOnly = new Date(params.jamDateTo).toISOString().split("T")[0]
+
+      // Parse the date string to a Date object
+      const startDate = new Date(dateFromOnly)
+      startDate.setDate(startDate.getDate() + 1)
+
+      // Add one day to the start date
+      const endDate = new Date(dateToOnly)
+      endDate.setDate(endDate.getDate() + 2)
+
+      // Set the query condition for jamDate
+      queryConditions.jamDate = {
+        $gte: startDate, // Greater than or equal to the start of the day
+        $lt: endDate, // Less than the end of the next day
+      }
+    }
+
+    console.log(params.jamDateFrom)
+    console.log(params.jamDateTo)
+    console.log(queryConditions.jamDateFrom)
+    console.log(queryConditions.jamDateTo)
+
     if (Object.keys(queryConditions).length === 0) {
       return res.status(400).json({error: "No search conditions provided."})
     }

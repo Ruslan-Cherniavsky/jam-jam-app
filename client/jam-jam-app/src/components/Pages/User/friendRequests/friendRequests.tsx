@@ -13,7 +13,7 @@ import {useLocation, useNavigate, useParams} from "react-router-dom"
 import Loader from "../../../../components_UI/Loaders/Loader"
 import {IParams} from "../../Jammers/Filter/Filter"
 import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList"
+import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList_Jammers"
 import {
   faBackward,
   faPlus,

@@ -4,7 +4,7 @@ import Sidebar from "../SideBar/SideBar"
 import {useAuthContext} from "../../context/AuthContext"
 import {Route, Routes} from "react-router"
 import PrivateRouteVerified from "./Auth/PrivateRoutes/PrivateRouteVerified"
-import JammersCardListPage from "./Jammers/CardListPage/CardListPage"
+import JammersCardListPage from "./Jammers/CardListPage_Jammers/CardListPage_jammers"
 import JamerCardPage from "./Jammers/ProfilePage/ProfilePage"
 import {CreateJamEvent} from "./James/CreateJam/CreateJam"
 import Signup from "./Auth/Signup/Signup"
@@ -22,7 +22,7 @@ import MyFriends from "./User/MyFriends/MyFriends"
 import InvitesToJams from "./James/InvitesToJams/InvitesToJams"
 import FriendRequests from "./User/friendRequests/friendRequests"
 import {CreatedJams} from "./James/CreatedJams/CreatedJams"
-import JamsCardListPage from "../Pages/James/CardListPage/CardListPage"
+import JamsCardListPage from "./James/CardListPage_Jams/CardListPage_Jams"
 
 export default function () {
   const {currentUser} = useAuthContext()
