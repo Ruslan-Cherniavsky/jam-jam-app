@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useEffect, useState} from "react"
 import {Navigate} from "react-router-dom"
 import Card from "react-bootstrap/Card"
 import ListGroup from "react-bootstrap/ListGroup"
@@ -83,6 +83,8 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
   }
 
   const formatDateString = (dateString: string) => {
+    console.log("data before formating ------->", dateString)
+
     const date = new Date(dateString)
     return (
       date.toLocaleDateString() +
@@ -210,6 +212,7 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
                   }}>{`${(jam.city && jam.city + ",") || " "} ${
                   jam.country || " "
                 }`}</Card.Subtitle>
+
                 <Card.Subtitle
                   className="mb-2 text-muted"
                   style={{
@@ -219,6 +222,7 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
                   }}>
                   {formatDateString(jam.jamDate)}
                 </Card.Subtitle>
+
                 <ListGroup>
                   <div
                     style={{

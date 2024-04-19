@@ -93,8 +93,8 @@ function JammersCardListPage() {
       region: parseNullOrUndefined(searchParams.get("region")) || "",
       city: parseNullOrUndefined(searchParams.get("city")) || "",
       isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
-      jamDateTo: parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
-      jamDateFrom: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
+      jamDateTo: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
+      jamDateFrom: parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
       genres: searchParams.getAll("genres[]") || [],
       instruments: searchParams.getAll("instruments[]") || [],
       username: parseNullOrUndefined(searchParams.get("username")) || "",
@@ -180,7 +180,9 @@ function JammersCardListPage() {
             params,
             currentPage
           )
-          console.log(data)
+
+          // console.log(data)
+          console.log("filtering params", params)
 
           setTotalPages(data.totalPages)
           setJams(data.jams)

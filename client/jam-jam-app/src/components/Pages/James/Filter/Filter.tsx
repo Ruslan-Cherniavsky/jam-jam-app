@@ -22,8 +22,8 @@ export interface IParams {
   region: string
   city: string
   isoCode: string
-  jamDateFrom: any | null | Date | string
-  jamDateTo: any | null | Date | string
+  jamDateFrom: null | Date | string
+  jamDateTo: null | Date | string
   genres: []
   instruments: []
 }
@@ -105,6 +105,26 @@ const Filter = (filterProps: FilterProps) => {
     return `${year}-${month}-${day}`
   }
 
+  const convertDateFormat = (dateString: string) => {
+    // Create a new Date object from the input date string
+    const date = new Date(dateString)
+
+    // Get the year, month, and day from the date object
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, "0") // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, "0")
+
+    // Get the hours, minutes, and seconds from the date object
+    const hours = String(date.getHours()).padStart(2, "0")
+    const minutes = String(date.getMinutes()).padStart(2, "0")
+    const seconds = String(date.getSeconds()).padStart(2, "0")
+
+    // Create the formatted date string in the desired format
+    const formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.000Z`
+
+    return formattedDate
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       const searchParams = new URLSearchParams(location.search)
@@ -113,8 +133,9 @@ const Filter = (filterProps: FilterProps) => {
         region: parseNullOrUndefined(searchParams.get("region")) || "",
         city: parseNullOrUndefined(searchParams.get("city")) || "",
         isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
-        jamDateTo: parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
-        jamDateFrom: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
+        jamDateTo: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
+        jamDateFrom:
+          parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
         genres: searchParams.getAll("genres[]") || [],
         instruments: searchParams.getAll("instruments[]") || [],
       }
@@ -124,17 +145,18 @@ const Filter = (filterProps: FilterProps) => {
       setSelectedRegion(urlParams.region)
       setSelectedCity(urlParams.city)
 
-      console.log("**************************")
-      console.log(urlParams.jamDateFrom)
+      console.log("data from url", urlParams)
 
       if (urlParams.jamDateFrom) {
-        setSelectedJamdDateFrom(formatDate(urlParams.jamDateFrom))
+        console.log(urlParams.jamDateFrom)
+
+        setSelectedJamdDateFrom(new Date(urlParams.jamDateFrom))
       }
       if (urlParams.jamDateTo) {
+        console.log(urlParams.jamDateTo)
+
         setSelectedJamdDateTo(new Date(urlParams.jamDateTo))
       }
-
-      // setSelectedJamdDateTo(urlParams.jamDateTo)
 
       if (urlParams.genres.length) {
         try {
@@ -199,6 +221,13 @@ const Filter = (filterProps: FilterProps) => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
+
+    console.log("**************************")
+
+    // console.log(urlParams.jamDateFrom)
+
+    console.log(selectedJamDateFrom)
+    console.log(selectedJamDateTo)
 
     try {
       setLoading(true)
