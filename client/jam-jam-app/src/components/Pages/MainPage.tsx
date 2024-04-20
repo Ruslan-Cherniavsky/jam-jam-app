@@ -23,7 +23,7 @@ import InvitesToJams from "./James/InvitesToJams/InvitesToJams"
 import FriendRequests from "./User/friendRequests/friendRequests"
 import {CreatedJams} from "./James/CreatedJams/CreatedJams"
 import JamsCardListPage from "./James/CardListPage_Jams/CardListPage_Jams"
-
+import JamCardPage from "./James/jamCardPage/jamCardPage"
 export default function () {
   const {currentUser} = useAuthContext()
 
@@ -68,6 +68,13 @@ export default function () {
                 element={
                   <PrivateRouteVerified>
                     <JamerCardPage />
+                  </PrivateRouteVerified>
+                }></Route>
+              <Route
+                path="/jamCard/:jamId"
+                element={
+                  <PrivateRouteVerified>
+                    <JamCardPage />
                   </PrivateRouteVerified>
                 }></Route>
 

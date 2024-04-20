@@ -371,6 +371,7 @@ function JammersCardListPage() {
             </Col>
           </Row>
         </Container>
+
         <Filter
           searching={ifSearching}
           filteredStatusChange={filteredStatusChange}

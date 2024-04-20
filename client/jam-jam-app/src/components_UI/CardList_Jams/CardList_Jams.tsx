@@ -72,14 +72,14 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
   cardListType,
   updateListCB,
 }) => {
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  const [selectedJamId, setSelectedJamId] = useState<string | null>(null)
 
   const userId = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?._id
   )
 
-  const handleCardClick = (currentJammerId: string) => {
-    setSelectedUserId(currentJammerId)
+  const handleCardClick = (currentJamId: string) => {
+    setSelectedJamId(currentJamId)
   }
 
   const formatDateString = (dateString: string) => {
@@ -175,7 +175,7 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
             <Card
               onClick={() => handleCardClick(jam._id)}
               className={`custom-card ${
-                selectedUserId === jam._id ? "custom-selected" : ""
+                selectedJamId === jam._id ? "custom-selected" : ""
               }`}>
               {jam.img ? (
                 <Card.Img
@@ -342,8 +342,8 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
           </div>
         ))}
       </div>
-      {selectedUserId && (
-        <Navigate to={`/jamerCard/${selectedUserId}`} replace={true} />
+      {selectedJamId && (
+        <Navigate to={`/jamCard/${selectedJamId}`} replace={true} />
       )}
     </>
   )

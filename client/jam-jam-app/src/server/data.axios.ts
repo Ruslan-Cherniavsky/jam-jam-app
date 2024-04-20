@@ -24,6 +24,7 @@ interface SearchText {
 
 const dataAxios: {
   dataFetch: (pageNumber: any) => Promise<any>
+  jemCardDataFetch: (id: any) => Promise<any>
   getAllJamsPaginate: (pageNumber: any) => Promise<any>
   getAllFilteredJamsPaginate: (params: Params, pageNumber: any) => Promise<any>
   getAllJamsPaginateBySearch: (params: Params, pageNumber: any) => Promise<any>
@@ -351,6 +352,17 @@ const dataAxios: {
     } catch (error) {
       console.error(error)
       throw error
+    }
+  },
+  jemCardDataFetch: async (id) => {
+    try {
+      const {data} = await axios.get(
+        `http://localhost:3500/jams/getjambyid/${id}`
+      )
+
+      return data
+    } catch (err) {
+      console.log(err)
     }
   },
 }
