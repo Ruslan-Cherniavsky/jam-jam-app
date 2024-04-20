@@ -214,7 +214,7 @@ const getJamsFiltered = async (req, res) => {
     //----
 
     if (params.type) {
-      queryConditions.city = params.type
+      queryConditions.type = params.type
     }
 
     if (params.entrance) {
@@ -255,10 +255,10 @@ const getJamsFiltered = async (req, res) => {
       }
     }
 
-    console.log(params.jamDateFrom)
-    console.log(params.jamDateTo)
-    console.log(queryConditions.jamDateFrom)
-    console.log(queryConditions.jamDateTo)
+    console.log(params.type)
+    // console.log(params.jamDateTo)
+    // console.log(queryConditions.jamDateFrom)
+    // console.log(queryConditions.jamDateTo)
 
     if (Object.keys(queryConditions).length === 0) {
       return res.status(400).json({error: "No search conditions provided."})

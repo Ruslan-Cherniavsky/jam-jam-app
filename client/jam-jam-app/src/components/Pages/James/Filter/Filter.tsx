@@ -33,6 +33,7 @@ const Filter = (filterProps: FilterProps) => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>("")
   const [selectedCity, setSelectedCity] = useState<string | null>("")
   const [fullCountryName, setFullCountryName] = useState<string | null>("")
+  const [selectedType, setSelectedType] = useState<string | null>("")
   //------
   const [loading, setLoading] = useState(false)
   const [genres, setGenres] = useState<Array<Object>>([])
@@ -134,6 +135,7 @@ const Filter = (filterProps: FilterProps) => {
         city: parseNullOrUndefined(searchParams.get("city")) || "",
         isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
         jamDateTo: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
+        type: parseNullOrUndefined(searchParams.get("type")) || "",
         jamDateFrom:
           parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
         genres: searchParams.getAll("genres[]") || [],
@@ -145,6 +147,7 @@ const Filter = (filterProps: FilterProps) => {
       setSelectedRegion(urlParams.region)
       setSelectedCity(urlParams.city)
 
+      setSelectedType(urlParams.type)
       console.log("data from url", urlParams)
 
       if (urlParams.jamDateFrom) {
@@ -219,6 +222,9 @@ const Filter = (filterProps: FilterProps) => {
     setSelectedCity(e.target.value || "")
   }
 
+  const handleTypeChange = (e: InputChangeEvent) => {
+    setSelectedType(e.target.value || "")
+  }
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
@@ -239,6 +245,7 @@ const Filter = (filterProps: FilterProps) => {
         !selectedCountry &&
         !selectedJamDateFrom &&
         !selectedJamDateTo &&
+        !selectedType &&
         selectedGenresStrings.length === 0 &&
         selectedInstrumentsStrings.length === 0
       ) {
@@ -250,6 +257,7 @@ const Filter = (filterProps: FilterProps) => {
         selectedCountry ||
         selectedJamDateFrom ||
         selectedJamDateTo ||
+        selectedType ||
         selectedGenresStrings ||
         selectedInstrumentsStrings
       ) {
@@ -262,6 +270,7 @@ const Filter = (filterProps: FilterProps) => {
           instruments: selectedInstrumentsStrings,
           jamDateFrom: selectedJamDateFrom,
           jamDateTo: selectedJamDateTo,
+          type: selectedType,
         }
 
         filterProps.fetchFilteredCB(params)
@@ -276,8 +285,6 @@ const Filter = (filterProps: FilterProps) => {
 
   const handleDateFromChange = (date: any) => {
     setSelectedJamdDateFrom(date)
-
-    console.log(date)
   }
   const handleDateToChange = (date: any) => {
     setSelectedJamdDateTo(date)
@@ -351,7 +358,7 @@ const Filter = (filterProps: FilterProps) => {
               </Form.Group>
             </Col>
 
-            <Col xl={2} lg={4} md={4}>
+            <Col xl={3} lg={4} md={4}>
               <MultiSelect
                 ifRequired={false}
                 dataArray={genres}
@@ -362,7 +369,7 @@ const Filter = (filterProps: FilterProps) => {
             </Col>
             {/* <Col></Col> */}
 
-            <Col xl={2} lg={4} md={4}>
+            <Col xl={3} lg={4} md={4}>
               <MultiSelect
                 ifRequired={false}
                 dataArray={instruments}
@@ -372,7 +379,22 @@ const Filter = (filterProps: FilterProps) => {
               />
             </Col>
 
-            <Col xl={2} lg={4} md={4} style={{marginTop: "22px"}}>
+            <Col xl={4} lg={4} md={4}>
+              <Form.Group controlId="type">
+                <Form.Control
+                  style={{marginTop: "22px"}}
+                  as="select"
+                  onChange={handleTypeChange}
+                  value={selectedType || ""}>
+                  <option value="">Select Type </option>
+                  {/* <option value=""> </option> */}
+                  <option value="indoor">Indoor </option>
+                  <option value="outdoor">Outdoor </option>
+                </Form.Control>
+              </Form.Group>
+            </Col>
+
+            <Col xl={2} lg={4} md={4} sm={6} xs={6} style={{marginTop: "22px"}}>
               <ReactDatePicker
                 selected={selectedJamDateFrom}
                 onChange={handleDateFromChange}
@@ -384,7 +406,7 @@ const Filter = (filterProps: FilterProps) => {
                 yearDropdownItemNumber={15}
               />
             </Col>
-            <Col xl={2} lg={4} md={4} style={{marginTop: "22px"}}>
+            <Col xl={2} lg={4} md={4} sm={6} xs={6} style={{marginTop: "22px"}}>
               <ReactDatePicker
                 selected={selectedJamDateTo}
                 onChange={handleDateToChange}
@@ -398,7 +420,7 @@ const Filter = (filterProps: FilterProps) => {
             </Col>
             {/* <Col></Col> */}
 
-            <Col xl={2} lg={4} md={4}>
+            <Col xl={4} lg={4} md={4}>
               <Button
                 variant="outline-dark"
                 disabled={loading}

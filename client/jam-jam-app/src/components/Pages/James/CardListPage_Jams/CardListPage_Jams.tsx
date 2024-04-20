@@ -56,6 +56,7 @@ function JammersCardListPage() {
     isoCode: string
     jamDateFrom: any
     jamDateTo: any
+    type: string
     genres: []
     sharedInstruments: []
   }
@@ -95,6 +96,7 @@ function JammersCardListPage() {
       isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
       jamDateTo: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
       jamDateFrom: parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
+      type: parseNullOrUndefined(searchParams.get("type")) || "",
       genres: searchParams.getAll("genres[]") || [],
       instruments: searchParams.getAll("instruments[]") || [],
       username: parseNullOrUndefined(searchParams.get("username")) || "",
@@ -113,6 +115,7 @@ function JammersCardListPage() {
       urlParams.isoCode ||
       urlParams.jamDateFrom ||
       urlParams.jamDateTo ||
+      urlParams.type ||
       urlParams.genres.length > 0 ||
       urlParams.instruments.length > 0
     ) {
