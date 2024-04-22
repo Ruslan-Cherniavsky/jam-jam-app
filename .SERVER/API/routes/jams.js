@@ -12,6 +12,7 @@ const {
   getAllJamsByHostedById,
   getJamByJamName,
   getAllJamsByJammerId,
+  deleteJammerFromJamByIds,
 } = require("../controllers/jams")
 
 router.post("/create", createJam)
@@ -21,6 +22,7 @@ router.get("/getalljams-paginate-filtered", getJamsFiltered)
 router.get("/getjambyid/:jamid", getJamById)
 router.patch("/updatejam/:jamid", updateJam)
 router.delete("/deletebyid/:jamid", deleteJamById)
+router.patch("/deletejammerfromjambyIds", deleteJammerFromJamByIds)
 router.post("/reportjam/", reportJam)
 router.get("/getalljamsbyhostedbyid/:userId", getAllJamsByHostedById)
 router.get("/getjambyjamname", getJamByJamName)

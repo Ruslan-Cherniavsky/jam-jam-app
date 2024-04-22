@@ -10,7 +10,12 @@ import {Jam} from "../JamCard/JamCard"
 function JamCardPage() {
   const [jemCardId, setJemCardId] = useState<any>(null)
   const [jemDataLocal, setJemDataLocal] = useState<Jam | null>(null)
+  const [updatePage, setUpdatePage] = useState<Boolean>(false)
   const params = useParams()
+
+  const updateCBfunction = () => {
+    setUpdatePage(!updatePage)
+  }
 
   useEffect(() => {
     setJemCardId(params.jamId)
@@ -24,11 +29,17 @@ function JamCardPage() {
     } else {
       return
     }
-  }, [jemCardId])
+  }, [jemCardId, updatePage])
 
   return (
     <>
-      <Col>{jemDataLocal ? <JamCard jam={jemDataLocal} /> : <Loader />}</Col>
+      <Col>
+        {jemDataLocal ? (
+          <JamCard jam={jemDataLocal} updateCard={updateCBfunction} />
+        ) : (
+          <Loader />
+        )}
+      </Col>
     </>
   )
 }

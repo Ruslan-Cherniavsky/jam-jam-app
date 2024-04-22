@@ -1,5 +1,6 @@
 import React, {useState} from "react"
 import {Navigate, useParams} from "react-router-dom"
+
 import {
   Card,
   Container,
@@ -11,7 +12,9 @@ import {
   Form,
   Alert,
 } from "react-bootstrap"
+
 import SocialMediaLinks from "../../User/UpdateProfilePage/SocialMediaLinks/SocialMediaLinks"
+
 import {
   faUserPlus,
   faMusic,
@@ -19,6 +22,7 @@ import {
   faFlag,
   faEdit,
 } from "@fortawesome/free-solid-svg-icons"
+
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {useAuthContext} from "../../../../context/AuthContext"
 import {useNavigate} from "react-router-dom"
@@ -80,11 +84,26 @@ export interface Jam {
   status: string
 }
 
-// interface JamCardListProps {
-//   jam: Jam
-// }
+interface ExistingJamRequest {
+  _id: string
+  jamId: string
+  instrumentId: string
+  senderId: string
+  receiverId: string
+  status: string
+  __v: number
+}
 
-const JamCard = ({jam}: {jam: Jam}) => {
+interface ExistingJamRequestsResponse {
+  existingJamRequests: ExistingJamRequest[]
+}
+
+interface JamCardListProps {
+  jam: Jam
+  updateCard: Function
+}
+
+const JamCard = ({jam, updateCard}: JamCardListProps) => {
   // const {userId} = useParams<{userId: string}>()
   const {currentUser} = useAuthContext()
   const navigate = useNavigate()
@@ -105,6 +124,7 @@ const JamCard = ({jam}: {jam: Jam}) => {
   // const handleInviteToJam = () => {
   //   console.log("Inviting to jam:", jammer.userName)
   // }
+
   const handleEditProfileClick = () => {
     navigate("/update-profile")
   }
@@ -114,6 +134,90 @@ const JamCard = ({jam}: {jam: Jam}) => {
     setShowReportModal(false)
   }
 
+  const sendJamRequest = async (jamId: string, instrumentId: string) => {
+    try {
+      if (!userId) {
+        setMessage("Error.")
+        return
+      }
+
+      const ifJammersRequired = jam.jammers.some(
+        (jammer) => jammer.maxNumberOfJammers > jammer.jammersId.length
+      )
+
+      if (!ifJammersRequired) {
+        setMessage("Jam Roles are full.")
+        return
+      }
+
+      const params = {
+        senderId: userId,
+        receiverId: userId,
+        jamId: jam._id,
+        instrumentId: instrumentId,
+      }
+
+      const jamRequestsByUser: ExistingJamRequestsResponse =
+        await dataAxios.getalljamrequestsbyids(params)
+
+      // console.log(jamRequestsByUser?.existingJamRequests)
+
+      if (jamRequestsByUser?.existingJamRequests) {
+        setMessage(
+          "Jam request has already been sent to this role for this jam."
+        )
+        return
+      }
+
+      const ifJamRequestSentAndAprooved = jam.jammers.some((jammer) =>
+        jammer.jammersId.some(
+          (jammersId) =>
+            jammersId._id === userId && jammer.instrument._id === instrumentId
+        )
+      )
+
+      if (ifJamRequestSentAndAprooved) {
+        setMessage("You are already on this role in this jam.")
+        return
+      }
+
+      if (userId)
+        if (userId) {
+          const jamRequestresponse = await dataAxios.sendJamRequest(
+            userId,
+            userId,
+            jamId,
+            instrumentId
+          )
+        }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const leaveJammerRole = async (jamId: string, instrumentId: string) => {
+    try {
+      if (!userId) {
+        setMessage("Error.")
+        return
+      }
+
+      const response = await dataAxios.deleteJammerFromJamByIds(
+        userId,
+        userId,
+        jamId,
+        instrumentId
+      )
+
+      if (response.status === 200) {
+        setMessage("You have left this role in this jam.")
+        updateCard()
+        return
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
   // const handleAddToFriend = async () => {
   //   try {
   //     const userData = await dataAxios.jemerCardDataFetchByEmail(
@@ -339,6 +443,11 @@ const JamCard = ({jam}: {jam: Jam}) => {
           <p>{jam.jamDescription}</p>
           <hr />
           <h4>Jammer roles:</h4>
+          {/* <h6>
+            *** Please only request to join if you can bring a required
+            instrument or if your instrument is on the list of shared
+            instruments.
+          </h6> */}
 
           <br></br>
           {jam.jammers.map((jammer) => (
@@ -346,7 +455,7 @@ const JamCard = ({jam}: {jam: Jam}) => {
               <h5>
                 {jammer.instrument.instrument}
                 {" ("}
-                {jammer.jammersId.length}
+                {jammer.jammersId.length || 0}
                 {"/"}
                 {jammer.maxNumberOfJammers}
                 {")"}
@@ -357,7 +466,30 @@ const JamCard = ({jam}: {jam: Jam}) => {
                   <Link to={`/jamerCard/${jammer._id}`}>{jammer.userName}</Link>
                 </li>
               ))}
-              <a href="/"> Request to join</a>
+              {jam.jammers.some(
+                (jammer) => jammer.maxNumberOfJammers > jammer.jammersId.length
+              ) ? (
+                !jammer.jammersId.some((jammer) => jammer._id === userId) ? (
+                  <a
+                    href="#"
+                    onClick={() =>
+                      sendJamRequest(jam._id, jammer.instrument._id)
+                    }>
+                    Request to join
+                  </a>
+                ) : (
+                  <a
+                    href="#"
+                    onClick={() =>
+                      leaveJammerRole(jam._id, jammer.instrument._id)
+                    }
+                    style={{color: "red"}}>
+                    Leave this role{" "}
+                  </a>
+                )
+              ) : (
+                <a>Full</a>
+              )}
               <br></br>
               <br></br>
 

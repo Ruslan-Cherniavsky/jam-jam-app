@@ -10,6 +10,7 @@ const {
   getAllJamRequestsByReceiverIdPaginate,
   deleteJamRequestsById,
   getAllJammersFromJamRequestsByHostedIdPaginate,
+  getAllJamRequestsByIds,
 
   // getAllJamRequestsByReceiverIdAndSenderIdPaginate,
 } = require("../controllers/jamRequests")
@@ -21,6 +22,8 @@ router.post("/respondtojamrequest", respondToJamRequest)
 router.get("/getalljamrequests", getAllJamRequests)
 router.get("/getalljamrequestspaginate", getAllJamRequestsPaginate)
 
+router.get("/getalljamrequestsbyids", getAllJamRequestsByIds)
+
 router.delete("/deletejamrequestsbyid/:jamRequestId", deleteJamRequestsById)
 
 router.get(
@@ -31,11 +34,6 @@ router.get(
 router.get(
   "/getalljammersfromjamrequestsbyhostedidpaginate",
   getAllJammersFromJamRequestsByHostedIdPaginate
-)
-
-router.get(
-  "/getalljamrequestsbyreceiveridandsenderidpaginate"
-  // getAllJamRequestsByReceiverIdAndSenderIdPaginate
 )
 
 module.exports = router

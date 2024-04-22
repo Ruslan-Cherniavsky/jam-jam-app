@@ -11,6 +11,9 @@ interface Params {
 
 type SenderId = string
 type ReceiverId = string
+type JamId = string
+type InstrumentId = string
+
 type Status = "pending" | "approved" | "rejected"
 type UserId = string | any
 type RequestId = string
@@ -22,11 +25,27 @@ interface SearchText {
   jamName: string | null
 }
 
+interface ExistingJamRequests {
+  _id: string
+  jamId: string
+  instrumentId: string
+  senderId: string
+  receiverId: string
+  status: string
+  __v: number
+}
+
 const dataAxios: {
   dataFetch: (pageNumber: any) => Promise<any>
   jemCardDataFetch: (id: any) => Promise<any>
   getAllJamsPaginate: (pageNumber: any) => Promise<any>
   getAllFilteredJamsPaginate: (params: Params, pageNumber: any) => Promise<any>
+  deleteJammerFromJamByIds: (
+    senderId: string,
+    receiverId: ReceiverId,
+    jamId: JamId,
+    instrumentId: InstrumentId
+  ) => Promise<any>
   getAllJamsPaginateBySearch: (params: Params, pageNumber: any) => Promise<any>
   jammersFetchFiltered: (params: SearchText, pageNumber: any) => Promise<any>
   genresFetch: () => Promise<any>
@@ -45,7 +64,15 @@ const dataAxios: {
     senderId: SenderId,
     receiverId: ReceiverId
   ) => Promise<any>
+  sendJamRequest: (
+    senderId: SenderId,
+    receiverId: ReceiverId,
+    jamId: JamId,
+    instrumentId: InstrumentId
+  ) => Promise<any>
+
   respondToFriendRequest: (requestId: RequestId, status: Status) => Promise<any>
+  getalljamrequestsbyids: (params: any) => Promise<any>
   getAllFriendRequestsByReceiverId: (receiverId: ReceiverId) => Promise<any>
   getAllFriendRequestsByReceiverIdPaginate: (
     receiverId: ReceiverId,
@@ -363,6 +390,50 @@ const dataAxios: {
       return data
     } catch (err) {
       console.log(err)
+    }
+  },
+
+  deleteJammerFromJamByIds: async (
+    senderId,
+    receiverId,
+    jamId,
+    instrumentId
+  ) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:3500/jams/deletejammerfromjambyIds`,
+        {senderId, receiverId, jamId, instrumentId}
+      )
+      return response
+    } catch (error) {
+      console.error("Error retrieving Jam requests by sender ID:", error)
+      throw error
+    }
+  },
+  //------jam Requests
+  getalljamrequestsbyids: async (params) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jamrequests/getalljamrequestsbyids`,
+        {params}
+      )
+      return response.data
+    } catch (error) {
+      console.error("Error retrieving Jam requests by sender ID:", error)
+      throw error
+    }
+  },
+
+  sendJamRequest: async (senderId, receiverId, jamId, instrumentId) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3500/jamrequests/sendjamrequest",
+        {senderId, receiverId, jamId, instrumentId}
+      )
+      return response
+    } catch (error) {
+      console.error("Error sending friend request:", error)
+      throw error
     }
   },
 }

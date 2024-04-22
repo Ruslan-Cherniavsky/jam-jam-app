@@ -7,7 +7,7 @@ const Instruments = require("../models/instruments")
 
 //-----------------------------------------------------------|
 //                                                           |
-//              Postman tests / admin function:
+//     Postman tests / admin function / validations:
 //                                                           |
 //-----------------------------------------------------------|
 
@@ -76,6 +76,74 @@ const deleteJamRequestsById = async (req, res) => {
   }
 }
 
+//---get all jam request by sender id
+
+const getAllJamRequestsByIds = async (req, res) => {
+  // const {senderId} = req.params
+  const {senderId, receiverId, jamId, instrumentId} = req.query
+
+  // const {senderId, receiverId, jamId, instrumentId} = req.body
+  console.log(req.query)
+
+  try {
+    // const jamRequests = await JamRequests.find({senderId}).populate([
+    //   {path: "senderId", select: "_id userName"},
+    //   {path: "receiverId", select: "_id userName"},
+    // ])
+
+    if (!mongoose.isValidObjectId(senderId)) {
+      return res.status(400).json({error: "Invalid sender ID"})
+    }
+    if (!mongoose.isValidObjectId(receiverId)) {
+      return res.status(400).json({error: "Invalid receiver ID"})
+    }
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid jam ID"})
+    }
+    if (!mongoose.isValidObjectId(instrumentId)) {
+      return res.status(400).json({error: "Invalid instrumentId ID"})
+    }
+
+    const sender = await User.findById(senderId)
+    if (!sender) {
+      return res.status(404).json({message: "Sender not found!"})
+    }
+
+    // if (senderId !== receiverId) {
+    //   return res.status(404).json({error: "senderId and receiverId must much!"})
+    // }
+
+    const jam = await Jam.findById(jamId)
+    if (!jam) {
+      return res.status(404).json({message: "Jam not found!"})
+    }
+
+    const instrument = await Instruments.findById(instrumentId)
+    if (!instrument) {
+      return res.status(404).json({message: "Instrument not found!"})
+    }
+
+    const existingJamRequests = await JamRequests.findOne({
+      senderId,
+      receiverId,
+      jamId,
+      instrumentId,
+    })
+
+    // if (existingRequest) {
+    //   return res.status(400).json({
+    //     message:
+    //       "You already sent invite to this user for this role in this Jam.",
+    //   })
+    // }
+
+    return res.status(200).json({existingJamRequests})
+  } catch (error) {
+    console.error("Error retrieving jam requests:", error)
+    return res.status(500).json({message: "Internal Server Error"})
+  }
+}
+
 //-----------------------------------------------------------|
 //                                                           |
 //                     Send Jam Request:
@@ -131,11 +199,14 @@ const sendJamRequest = async (req, res) => {
         .json({message: "This role in this jam is not exist anymore..."})
     }
 
-    const isJammer = jam.jammers.some(
-      (jammer) =>
+    const isJammer = jam.jammers.some((jammer) => {
+      // console.log("________", jammer.instrument.toString())
+      // console.log("____", instrumentId)
+      return (
         jammer.jammersId.includes(senderId) &&
         jammer.instrument.toString() === instrumentId
-    )
+      )
+    })
     if (isJammer) {
       return res
         .status(400)
@@ -308,6 +379,8 @@ const inviteToJam = async (req, res) => {
 const respondToJamRequest = async (req, res) => {
   const {requestId, status} = req.body
 
+  console.log(req.body)
+
   try {
     if (!mongoose.isValidObjectId(requestId)) {
       return res.status(400).json({error: "Invalid request ID"})
@@ -367,11 +440,21 @@ const respondToJamRequest = async (req, res) => {
     }
 
     if (status === "approved") {
-      const isJammersNumberValid = jam.jammers.some(
-        (jammer) =>
+      const isJammersNumberValid = jam.jammers.some((jammer) => {
+        // console.log("Max Number Of Jammers:", jammer.maxNumberOfJammers)
+        // console.log("Number of Jammers:", jammer.jammersId.length)
+        // console.log(
+        //   "Instrument from request:",
+        //   request.instrumentId._id.toString()
+        // )
+        // console.log("Instrument:", jammer.instrument.toString())
+        return (
           jammer.maxNumberOfJammers > jammer.jammersId.length &&
-          jammer.instrument.toString() === request.instrumentId
-      )
+          jammer.instrument.toString() === request.instrumentId._id.toString()
+        )
+      })
+
+      // console.log("_______________", {isJammersNumberValid})
 
       if (!isJammersNumberValid) {
         return res.status(400).json({message: "This jammer roles is full"})
@@ -419,7 +502,7 @@ const respondToJamRequest = async (req, res) => {
 
 //---Get all invites to jam by reciver Id:
 // reciver id is user id, sender id is jam host, that send you jam request
-// this function is for get all jam requests that sendet to you by other jame hosts, and not by yourself
+// this function is for get all jam requests that sent to you by other jame hosts, and not by yourself
 
 const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
   const {receiverId, senderId} = req.body
@@ -601,4 +684,6 @@ module.exports = {
   deleteJamRequestsById,
 
   getAllJammersFromJamRequestsByHostedIdPaginate,
+
+  getAllJamRequestsByIds,
 }

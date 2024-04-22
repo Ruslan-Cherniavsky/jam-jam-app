@@ -484,6 +484,64 @@ const getAllJamsByJammerId = async (req, res) => {
   }
 }
 
+const deleteJammerFromJamByIds = async (req, res) => {
+  const {jamId, receiverId, senderId, instrumentId} = req.body
+
+  try {
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid jam ID"})
+    }
+
+    if (!mongoose.isValidObjectId(receiverId)) {
+      return res.status(400).json({error: "Invalid receiver ID"})
+    }
+
+    if (!mongoose.isValidObjectId(senderId)) {
+      return res.status(400).json({error: "Invalid sender ID"})
+    }
+
+    if (!mongoose.isValidObjectId(instrumentId)) {
+      return res.status(400).json({error: "Invalid instrument ID"})
+    }
+
+    const jam = await Jam.findById(jamId)
+    if (!jam) {
+      return res.status(404).json({message: "Jam not found."})
+    }
+
+    const updatedJam = await Jam.findOneAndUpdate(
+      {
+        _id: jamId,
+        "jammers.jammersId": receiverId,
+        "jammers.jammersId": senderId,
+        "jammers.instrument": instrumentId,
+      },
+      {
+        $pull: {
+          "jammers.$.jammersId": receiverId,
+        },
+      },
+      {
+        new: true,
+      }
+    )
+
+    if (!updatedJam) {
+      return res
+        .status(404)
+        .json({message: "Jammer not found in the jam with provided IDs."})
+    }
+
+    res.status(200).json({
+      message: "Jammer ben deleted from this role in this jam ",
+      updatedJam,
+    })
+  } catch (error) {
+    console.error("Error deleting receiver from jam:", error)
+    res.status(500).json({error: "Internal server error"})
+  }
+}
+
 module.exports = {
   createJam,
   getAllJams,
@@ -496,4 +554,5 @@ module.exports = {
   getAllJamsByHostedById,
   getJamByJamName,
   getAllJamsByJammerId,
+  deleteJammerFromJamByIds,
 }
