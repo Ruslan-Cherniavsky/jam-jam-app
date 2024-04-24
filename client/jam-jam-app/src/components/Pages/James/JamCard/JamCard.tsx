@@ -30,6 +30,11 @@ import dataAxios from "../../../../server/data.axios"
 import {RootState} from "../../../../redux/store"
 import {useDispatch, useSelector} from "react-redux"
 import {Link} from "react-router-dom"
+import Map from "./Map/MapDisplay"
+import MapWithSearch from "./Map/MapWithSearch"
+import MapDisplay from "./Map/MapDisplay"
+
+import {formatDateString} from "../../../../helpers/formatDateString"
 
 export interface Jam {
   _id: string
@@ -101,9 +106,10 @@ interface ExistingJamRequestsResponse {
 interface JamCardListProps {
   jam: Jam
   updateCard: Function
+  ifPastEvent: Boolean
 }
 
-const JamCard = ({jam, updateCard}: JamCardListProps) => {
+const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
   // const {userId} = useParams<{userId: string}>()
   const {currentUser} = useAuthContext()
   const navigate = useNavigate()
@@ -163,9 +169,7 @@ const JamCard = ({jam, updateCard}: JamCardListProps) => {
       // console.log(jamRequestsByUser?.existingJamRequests)
 
       if (jamRequestsByUser?.existingJamRequests) {
-        setMessage(
-          "Jam request has already been sent to this role for this jam."
-        )
+        setMessage("Jam request has already been sent.")
         return
       }
 
@@ -341,167 +345,198 @@ const JamCard = ({jam, updateCard}: JamCardListProps) => {
   // }
 
   return (
-    <Container className="mt-4">
-      <Button
-        variant="outline-dark"
-        size="sm"
-        className="mr-2"
-        style={{
-          borderColor: iconColor,
-          marginRight: "20px",
-          marginBottom: "20px",
-        }}
-        onClick={() => {
-          navigate(-1)
-        }}>
-        <FontAwesomeIcon
-          style={{color: iconColor, marginRight: iconSpacing}}
-          icon={faBackward}
-          className="mr-1"
-        />{" "}
-        Back
-      </Button>
-
-      <Card>
-        <Card.Header>
-          <Row className="align-items-center">
-            <Col xl={10} lg={10} md={8} sm={8} xs={8}>
-              <h2>
-                {jam.jamName}{" "}
-                {/* {jammer?.email === currentUser?.email && "*(Me)"} */}
-              </h2>
-            </Col>
-            {/* <Col xl={2} lg={2} md={3} sm={4} xs={4}></Col> */}
-            {/* {jammer?.email !== currentUser?.email && ( */}
-            <Col xl={2} lg={2} md={4} sm={4} xs={4}>
-              <Button
-                onClick={() => setShowReportModal(true)}
-                variant="outline-dark"
-                size="sm"
+    <>
+      <Container className="mt-4">
+        <Row>
+          <Col xl={2} lg={2} md={3} sm={3} xs={3}>
+            <Button
+              variant="outline-dark"
+              size="sm"
+              // className="mr-2"
+              className="w-100"
+              style={{
+                borderColor: iconColor,
+                marginRight: "20px",
+                marginBottom: "20px",
+              }}
+              onClick={() => {
+                navigate(-1)
+              }}>
+              <FontAwesomeIcon
+                style={{color: iconColor, marginRight: iconSpacing}}
+                icon={faBackward}
+                className="mr-1"
+              />{" "}
+              Back
+            </Button>
+          </Col>
+          <Col>
+            {message && (
+              <Alert
                 style={{
-                  borderColor: iconColor,
-                  width: "100%",
+                  height: "33px",
+                  paddingTop: " 4px",
+                  textAlign: "center",
                 }}
-                // disabled={jammer?.email === currentUser?.email}
-              >
-                <FontAwesomeIcon
-                  style={{color: iconColor, marginRight: "4px"}}
-                  icon={faFlag}
-                />{" "}
-                Report
-              </Button>
-            </Col>
-            {/* )} */}
-          </Row>
-        </Card.Header>
-        <Card.Body>
-          {message && <Alert variant="info">{message}</Alert>}
+                variant="info small">
+                {message}
+              </Alert>
+            )}
+          </Col>
+        </Row>
+        <Card>
+          <Card.Header>
+            <Row className="align-items-center">
+              <Col xl={10} lg={10} md={8} sm={8} xs={8}>
+                <h2>
+                  {jam.jamName}{" "}
+                  {/* {jammer?.email === currentUser?.email && "*(Me)"} */}
+                </h2>
+              </Col>
 
-          <Row>
-            <Col md={4}>
-              <Image
-                style={{margin: "0px 0px 15px 0px"}}
-                src={jam.img}
-                className="img-fluid"
-                alt="User"
-                fluid
-              />
-            </Col>
-            <Col md={8}>
-              <p>
-                {` ${jam.country}`} {jam.city ? `${","}` : ""}
-                {jam.city && `${jam.city} `}
-              </p>
-              {/* <p>Age: {calculateAge(jammer.dob)}</p> */}
-              {/* <p>Gender: {jammer.gender}</p> */}
-              <p>Type: {jam.type}</p>
-              <h5>Shared Instruments:</h5>
-              <ul>
-                {jam.sharedInstruments.map((instrument) => (
-                  <li key={instrument._id}>{instrument.instrument}</li>
-                ))}
-              </ul>
-              <h5>Genres:</h5>
-              <ul>
-                {jam.genres.map((genre) => (
-                  <li key={genre._id}>{genre.genre}</li>
-                ))}
-              </ul>
-              <p>
-                Hosted By:{" "}
-                <Link to={`/jamerCard/${jam.hostedBy._id}`}>
-                  {" "}
-                  {jam.hostedBy.userName}
-                </Link>
-              </p>
-            </Col>
-          </Row>
+              {/* <Col xl={2} lg={2} md={3} sm={4} xs={4}></Col> */}
+              {/* {jammer?.email !== currentUser?.email && ( */}
+              <Col xl={2} lg={2} md={4} sm={4} xs={4}>
+                <Button
+                  onClick={() => setShowReportModal(true)}
+                  variant="outline-dark"
+                  size="sm"
+                  style={{
+                    borderColor: iconColor,
+                    width: "100%",
+                  }}
+                  // disabled={jammer?.email === currentUser?.email}
+                >
+                  <FontAwesomeIcon
+                    style={{color: iconColor, marginRight: "4px"}}
+                    icon={faFlag}
+                  />{" "}
+                  Report
+                </Button>
+              </Col>
+              {/* )} */}
+            </Row>
+          </Card.Header>
+          <Card.Body>
+            {/* {message && <Alert variant="info">{message}</Alert>} */}
+            <Row>
+              <Col md={4}>
+                <Image
+                  style={{margin: "0px 0px 15px 0px"}}
+                  src={jam.img}
+                  className="img-fluid"
+                  alt="User"
+                  fluid
+                />
+              </Col>
+              <Col md={8}>
+                <p>
+                  {` ${jam.country}`} {jam.city ? `${","}` : ""}
+                  {jam.city && `${jam.city} `}
+                </p>
+                <p>{formatDateString(jam.jamDate)}</p>
+                {/* <p>Age: {calculateAge(jammer.dob)}</p> */}
+                {/* <p>Gender: {jammer.gender}</p> */}
+                <h5>Shared Instruments:</h5>
+                <ul>
+                  {jam.sharedInstruments.map((instrument) => (
+                    <li key={instrument._id}>{instrument.instrument}</li>
+                  ))}
+                </ul>
+                <h5>Genres:</h5>
+                <ul>
+                  {jam.genres.map((genre) => (
+                    <li key={genre._id}>{genre.genre}</li>
+                  ))}
+                </ul>
+                <p>Type: {jam.type}</p>
+                <p>
+                  Hosted By:{" "}
+                  <Link to={`/jamerCard/${jam.hostedBy._id}`}>
+                    {" "}
+                    {jam.hostedBy.userName}
+                  </Link>
+                </p>
+              </Col>
+            </Row>
+            {/* <SocialMediaLinks socialLinks={jammer.links} /> */}
+            <hr />
+            <h4>Jam Description:</h4>
+            <p>{jam.jamDescription}</p>
+            <hr />
 
-          {/* <SocialMediaLinks socialLinks={jammer.links} /> */}
-          <hr />
-          <h4>Jam Description:</h4>
-          <p>{jam.jamDescription}</p>
-          <hr />
-          <h4>Jammer roles:</h4>
-          {/* <h6>
+            <h4>Jammer roles:</h4>
+            {/* <h6>
             *** Please only request to join if you can bring a required
             instrument or if your instrument is on the list of shared
             instruments.
           </h6> */}
+            <br></br>
+            {!ifPastEvent ? (
+              jam.jammers.map((jammer) => (
+                <div style={{marginLeft: "15px"}} key={jammer._id}>
+                  <h5>
+                    {jammer.instrument.instrument}
+                    {" ("}
+                    {jammer.jammersId.length || 0}
+                    {"/"}
+                    {jammer.maxNumberOfJammers}
+                    {")"}
+                  </h5>
 
-          <br></br>
-          {jam.jammers.map((jammer) => (
-            <div style={{marginLeft: "15px"}} key={jammer._id}>
-              <h5>
-                {jammer.instrument.instrument}
-                {" ("}
-                {jammer.jammersId.length || 0}
-                {"/"}
-                {jammer.maxNumberOfJammers}
-                {")"}
-              </h5>
+                  {jammer.jammersId.map((jammer) => (
+                    <li key={jammer._id}>
+                      <Link to={`/jamerCard/${jammer._id}`}>
+                        {jammer.userName}
+                      </Link>
+                    </li>
+                  ))}
+                  {jam.jammers.some(
+                    (jammer) =>
+                      jammer.maxNumberOfJammers > jammer.jammersId.length
+                  ) ? (
+                    !jammer.jammersId.some(
+                      (jammer) => jammer._id === userId
+                    ) ? (
+                      <a
+                        href="#"
+                        onClick={() =>
+                          sendJamRequest(jam._id, jammer.instrument._id)
+                        }>
+                        Request to join
+                      </a>
+                    ) : (
+                      <a
+                        href="#"
+                        onClick={() =>
+                          leaveJammerRole(jam._id, jammer.instrument._id)
+                        }
+                        style={{color: "red"}}>
+                        Leave this role{" "}
+                      </a>
+                    )
+                  ) : (
+                    <a>Full</a>
+                  )}
+                  <br></br>
+                  <br></br>
 
-              {jammer.jammersId.map((jammer) => (
-                <li key={jammer._id}>
-                  <Link to={`/jamerCard/${jammer._id}`}>{jammer.userName}</Link>
-                </li>
-              ))}
-              {jam.jammers.some(
-                (jammer) => jammer.maxNumberOfJammers > jammer.jammersId.length
-              ) ? (
-                !jammer.jammersId.some((jammer) => jammer._id === userId) ? (
-                  <a
-                    href="#"
-                    onClick={() =>
-                      sendJamRequest(jam._id, jammer.instrument._id)
-                    }>
-                    Request to join
-                  </a>
-                ) : (
-                  <a
-                    href="#"
-                    onClick={() =>
-                      leaveJammerRole(jam._id, jammer.instrument._id)
-                    }
-                    style={{color: "red"}}>
-                    Leave this role{" "}
-                  </a>
-                )
-              ) : (
-                <a>Full</a>
-              )}
-              <br></br>
-              <br></br>
+                  {/* To Do specific Logic */}
 
-              {/* To Do specific Logic */}
+                  {/* <p>{jammer.instrument.instrument}</p> */}
+                </div>
+              ))
+            ) : (
+              <a style={{color: "red"}}>
+                {" "}
+                The jam is over... See you next time!
+              </a>
+            )}
 
-              {/* <p>{jammer.instrument.instrument}</p> */}
-            </div>
-          ))}
-
-          <hr />
-          <h4>Audience:</h4>
-          {jam.audience.map((visitor) => (
+            <hr />
+            <h4>Audience:</h4>
+            <p>Comming Soon...</p>
+            {/* {jam.audience.map((visitor) => (
             <span key={visitor._id}>
               {" "}
               <Link to={`/jamerCard/${visitor._id}`}>
@@ -511,46 +546,56 @@ const JamCard = ({jam, updateCard}: JamCardListProps) => {
           ))}
           <br></br>
           <br></br>
-          <a href="/"> Request to join</a>
+          <a href="/"> Request to join</a> */}
+            <hr />
+            <h4>Jam Location:</h4>
+            {/* <p>Comming Soon...</p> */}
 
-          <hr />
-          <h4>Comments:</h4>
-          <p>Comming Soon...</p>
-        </Card.Body>
-      </Card>
+            <MapWithSearch city={jam.city} country={jam.country} />
+            {/* 
+            <div>
+              <h1>Map Display</h1>
+            </div> */}
 
-      <Modal show={showReportModal} onHide={() => handleSetShowReportModal()}>
-        <Modal.Header closeButton>
-          <Modal.Title>Report User</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
+            <hr />
+            <h4>Comments:</h4>
+            <p>Comming Soon...</p>
+          </Card.Body>
+        </Card>
 
-          <Form.Group controlId="reportReason">
-            <Form.Label>Enter report reason:</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
-              value={reportReason}
-              onChange={(e) => setReportReason(e.target.value)}
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            variant="outline-dark"
-            size="sm"
-            style={{
-              borderColor: iconColor,
-            }}
-            // onClick={handleReport}
-          >
-            Send Report
-          </Button>
-        </Modal.Footer>
-      </Modal>
-      <br></br>
-    </Container>
+        <Modal show={showReportModal} onHide={() => handleSetShowReportModal()}>
+          <Modal.Header closeButton>
+            <Modal.Title>Report User</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {error && <Alert variant="danger">{error}</Alert>}
+
+            <Form.Group controlId="reportReason">
+              <Form.Label>Enter report reason:</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={3}
+                value={reportReason}
+                onChange={(e) => setReportReason(e.target.value)}
+              />
+            </Form.Group>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="outline-dark"
+              size="sm"
+              style={{
+                borderColor: iconColor,
+              }}
+              // onClick={handleReport}
+            >
+              Send Report
+            </Button>
+          </Modal.Footer>
+        </Modal>
+        <br></br>
+      </Container>
+    </>
   )
 }
 

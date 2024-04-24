@@ -11,9 +11,11 @@ import {
   Pagination,
   Row,
 } from "react-bootstrap"
+import {useDispatch, useSelector} from "react-redux"
+
 import Filter, {IParams} from "../Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./CardListPage_Jams.css"
+import "./InvitesToJamsPage.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {
   faCalendarCheck,
@@ -21,8 +23,10 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons"
 import {faNode} from "@fortawesome/free-brands-svg-icons"
+import {RootState} from "../../../../redux/store"
+import JamsInvitesCardList from "../../../../components_UI/CardList_JamRequests/CardList_JamRequests"
 
-function JammersCardListPage() {
+function InvitesToJamsCardListPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
@@ -34,7 +38,8 @@ function JammersCardListPage() {
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
   const [value, setValue] = useState([3])
-
+  const [jamInvites, setJamsInvites] = useState([])
+  const [pageUpdateStatus, setPageUpdateStatus] = useState(true)
   const [searchText, setSearchText] = useState<SearchText | any>({jamName: ""})
 
   const [params, setParams] = useState<IJamParams | SearchText | Object | any>(
@@ -42,8 +47,12 @@ function JammersCardListPage() {
   )
   const [totalPages, setTotalPages] = useState(0)
 
+  const userId = useSelector(
+    (state: RootState) => state.userDataMongoDB.allUserData?._id
+  )
+
   const MAX_PAGES_DISPLAYED = 9
-  const CARD_LIST_TYPE = "Explore Jams"
+  const CARD_LIST_TYPE = "Jam Invites"
 
   interface SearchText {
     jamName: string | null
@@ -63,7 +72,7 @@ function JammersCardListPage() {
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/jam-events?page=${currentPage}&${queryString}`
+    const newUrl = `/invites-to-jams?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -166,13 +175,31 @@ function JammersCardListPage() {
   useEffect(() => {
     const fetchJams = async () => {
       try {
-        if (!ifFiltered && !gettingUrlParams && !ifSearching) {
+        if (!ifFiltered && !gettingUrlParams && !ifSearching && userId) {
           setSearchText({jamName: ""})
 
           setLoading(true)
-          const data = await dataAxios.getAllJamsPaginate(currentPage)
-          setTotalPages(data.totalPages)
-          setJams(data.jams)
+          const requestParams = {
+            senderId: userId,
+            receiverId: userId,
+          }
+
+          const data = await dataAxios.getAllJamInvites(
+            requestParams,
+            currentPage
+          )
+
+          const currentJams = data.data.jamRequests.map(
+            (jamRequest: any) => (jamRequest = jamRequest.jamId)
+          )
+
+          console.log(userId)
+          console.log(currentJams)
+          console.log(data.data.jamRequests)
+
+          setTotalPages(data.data.totalPages)
+          setJams(currentJams)
+          setJamsInvites(data.data.jamRequests)
 
           //Todo -------------------->>>>
         } else if (ifFiltered && !ifSearching) {
@@ -185,7 +212,7 @@ function JammersCardListPage() {
           )
 
           // console.log(data)
-          console.log("filtering params", params)
+          // console.log("filtering params", params)
 
           setTotalPages(data.totalPages)
           setJams(data.jams)
@@ -206,7 +233,7 @@ function JammersCardListPage() {
     }
 
     fetchJams()
-  }, [currentPage, gettingUrlParams, params])
+  }, [currentPage, gettingUrlParams, params, userId, pageUpdateStatus])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -229,6 +256,10 @@ function JammersCardListPage() {
     if (page >= 0 && page < totalPages) {
       setCurrentPage(page + 1)
     }
+  }
+
+  const pageUpdater = () => {
+    setPageUpdateStatus(!pageUpdateStatus)
   }
 
   async function filteredStatusChange() {
@@ -255,7 +286,7 @@ function JammersCardListPage() {
             paddingTop: "2px",
             marginBottom: "20px",
           }}>
-          Explore Jams
+          Jam Invites
         </h5>
         <Container className="selectContainer border rounded">
           <Row>
@@ -376,12 +407,12 @@ function JammersCardListPage() {
           </Row>
         </Container>
 
-        <Filter
+        {/* <Filter
           searching={ifSearching}
           filteredStatusChange={filteredStatusChange}
           setIfFilteringCB={ifFilteringCB}
           fetchFilteredCB={fetchFilteredCB}
-        />
+        /> */}
 
         <div className="d-none d-xl-block">
           <Container>
@@ -403,7 +434,7 @@ function JammersCardListPage() {
               </Col>
               <Col xl={2}></Col>
 
-              <Col xl={4}>
+              {/* <Col xl={4}>
                 <Form className="mb-2">
                   <FormControl
                     type="text"
@@ -422,7 +453,7 @@ function JammersCardListPage() {
                   className="w-100">
                   Search
                 </Button>
-              </Col>
+              </Col> */}
             </Row>
           </Container>
         </div>
@@ -432,7 +463,7 @@ function JammersCardListPage() {
             <Row>
               <Col xl={2}></Col>
 
-              <Col xl={4} md={8} sm={8} xs={8}>
+              {/* <Col xl={4} md={8} sm={8} xs={8}>
                 <Form className="mb-2">
                   <FormControl
                     style={{margin: " 0px 0px 15px 0px"}}
@@ -453,7 +484,8 @@ function JammersCardListPage() {
                   className="w-100">
                   Search
                 </Button>
-              </Col>
+              </Col> */}
+
               <Col xl={4}>
                 {jams.length > 0 && (
                   <Pagination className="my-custom-pagination">
@@ -475,15 +507,16 @@ function JammersCardListPage() {
 
         {jams && !ifFiltering && !loading ? (
           jams.length > 0 ? (
-            <JammersCardList
-              updateListCB={handlePageChange}
+            <JamsInvitesCardList
+              jamInvites={jamInvites}
+              updateListCB={pageUpdater}
               cardListType={CARD_LIST_TYPE}
               jams={jams}
             />
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
-                <p>Jams not found =(</p>
+                <p>Jam Invites not found.</p>
               </div>
             </div>
           )
@@ -509,4 +542,4 @@ function JammersCardListPage() {
   )
 }
 
-export default JammersCardListPage
+export default InvitesToJamsCardListPage

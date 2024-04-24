@@ -12,18 +12,21 @@ import ForgotPassword from "./Auth/ForgotPassword/ForgotPassword"
 import Login from "./Auth/Login/Login"
 import PrivateRouteUnverified from "./Auth/PrivateRoutes/PrivateRouteUnverified"
 import CheckEmail from "./Auth/CheckEmail/CheckEmail"
-import JoinedJams from "./James/JoinedJams/JoinedJams"
 import ProfilePage from "./User/ProfilePage/ProfilePage"
 import UbdateProfilePage from "./User/UpdateProfilePage/Page/UbdateProfilePage"
 import PrivateRouteUpdateProfile from "./Auth/PrivateRoutes/PrivateRouteUpdateProfile"
 import "./MainPage.css"
 import HomePage from "./HomePage/HomePage"
 import MyFriends from "./User/MyFriends/MyFriends"
-import InvitesToJams from "./James/InvitesToJams/InvitesToJams"
+import InvitesToJamsCardListPage from "./James/InvitesToJams/InvitesToJamsPage"
 import FriendRequests from "./User/friendRequests/friendRequests"
 import {CreatedJams} from "./James/CreatedJams/CreatedJams"
 import JamsCardListPage from "./James/CardListPage_Jams/CardListPage_Jams"
 import JamCardPage from "./James/jamCardPage/jamCardPage"
+import JoinedJamsCardListPage from "./James/JoinedJams/JoinedJamsPage"
+import UbdateJamPage from "./James/CreateJam/Page/CreateJamPage"
+import HostJamPage from "./James/CreateJam/Page/CreateJamPage"
+import CreateJamPage from "./James/CreateJam/Page/CreateJamPage"
 export default function () {
   const {currentUser} = useAuthContext()
 
@@ -86,10 +89,10 @@ export default function () {
                   </PrivateRouteVerified>
                 }></Route>
               <Route
-                path="/create-jam/"
+                path="/host-jam/"
                 element={
                   <PrivateRouteVerified>
-                    <CreatedJams />
+                    <CreateJamPage />
                   </PrivateRouteVerified>
                 }></Route>
 
@@ -97,7 +100,7 @@ export default function () {
                 path="/joined-jams"
                 element={
                   <PrivateRouteVerified>
-                    <JoinedJams />
+                    <JoinedJamsCardListPage />
                   </PrivateRouteVerified>
                 }></Route>
 
@@ -126,7 +129,7 @@ export default function () {
                 path="/invites-to-jams"
                 element={
                   <PrivateRouteUpdateProfile>
-                    <InvitesToJams />
+                    <InvitesToJamsCardListPage />
                   </PrivateRouteUpdateProfile>
                 }></Route>
               <Route

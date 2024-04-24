@@ -1,18 +1,14 @@
 import React, {useEffect, useState} from "react"
 import UpdateProfileFirebase from "../../../Auth/UpdateProfileFirebase/UpdateProfileFirebase"
-import UpdateProfile from "../UpdateProfile/UpdateProfile"
+import CreateJam from "../CreateJamInputs/CreateJam"
 import {useAuthContext} from "../../../../../context/AuthContext"
 import {useSelector} from "react-redux"
 import {RootState} from "../../../../../redux/store"
 
-export default function UbdateProfilePage() {
-  const {
-    currentUser,
-    updateCurrentPassword,
-    reauthenticateCurrentWithCredential,
-  } = useAuthContext()
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState<boolean>(false)
+export default function CreateJamPage() {
+  const {currentUser} = useAuthContext()
+  // const [error, setError] = useState<string | null>(null)
+  // const [loading, setLoading] = useState<boolean>(false)
   // const [ifGoogleUser, setifGoogleUser] = useState<boolean>(false)
 
   const userDataDB = useSelector(
@@ -29,9 +25,11 @@ export default function UbdateProfilePage() {
   //     setifGoogleUser(false)
   //   }
   // }, [currentUser])
+
   return (
     <>
-      {userDataDB && <UpdateProfile userDataDB={userDataDB} />}
+      {/* {userDataDB && <UpdateProfile userDataDB={userDataDB} />} */}
+      <CreateJam />
       {/* {!ifGoogleUser ? <UpdateProfileFirebase /> : null} */}
     </>
   )

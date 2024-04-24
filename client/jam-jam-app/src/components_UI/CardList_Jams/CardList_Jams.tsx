@@ -9,6 +9,7 @@ import {Col, Row} from "react-bootstrap"
 import {useSelector} from "react-redux"
 import {RootState} from "../../redux/store"
 import dataAxios from "../../server/data.axios"
+import {formatDateString} from "../../helpers/formatDateString"
 
 import {useNavigate} from "react-router-dom"
 
@@ -82,21 +83,6 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
     setSelectedJamId(currentJamId)
   }
 
-  const formatDateString = (dateString: string) => {
-    console.log("data before formating ------->", dateString)
-
-    const date = new Date(dateString)
-    return (
-      date.toLocaleDateString() +
-      " " +
-      date.toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      })
-    )
-  }
-  // const date = new Date(jam.jamDate)
   const navigate = useNavigate()
 
   const handleUnfriend = async (

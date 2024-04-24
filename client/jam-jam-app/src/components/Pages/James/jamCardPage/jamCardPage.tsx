@@ -11,6 +11,7 @@ function JamCardPage() {
   const [jemCardId, setJemCardId] = useState<any>(null)
   const [jemDataLocal, setJemDataLocal] = useState<Jam | null>(null)
   const [updatePage, setUpdatePage] = useState<Boolean>(false)
+  const [ifPastEvent, setIfPastEvent] = useState<Boolean>(false)
   const params = useParams()
 
   const updateCBfunction = () => {
@@ -22,9 +23,22 @@ function JamCardPage() {
   }, [params])
 
   useEffect(() => {
+    const currentDate = Date.now()
+
     if (jemCardId) {
       dataAxios.jemCardDataFetch(jemCardId).then((data) => {
         setJemDataLocal(data.jam)
+
+        if (
+          new Date(data.jam.jamDate).getTime() + 5 * 60 * 60 * 1000 <
+          currentDate
+        ) {
+          setIfPastEvent(true)
+        }
+        // console.log(new Date(data.jam.jamDate).getTime())
+        // console.log(new Date(data.jam.jamDate).getTime() + 5 * 60 * 60 * 1000)
+        // console.log(currentDate)
+        // console.log(data.jam.jamDate < currentDate)
       })
     } else {
       return
@@ -35,7 +49,11 @@ function JamCardPage() {
     <>
       <Col>
         {jemDataLocal ? (
-          <JamCard jam={jemDataLocal} updateCard={updateCBfunction} />
+          <JamCard
+            jam={jemDataLocal}
+            ifPastEvent={ifPastEvent}
+            updateCard={updateCBfunction}
+          />
         ) : (
           <Loader />
         )}

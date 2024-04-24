@@ -37,7 +37,9 @@ interface ExistingJamRequests {
 
 const dataAxios: {
   dataFetch: (pageNumber: any) => Promise<any>
+  getAllJamInvites: (params: any, pageNumber: any) => Promise<any>
   jemCardDataFetch: (id: any) => Promise<any>
+  respondToJamRequest: (requestId: string, status: string) => Promise<any>
   getAllJamsPaginate: (pageNumber: any) => Promise<any>
   getAllFilteredJamsPaginate: (params: Params, pageNumber: any) => Promise<any>
   deleteJammerFromJamByIds: (
@@ -55,6 +57,8 @@ const dataAxios: {
   usernamesDataFetch: () => Promise<any>
   userDataFetch: () => Promise<any>
   userCardDataUpdate: (id: any, payload: object) => Promise<any>
+  createJam: (jam: object) => Promise<any>
+  getAllJamsByJammerId: (userId: any, pageNumber: any) => Promise<any>
   createUserMongoDB: (email: string | any) => Promise<any>
   fetchGenresByIds: (genreIds: string[]) => Promise<any>
   fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
@@ -433,6 +437,53 @@ const dataAxios: {
       return response
     } catch (error) {
       console.error("Error sending friend request:", error)
+      throw error
+    }
+  },
+  getAllJamsByJammerId: async (userId, pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jams/getjambyjammerid/${userId}?page=${pageNumber}`
+      )
+      return response
+    } catch (error) {
+      console.error("Error sending friend request:", error)
+      throw error
+    }
+  },
+  getAllJamInvites: async (params, pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jamrequests/getalljamrequestsbyreceiveridpaginate?page=${pageNumber}`,
+        {params}
+      )
+      return response
+    } catch (error) {
+      console.error("Error getting jam invites:", error)
+      throw error
+    }
+  },
+  respondToJamRequest: async (requestId, status) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3500/jamrequests/respondtojamrequest",
+        {requestId, status}
+      )
+      return response
+    } catch (error) {
+      console.error("Error responding jam invites:", error)
+      throw error
+    }
+  },
+  createJam: async (jam) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:3500/jams/create",
+        jam
+      )
+      return response
+    } catch (error) {
+      console.error("Error responding jam invites:", error)
       throw error
     }
   },

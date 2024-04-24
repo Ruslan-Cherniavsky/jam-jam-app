@@ -371,8 +371,6 @@ const inviteToJam = async (req, res) => {
 //                                                           |
 //-----------------------------------------------------------|
 
-//----can see onley user that hosted jam
-
 //-----response to jam requests(invites) from getAllJamRequestsByReceiverIdPaginate (jame hosts that invites you to his james)
 //-----and getAllJammersFromJamRequestsByHostedIdPaginate response to other james ewquests that ask yiu to join yore hosted jam
 
@@ -468,11 +466,15 @@ const respondToJamRequest = async (req, res) => {
         {arrayFilters: [{"elem.instrument": request.instrumentId}]}
       )
 
+      //------ TODO mail sent
+
       await JamRequests.deleteMany({
         jamId: request.jamId,
         instrumentId: request.instrumentId,
         receiverId: request.receiverId,
       })
+
+      //Todo
 
       return res.status(200).json({
         message: `Jam request approved successfully. All Requests for that role in this jam, with required user is deleted.`,
@@ -505,17 +507,19 @@ const respondToJamRequest = async (req, res) => {
 // this function is for get all jam requests that sent to you by other jame hosts, and not by yourself
 
 const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
-  const {receiverId, senderId} = req.body
+  const {receiverId, senderId} = req.query
+
+  // console.log(req.query)
 
   if (!senderId || !mongoose.isValidObjectId(senderId)) {
     return res.status(404).json({message: "invalid sender Id"})
   }
 
-  if (senderId === receiverId) {
-    return res
-      .status(404)
-      .json({message: "receiverId and senderId must be deferent"})
-  }
+  // if (senderId === receiverId) {
+  //   return res
+  //     .status(404)
+  //     .json({message: "receiverId and senderId must be deferent"})
+  // }
 
   const page = parseInt(req.query.page) || 1
   const perPage = 12
@@ -538,13 +542,19 @@ const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
     })
       .populate("senderId", "_id userName")
       .populate("receiverId", "_id userName")
-      .populate("jamId")
+      .populate({
+        path: "jamId",
+        populate: [
+          {path: "hostedBy", select: "_id userName"},
+          {path: "genres"},
+        ],
+      })
       .populate("instrumentId")
       .skip((page - 1) * perPage)
       .limit(perPage)
 
     if (!jamRequests || jamRequests.length === 0) {
-      return res.status(404).json({message: "No jam requests found"})
+      return res.status(200).json({jamRequests, totalPages})
     }
 
     return res.status(200).json({jamRequests, totalPages})

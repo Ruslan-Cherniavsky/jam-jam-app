@@ -11,9 +11,11 @@ import {
   Pagination,
   Row,
 } from "react-bootstrap"
+import {useDispatch, useSelector} from "react-redux"
+
 import Filter, {IParams} from "../Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./CardListPage_Jams.css"
+import "./JoinedJamsPage.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {
   faCalendarCheck,
@@ -21,8 +23,9 @@ import {
   faPlus,
 } from "@fortawesome/free-solid-svg-icons"
 import {faNode} from "@fortawesome/free-brands-svg-icons"
+import {RootState} from "../../../../redux/store"
 
-function JammersCardListPage() {
+function JoinedJamsCardListPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
@@ -41,6 +44,10 @@ function JammersCardListPage() {
     {}
   )
   const [totalPages, setTotalPages] = useState(0)
+
+  const userId = useSelector(
+    (state: RootState) => state.userDataMongoDB.allUserData?._id
+  )
 
   const MAX_PAGES_DISPLAYED = 9
   const CARD_LIST_TYPE = "Explore Jams"
@@ -63,7 +70,7 @@ function JammersCardListPage() {
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/jam-events?page=${currentPage}&${queryString}`
+    const newUrl = `/joined-jams?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -166,13 +173,16 @@ function JammersCardListPage() {
   useEffect(() => {
     const fetchJams = async () => {
       try {
-        if (!ifFiltered && !gettingUrlParams && !ifSearching) {
+        if (!ifFiltered && !gettingUrlParams && !ifSearching && userId) {
           setSearchText({jamName: ""})
 
           setLoading(true)
-          const data = await dataAxios.getAllJamsPaginate(currentPage)
-          setTotalPages(data.totalPages)
-          setJams(data.jams)
+          const data = await dataAxios.getAllJamsByJammerId(userId, currentPage)
+          setTotalPages(data.data.totalPages)
+          setJams(data.data.jams)
+
+          // console.log(data.data.jams)
+          // console.log(userId)
 
           //Todo -------------------->>>>
         } else if (ifFiltered && !ifSearching) {
@@ -185,7 +195,7 @@ function JammersCardListPage() {
           )
 
           // console.log(data)
-          console.log("filtering params", params)
+          // console.log("filtering params", params)
 
           setTotalPages(data.totalPages)
           setJams(data.jams)
@@ -206,7 +216,7 @@ function JammersCardListPage() {
     }
 
     fetchJams()
-  }, [currentPage, gettingUrlParams, params])
+  }, [currentPage, gettingUrlParams, params, userId])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -255,7 +265,7 @@ function JammersCardListPage() {
             paddingTop: "2px",
             marginBottom: "20px",
           }}>
-          Explore Jams
+          Joined Jams
         </h5>
         <Container className="selectContainer border rounded">
           <Row>
@@ -376,12 +386,12 @@ function JammersCardListPage() {
           </Row>
         </Container>
 
-        <Filter
+        {/* <Filter
           searching={ifSearching}
           filteredStatusChange={filteredStatusChange}
           setIfFilteringCB={ifFilteringCB}
           fetchFilteredCB={fetchFilteredCB}
-        />
+        /> */}
 
         <div className="d-none d-xl-block">
           <Container>
@@ -403,7 +413,7 @@ function JammersCardListPage() {
               </Col>
               <Col xl={2}></Col>
 
-              <Col xl={4}>
+              {/* <Col xl={4}>
                 <Form className="mb-2">
                   <FormControl
                     type="text"
@@ -422,7 +432,7 @@ function JammersCardListPage() {
                   className="w-100">
                   Search
                 </Button>
-              </Col>
+              </Col> */}
             </Row>
           </Container>
         </div>
@@ -432,7 +442,7 @@ function JammersCardListPage() {
             <Row>
               <Col xl={2}></Col>
 
-              <Col xl={4} md={8} sm={8} xs={8}>
+              {/* <Col xl={4} md={8} sm={8} xs={8}>
                 <Form className="mb-2">
                   <FormControl
                     style={{margin: " 0px 0px 15px 0px"}}
@@ -453,7 +463,7 @@ function JammersCardListPage() {
                   className="w-100">
                   Search
                 </Button>
-              </Col>
+              </Col> */}
               <Col xl={4}>
                 {jams.length > 0 && (
                   <Pagination className="my-custom-pagination">
@@ -509,4 +519,4 @@ function JammersCardListPage() {
   )
 }
 
-export default JammersCardListPage
+export default JoinedJamsCardListPage

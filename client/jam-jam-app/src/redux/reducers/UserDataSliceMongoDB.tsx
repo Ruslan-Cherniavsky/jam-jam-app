@@ -1,4 +1,5 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit"
+
 export interface UserDataSliceMongoDB {
   _id: string
   email: string
