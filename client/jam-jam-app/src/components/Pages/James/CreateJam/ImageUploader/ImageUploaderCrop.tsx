@@ -12,7 +12,7 @@ import {Button, Container} from "react-bootstrap"
 
 const storage = getStorage()
 const placeholder =
-  "https://i.pinimg.com/736x/0d/64/98/0d64989794b1a4c9d89bff571d3d5842.jpg"
+  "https://firebasestorage.googleapis.com/v0/b/jam-jam-development.appspot.com/o/images%2Fw32222.png?alt=media&token=cd49e79d-57f4-4b6a-abde-7f95e1b1f843"
 
 interface ImageUploadProps {
   handleImageURL: (url: string) => void
@@ -190,7 +190,11 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
         <img
           className="w-100"
           src={imageURL || placeholder}
-          style={{width: "300px"}}
+          style={{
+            width: "300px",
+            border: "gray solid 1px",
+            borderRadius: "8px",
+          }}
           alt={placeholder}
         />
       </div>
@@ -223,7 +227,7 @@ const ImageUploadCrop = ({handleImageURL, currentURL}: ImageUploadProps) => {
           className="w-100"
           type="button"
           onClick={() => document.getElementById("fileInput")?.click()}>
-          Upload
+          Upload Image
         </Button>
       </div>
 

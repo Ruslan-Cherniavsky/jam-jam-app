@@ -335,8 +335,6 @@ export default function UpdateProfile({
                 </Col>
 
                 <Col xl={4} lg={6} md={9} sm={12}>
-                  {/* <br></br> */}
-
                   <Form.Group id="userName">
                     <Form.Label
                     // style={{marginTop: "7%"}}
