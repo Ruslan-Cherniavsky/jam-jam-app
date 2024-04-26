@@ -33,8 +33,8 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
     {to: "/my-profile", label: "My Profile"},
     {to: "/update-profile", label: "Edit Profile"},
     {to: "/my-friends", label: "My Friends"},
-    {to: "/create-jam/", label: "Host Jam-Events"},
-    {to: "/created-jams/:jamerId", label: "Created Jam-Events"},
+    {to: "/host-jam", label: "Host Jam-Events"},
+    {to: "/hosted-jams", label: "Created Jam-Events"},
     {to: "/joined-jams", label: "Joined Jam-Events"},
   ]
 
@@ -158,9 +158,9 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/created-jams/"
+            to="/hosted-jams"
             className={
-              pathname === "/created-jams/"
+              pathname === "/hosted-jams"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>
@@ -170,9 +170,9 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/create-jam/"
+            to="/host-jam"
             className={
-              pathname === "/create-jam/"
+              pathname === "/host-jam"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>

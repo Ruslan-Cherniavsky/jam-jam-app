@@ -1,0 +1,30 @@
+/* Add your custom pagination styles */
+.my-custom-pagination .page-link {
+  color: #666666; /* Text color */
+  background-color: #ffffff; /* Background color */
+  border-color: #d6d6d6; /* Border color */
+  --bs-pagination-focus-box-shadow: none;
+}
+
+.my-custom-pagination .page-link:hover {
+  color: #ffffff; /* Hover text color */
+  background-color: #dddddd; /* Hover background color */
+  border-color: #d1d1d1; /* Hover border color */
+  --bs-pagination-focus-box-shadow: none;
+}
+
+.my-custom-pagination .page-item.active .page-link {
+  color: #ffffff; /* Hover text color */
+
+  background-color: #a7a7a7; /* Active background color */
+  border-color: #afafaf; /* Active border color */
+  --bs-pagination-focus-box-shadow: none;
+}
+
+.my-custom-pagination .page-item.active .page-link {
+  color: #ffffff; /* Hover text color */
+
+  background-color: #444444; /* Active background color */
+  border-color: #afafaf; /* Active border color */
+  --bs-pagination-focus-box-shadow: none;
+}

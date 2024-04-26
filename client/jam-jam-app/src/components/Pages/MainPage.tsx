@@ -20,13 +20,11 @@ import HomePage from "./HomePage/HomePage"
 import MyFriends from "./User/MyFriends/MyFriends"
 import InvitesToJamsCardListPage from "./James/InvitesToJams/InvitesToJamsPage"
 import FriendRequests from "./User/friendRequests/friendRequests"
-import {CreatedJams} from "./James/CreatedJams/CreatedJams"
 import JamsCardListPage from "./James/CardListPage_Jams/CardListPage_Jams"
 import JamCardPage from "./James/jamCardPage/jamCardPage"
 import JoinedJamsCardListPage from "./James/JoinedJams/JoinedJamsPage"
-import UbdateJamPage from "./James/CreateJam/Page/CreateJamPage"
-import HostJamPage from "./James/CreateJam/Page/CreateJamPage"
 import CreateJamPage from "./James/CreateJam/Page/CreateJamPage"
+import HostedJamsPage from "./James/HostedJams/HostedJamsPage"
 export default function () {
   const {currentUser} = useAuthContext()
 
@@ -82,14 +80,14 @@ export default function () {
                 }></Route>
 
               <Route
-                path="/created-jams/"
+                path="/hosted-jams"
                 element={
                   <PrivateRouteVerified>
-                    <CreateJamEvent />
+                    <HostedJamsPage />
                   </PrivateRouteVerified>
                 }></Route>
               <Route
-                path="/host-jam/"
+                path="/host-jam"
                 element={
                   <PrivateRouteVerified>
                     <CreateJamPage />

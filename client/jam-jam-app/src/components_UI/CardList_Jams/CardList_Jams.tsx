@@ -83,6 +83,20 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
     setSelectedJamId(currentJamId)
   }
 
+  const deleteJambyJamId = async (jamId: string) => {
+    try {
+      if (jamId) {
+        const response = await dataAxios.totalDeleteJamByJamId(jamId)
+        if (response.status === 200) {
+          console.log(`Jam ${jamId} deleted succesful`)
+          updateListCB()
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting jam:", error)
+    }
+  }
+
   const navigate = useNavigate()
 
   const handleUnfriend = async (
@@ -283,6 +297,27 @@ const JamsCardList: React.FC<JamsCardListProps> = ({
                     </Row>
                   </div>
                 )}
+
+                {cardListType === "Hosted Jams" && (
+                  <Col md={12} sm={12} xs={12}>
+                    <Button
+                      size="sm"
+                      style={{
+                        borderColor: "#BCBCBC",
+                        width: "100%",
+                        marginTop: "10px",
+                      }}
+                      variant="outline-dark"
+                      className="confirm-button"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        deleteJambyJamId(jam._id)
+                      }}>
+                      Delete Jam
+                    </Button>
+                  </Col>
+                )}
+
                 {cardListType === "My Friends" && (
                   <div className="friendRequestsCont">
                     <Row>

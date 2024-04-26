@@ -389,7 +389,9 @@ function InvitesToJamsCardListPage() {
                 variant="outline-dark"
                 style={{marginBottom: "20px", marginTop: "20px"}}
                 disabled={loading}
-                onClick={handleSearch}
+                onClick={() => {
+                  navigate("/hosted-jams")
+                }}
                 className="w-100">
                 Hosted Jams
               </Button>

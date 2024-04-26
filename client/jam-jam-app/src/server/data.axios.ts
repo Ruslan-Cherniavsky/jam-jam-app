@@ -41,6 +41,7 @@ const dataAxios: {
   jemCardDataFetch: (id: any) => Promise<any>
   respondToJamRequest: (requestId: string, status: string) => Promise<any>
   getAllJamsPaginate: (pageNumber: any) => Promise<any>
+  totalDeleteJamByJamId: (jamId: string) => Promise<any>
   getAllFilteredJamsPaginate: (params: Params, pageNumber: any) => Promise<any>
   deleteJammerFromJamByIds: (
     senderId: string,
@@ -59,6 +60,7 @@ const dataAxios: {
   userCardDataUpdate: (id: any, payload: object) => Promise<any>
   createJam: (jam: object) => Promise<any>
   getAllJamsByJammerId: (userId: any, pageNumber: any) => Promise<any>
+  getAllJamsByHostedById: (userId: any, pageNumber: any) => Promise<any>
   createUserMongoDB: (email: string | any) => Promise<any>
   fetchGenresByIds: (genreIds: string[]) => Promise<any>
   fetchInstrumentsByIds: (instrumentIds: string[]) => Promise<any>
@@ -451,6 +453,17 @@ const dataAxios: {
       throw error
     }
   },
+  getAllJamsByHostedById: async (userId, pageNumber) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jams/getalljamsbyhostedbyid/${userId}?page=${pageNumber}`
+      )
+      return response
+    } catch (error) {
+      console.error("Error sending friend request:", error)
+      throw error
+    }
+  },
   getAllJamInvites: async (params, pageNumber) => {
     try {
       const response = await axios.get(
@@ -484,6 +497,17 @@ const dataAxios: {
       return response
     } catch (error) {
       console.error("Error responding jam invites:", error)
+      throw error
+    }
+  },
+  totalDeleteJamByJamId: async (jamId) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:3500/jams/totaldeletejambyjamid/${jamId}`
+      )
+      return response
+    } catch (error) {
+      console.error("Error deleting jam and jam invites:", error)
       throw error
     }
   },

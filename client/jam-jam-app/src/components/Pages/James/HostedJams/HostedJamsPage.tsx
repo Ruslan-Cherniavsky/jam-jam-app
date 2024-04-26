@@ -15,7 +15,7 @@ import {useDispatch, useSelector} from "react-redux"
 
 import Filter, {IParams} from "../Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./JoinedJamsPage.css"
+import "./HostedJamsPage.css"
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {
   faCalendarCheck,
@@ -25,7 +25,7 @@ import {
 import {faNode} from "@fortawesome/free-brands-svg-icons"
 import {RootState} from "../../../../redux/store"
 
-function JoinedJamsCardListPage() {
+function HostedJamsPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
@@ -37,6 +37,8 @@ function JoinedJamsCardListPage() {
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
   const [value, setValue] = useState([3])
+
+  const [pageUpdateStatus, setPageUpdateStatus] = useState(true)
 
   const [searchText, setSearchText] = useState<SearchText | any>({jamName: ""})
 
@@ -50,7 +52,7 @@ function JoinedJamsCardListPage() {
   )
 
   const MAX_PAGES_DISPLAYED = 9
-  const CARD_LIST_TYPE = "Explore Jams"
+  const CARD_LIST_TYPE = "Hosted Jams"
 
   interface SearchText {
     jamName: string | null
@@ -68,9 +70,13 @@ function JoinedJamsCardListPage() {
     sharedInstruments: []
   }
 
+  const pageUpdater = () => {
+    setPageUpdateStatus(!pageUpdateStatus)
+  }
+
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/joined-jams?page=${currentPage}&${queryString}`
+    const newUrl = `/hosted-jams?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -177,7 +183,10 @@ function JoinedJamsCardListPage() {
           setSearchText({jamName: ""})
 
           setLoading(true)
-          const data = await dataAxios.getAllJamsByJammerId(userId, currentPage)
+          const data = await dataAxios.getAllJamsByHostedById(
+            userId,
+            currentPage
+          )
           setTotalPages(data.data.totalPages)
           setJams(data.data.jams)
 
@@ -216,7 +225,7 @@ function JoinedJamsCardListPage() {
     }
 
     fetchJams()
-  }, [currentPage, gettingUrlParams, params, userId])
+  }, [currentPage, gettingUrlParams, params, userId, pageUpdateStatus])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -265,7 +274,7 @@ function JoinedJamsCardListPage() {
             paddingTop: "2px",
             marginBottom: "20px",
           }}>
-          Joined Jams
+          Hosted Jams
         </h5>
         <Container className="selectContainer border rounded">
           <Row>
@@ -488,7 +497,7 @@ function JoinedJamsCardListPage() {
         {jams && !ifFiltering && !loading ? (
           jams.length > 0 ? (
             <JammersCardList
-              updateListCB={handlePageChange}
+              updateListCB={pageUpdater}
               cardListType={CARD_LIST_TYPE}
               jams={jams}
             />
@@ -521,4 +530,4 @@ function JoinedJamsCardListPage() {
   )
 }
 
-export default JoinedJamsCardListPage
+export default HostedJamsPage

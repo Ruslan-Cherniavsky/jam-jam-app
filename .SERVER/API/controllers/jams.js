@@ -1,6 +1,7 @@
 const mongoose = require("mongoose")
 const Jam = require("../models/jam")
 const User = require("../models/user")
+const JamRequests = require("../models/jamRequests")
 
 //-----------------------------------------------------------|
 //                                                           |
@@ -372,6 +373,37 @@ const getAllJamsByHostedById = async (req, res) => {
   }
 }
 
+//delete jam from hosted james list
+
+const totalDeleteJamByJamId = async (req, res) => {
+  const jamId = req.params.jamId
+
+  try {
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid jam ID"})
+    }
+
+    const jam = await Jam.findById(jamId)
+    if (!jam) {
+      return res.status(404).json({message: "Jam not found"})
+    }
+
+    // Delete the jam
+    await Jam.findByIdAndDelete(jamId)
+
+    // Delete all jam requests associated with the jam
+    await JamRequests.deleteMany({jamId})
+
+    return res.status(200).json({
+      success: true,
+      message: `Jam with ID ${jamId} and associated jam requests deleted successfully.`,
+    })
+  } catch (error) {
+    console.error("Error deleting jam and associated jam requests:", error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
 //-----------------------------------------------------------|
 //                                                           |
 //                          Jam Card:
@@ -555,4 +587,5 @@ module.exports = {
   getJamByJamName,
   getAllJamsByJammerId,
   deleteJammerFromJamByIds,
+  totalDeleteJamByJamId,
 }
