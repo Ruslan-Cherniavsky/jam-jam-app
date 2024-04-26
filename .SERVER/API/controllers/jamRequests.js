@@ -629,7 +629,7 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const perPage = 12
   // const userId = req.params.userId
-  const {userId} = req.body // Corrected to use req.body
+  const userId = req.params.userId // Corrected to use req.body
 
   try {
     if (!mongoose.isValidObjectId(userId)) {

@@ -1,7 +1,4 @@
-import {useEffect, useState} from "react"
-import Loader from "../../../../components_UI/Loaders/Loader"
-import dataAxios from "../../../../server/data.axios"
-import JammersCardList from "../../../../components_UI/CardList_Jams/CardList_Jams"
+import React, {useEffect, useState} from "react"
 import {
   Button,
   Col,
@@ -11,68 +8,65 @@ import {
   Pagination,
   Row,
 } from "react-bootstrap"
-import {useDispatch, useSelector} from "react-redux"
 
-import Filter, {IParams} from "../Filter/Filter"
 import {useLocation, useNavigate, useParams} from "react-router-dom"
-import "./InvitesToJamsPage.css"
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import Loader from "../../../../components_UI/Loaders/Loader"
+import {IParams} from "../../Jammers/Filter/Filter"
+import dataAxios from "../../../../server/data.axios"
+import JammersCardList from "../../../../components_UI/CardList_Jammers/CardList_Jammers"
 import {
+  faBackward,
   faCalendarCheck,
   faEnvelopeOpenText,
   faPlus,
+  faUserFriends,
 } from "@fortawesome/free-solid-svg-icons"
-import {faNode} from "@fortawesome/free-brands-svg-icons"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
 import {RootState} from "../../../../redux/store"
-import JamsInvitesCardList from "../../../../components_UI/CardList_JamRequests/CardList_JamRequests"
+import {useDispatch, useSelector} from "react-redux"
+import {
+  setFriendRequestsNumber,
+  setJamRequestsNumber,
+} from "../../../../redux/reducers/UserNotifications"
+import JammersRequestsCardList from "../../../../components_UI/CardList_Jammers_JamRequests/CardList_Jammers_JamRequests"
 
-function InvitesToJamsCardListPage() {
+export default function JamRequests() {
   const navigate = useNavigate()
   const location = useLocation()
   const [ifFiltering, setIfFiltering] = useState(false)
   const [ifSearching, setIfSearching] = useState(false)
-  const [jams, setJams] = useState([])
+  const [jammers, setJammers] = useState([])
   const [loading, setLoading] = useState(true)
-  const {page}: {page?: string} = useParams()
+  // const {page}: {page?: string} = useParams()
   const [currentPage, setCurrentPage] = useState(1)
   const [ifFiltered, setIfFiltered] = useState(false)
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
-  const [value, setValue] = useState([3])
-  const [jamInvites, setJamsInvites] = useState([])
-  const [pageUpdateStatus, setPageUpdateStatus] = useState(true)
-  const [searchText, setSearchText] = useState<SearchText | any>({jamName: ""})
+  const [jamRequests, setJamRequests] = useState([])
 
-  const [params, setParams] = useState<IJamParams | SearchText | Object | any>(
-    {}
-  )
+  const [searchText, setSearchText] = useState<SearchText | any>({username: ""})
+
+  const [params, setParams] = useState<IParams | SearchText | Object | any>({})
   const [totalPages, setTotalPages] = useState(0)
+
+  const [reloadPage, setReloadPage] = useState(true)
+
+  const dispatch = useDispatch()
+
+  const CARD_LIST_TYPE = "Friend Requests"
 
   const userId = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?._id
   )
 
   const MAX_PAGES_DISPLAYED = 9
-  const CARD_LIST_TYPE = "Jam Invites"
 
   interface SearchText {
-    jamName: string | null
-  }
-
-  interface IJamParams {
-    country: string
-    region: string
-    city: string
-    isoCode: string
-    jamDateFrom: any
-    jamDateTo: any
-    type: string
-    genres: []
-    sharedInstruments: []
+    username: string | null
   }
 
   useEffect(() => {
     const queryString = convertParamsToQueryString(params)
-    const newUrl = `/invites-to-jams?page=${currentPage}&${queryString}`
+    const newUrl = `/jam-requests?page=${currentPage}&${queryString}`
 
     navigate(newUrl)
     navigate(newUrl)
@@ -81,18 +75,10 @@ function InvitesToJamsCardListPage() {
   const handleSearchInput = (event: any) => {
     const currentSearchText = {
       ...searchText,
-      jamName: event.target.value,
+      username: event.target.value,
     }
 
     setSearchText(currentSearchText)
-  }
-
-  const handleSearch = () => {
-    setLoading(true)
-    setIfSearching(true)
-    setIfFiltered(false)
-    setParams({...searchText})
-    setCurrentPage(1)
   }
 
   useEffect(() => {
@@ -103,9 +89,6 @@ function InvitesToJamsCardListPage() {
       region: parseNullOrUndefined(searchParams.get("region")) || "",
       city: parseNullOrUndefined(searchParams.get("city")) || "",
       isoCode: parseNullOrUndefined(searchParams.get("isoCode")) || "",
-      jamDateTo: parseNullOrUndefined(searchParams.get("jamDateTo")) || "",
-      jamDateFrom: parseNullOrUndefined(searchParams.get("jamDateFrom")) || "",
-      type: parseNullOrUndefined(searchParams.get("type")) || "",
       genres: searchParams.getAll("genres[]") || [],
       instruments: searchParams.getAll("instruments[]") || [],
       username: parseNullOrUndefined(searchParams.get("username")) || "",
@@ -122,9 +105,6 @@ function InvitesToJamsCardListPage() {
       urlParams.city ||
       urlParams.region ||
       urlParams.isoCode ||
-      urlParams.jamDateFrom ||
-      urlParams.jamDateTo ||
-      urlParams.type ||
       urlParams.genres.length > 0 ||
       urlParams.instruments.length > 0
     ) {
@@ -133,10 +113,10 @@ function InvitesToJamsCardListPage() {
     }
 
     const urlParamsSearch = {
-      jamName: parseNullOrUndefined(searchParams.get("jamName")) || "",
+      username: parseNullOrUndefined(searchParams.get("username")) || "",
     }
 
-    if (urlParamsSearch.jamName) {
+    if (urlParamsSearch.username) {
       setParams(urlParamsSearch)
       setIfSearching(true)
       setSearchText(urlParamsSearch)
@@ -146,18 +126,6 @@ function InvitesToJamsCardListPage() {
     setGettingUrlParams(false)
   }, [])
 
-  const convertParamsToQueryString = (params: any) => {
-    return Object.keys(params)
-      .map((key) => {
-        if (Array.isArray(params[key])) {
-          return params[key].map((value: any) => `${key}[]=${value}`).join("&")
-        } else {
-          return `${key}=${params[key]}`
-        }
-      })
-      .join("&")
-  }
-
   function ifFilteringCB(ifFilteringProp: boolean) {
     setIfSearching(false)
     setIfFiltering(ifFilteringProp)
@@ -166,64 +134,56 @@ function InvitesToJamsCardListPage() {
   const fetchFilteredCB = async (params: Object | any) => {
     setLoading(true)
     setParams(params)
-    setSearchText({jamName: ""})
+    setSearchText({username: ""})
     setIfSearching(false)
     setIfFiltered(true)
     setCurrentPage(1)
   }
 
   useEffect(() => {
-    const fetchJams = async () => {
+    const fetchJammers = async () => {
       try {
-        if (!ifFiltered && !gettingUrlParams && !ifSearching && userId) {
-          setSearchText({jamName: ""})
-
+        if (typeof userId === "string" && currentPage) {
           setLoading(true)
-          const requestParams = {
-            senderId: userId,
-            receiverId: userId,
-          }
 
-          const data = await dataAxios.getAllJamInvites(
-            requestParams,
-            currentPage
+          const dataPaginate =
+            await dataAxios.getAllJammersFromJamRequestsByHostedIdPaginate(
+              userId,
+              currentPage
+            )
+
+          // const dataAll = await dataAxios.getAllFriendRequestsByReceiverId(
+          //   userId
+          // )
+
+          // console.log(dataPaginate.data.jamRequests)
+
+          const jamRequests = dataPaginate.data.jamRequests
+
+          const jammers = jamRequests.map(
+            (jamRequest: any) => (jamRequest = jamRequest.receiverId)
           )
+          console.log(jammers)
+          console.log(dataPaginate)
 
-          const currentJams = data.data.jamRequests.map(
-            (jamRequest: any) => (jamRequest = jamRequest.jamId)
-          )
+          setJammers(jammers)
 
-          console.log(userId)
-          console.log(currentJams)
-          console.log(data.data.jamRequests)
+          setJamRequests(dataPaginate.data.jamRequests)
+          setTotalPages(dataPaginate.data.totalPages)
 
-          setTotalPages(data.data.totalPages)
-          setJams(currentJams)
-          setJamsInvites(data.data.jamRequests)
+          // dispatch(setFriendRequestsNumber(dataAll.friendRequests.length))
 
-          //Todo -------------------->>>>
-        } else if (ifFiltered && !ifSearching) {
-          setSearchText({jamName: ""})
-
-          setLoading(true)
-          const data = await dataAxios.getAllFilteredJamsPaginate(
-            params,
-            currentPage
-          )
-
-          // console.log(data)
-          // console.log("filtering params", params)
-
-          setTotalPages(data.totalPages)
-          setJams(data.jams)
-        } else if (ifSearching) {
-          setLoading(true)
-          const data = await dataAxios.getAllJamsPaginateBySearch(
-            params,
-            currentPage
-          )
-          setTotalPages(data.totalPages)
-          setJams(data.jams)
+          // if (dataPaginate.friendRequests.length > 0) {
+          //   const friendRequestSenders = dataPaginate.friendRequests.map(
+          //     (request: any) => request.senderId
+          //   )
+          //   setJammers(friendRequestSenders)
+          //   setTotalPages(dataPaginate.totalPages)
+          // } else {
+          //   setJammers([])
+          //   setTotalPages(1)
+          //   setLoading(false)
+          // }
         }
         setLoading(false)
       } catch (error) {
@@ -232,8 +192,8 @@ function InvitesToJamsCardListPage() {
       }
     }
 
-    fetchJams()
-  }, [currentPage, gettingUrlParams, params, userId, pageUpdateStatus])
+    fetchJammers()
+  }, [currentPage, gettingUrlParams, reloadPage, userId])
 
   const renderPaginationItems = () => {
     const startPage = Math.max(
@@ -258,8 +218,8 @@ function InvitesToJamsCardListPage() {
     }
   }
 
-  const pageUpdater = () => {
-    setPageUpdateStatus(!pageUpdateStatus)
+  const handlePageUpdate = () => {
+    setReloadPage(!reloadPage)
   }
 
   async function filteredStatusChange() {
@@ -269,14 +229,30 @@ function InvitesToJamsCardListPage() {
     setCurrentPage(1)
   }
 
-  const handleChange = (val: any) => {
-    console.log(val)
-    setValue(val)
+  const handleSearch = () => {
+    setLoading(true)
+    setIfSearching(true)
+    setIfFiltered(false)
+    setParams({...searchText})
+    setCurrentPage(1)
+  }
+
+  const convertParamsToQueryString = (params: any) => {
+    return Object.keys(params)
+      .map((key) => {
+        if (Array.isArray(params[key])) {
+          return params[key].map((value: any) => `${key}[]=${value}`).join("&")
+        } else {
+          return `${key}=${params[key]}`
+        }
+      })
+      .join("&")
   }
 
   return (
     <>
       <div className="container mt-4">
+        {/* <div className="d-none d-xl-block"> */}
         <h5
           style={{
             backgroundColor: "#f8f9fc",
@@ -286,7 +262,7 @@ function InvitesToJamsCardListPage() {
             paddingTop: "2px",
             marginBottom: "20px",
           }}>
-          Jam Invites
+          Jam Requests
         </h5>
         <Container className="selectContainer border rounded">
           <Row>
@@ -410,88 +386,88 @@ function InvitesToJamsCardListPage() {
             </Col>
           </Row>
         </Container>
-
-        {/* <Filter
-          searching={ifSearching}
-          filteredStatusChange={filteredStatusChange}
-          setIfFilteringCB={ifFilteringCB}
-          fetchFilteredCB={fetchFilteredCB}
-        /> */}
-
-        <div className="d-none d-xl-block">
-          <Container>
-            <Row>
-              <Col xl={4}>
-                {jams.length > 0 && (
-                  <Pagination className="my-custom-pagination">
-                    <Pagination.Prev
-                      onClick={() => handlePageChange(currentPage - 2)}
-                      disabled={currentPage === 1}
-                    />
-                    {renderPaginationItems()}
-                    <Pagination.Next
-                      onClick={() => handlePageChange(currentPage)}
-                      disabled={currentPage === totalPages}
-                    />
-                  </Pagination>
-                )}
-              </Col>
-              <Col xl={2}></Col>
-
-              {/* <Col xl={4}>
-                <Form className="mb-2">
-                  <FormControl
-                    type="text"
-                    placeholder="Search By Jam Name"
-                    className="mr-sm-2"
-                    onChange={handleSearchInput}
-                    value={searchText?.jamName}
-                  />
-                </Form>
-              </Col>
-              <Col xl={2}>
-                <Button
-                  variant="outline-dark"
-                  disabled={loading}
-                  onClick={handleSearch}
-                  className="w-100">
-                  Search
-                </Button>
-              </Col> */}
-            </Row>
-          </Container>
-        </div>
+        <Row>
+          <Col xl={4}>
+            {jammers.length > 0 && (
+              <Pagination className="my-custom-pagination">
+                <Pagination.Prev
+                  onClick={() => handlePageChange(currentPage - 2)}
+                  disabled={currentPage === 1}
+                />
+                {renderPaginationItems()}
+                <Pagination.Next
+                  onClick={() => handlePageChange(currentPage)}
+                  disabled={currentPage === totalPages}
+                />
+              </Pagination>
+            )}
+          </Col>
+          <Col xl={2}></Col>
+        </Row>
 
         <div className="d-block d-xl-none">
           <Container>
+            <h5
+              style={{
+                backgroundColor: "#f8f9fc",
+                color: "#929292",
+                // textAlign: "center",
+                paddingBottom: "6px",
+                paddingTop: "2px",
+                paddingLeft: "5px",
+                marginBottom: "20px",
+              }}>
+              Friend Requests
+            </h5>
             <Row>
-              <Col xl={2}></Col>
-
-              {/* <Col xl={4} md={8} sm={8} xs={8}>
-                <Form className="mb-2">
-                  <FormControl
-                    style={{margin: " 0px 0px 15px 0px"}}
-                    type="text"
-                    placeholder="Search By Jam Name"
-                    className="mr-sm-2"
-                    onChange={handleSearchInput}
-                    value={searchText?.jamName}
-                  />
-                </Form>
-              </Col>
-              <Col xl={2} md={4} sm={4} xs={4}>
+              <Col md={6}>
                 <Button
-                  onClick={handleSearch}
                   variant="outline-dark"
-                  disabled={loading}
-                  style={{margin: " 0px 0px 15px 0px"}}
-                  className="w-100">
-                  Search
+                  // size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: "#BCBCBC",
+                    marginRight: "20px",
+                    marginBottom: "20px",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/jammersList")
+                  }}>
+                  <FontAwesomeIcon
+                    style={{color: "#BCBCBC", marginRight: "12px"}}
+                    icon={faPlus}
+                    className="mr-1"
+                  />{" "}
+                  Browse Jammers
                 </Button>
-              </Col> */}
+              </Col>
+
+              <Col md={6}>
+                <Button
+                  variant="outline-dark"
+                  // size="sm"
+                  className="mr-2"
+                  style={{
+                    borderColor: "#BCBCBC",
+                    marginRight: "20px",
+                    marginBottom: "20px",
+                    width: "100%",
+                  }}
+                  onClick={() => {
+                    navigate("/my-friends")
+                  }}>
+                  <FontAwesomeIcon
+                    style={{color: "#BCBCBC", marginRight: "12px"}}
+                    icon={faUserFriends}
+                    className="mr-1"
+                  />{" "}
+                  My Friends{" "}
+                </Button>
+              </Col>
 
               <Col xl={4}>
-                {jams.length > 0 && (
+                {jammers.length > 0 && (
                   <Pagination className="my-custom-pagination">
                     <Pagination.Prev
                       onClick={() => handlePageChange(currentPage - 2)}
@@ -509,18 +485,18 @@ function InvitesToJamsCardListPage() {
           </Container>
         </div>
 
-        {jams && !ifFiltering && !loading ? (
-          jams.length > 0 ? (
-            <JamsInvitesCardList
-              jamInvites={jamInvites}
-              updateListCB={pageUpdater}
+        {jammers && !loading ? (
+          jammers.length > 0 ? (
+            <JammersRequestsCardList
+              jamRequests={jamRequests}
+              updateListCB={handlePageUpdate}
               cardListType={CARD_LIST_TYPE}
-              jams={jams}
+              jammers={jammers}
             />
           ) : (
             <div className="container mt-4">
               <div className="row row-cols-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4">
-                <p>Jam Invites not found.</p>
+                <p>You don't have Friend Requests.</p>
               </div>
             </div>
           )
@@ -528,7 +504,7 @@ function InvitesToJamsCardListPage() {
           <Loader />
         )}
 
-        {jams.length > 4 && !loading && (
+        {jammers.length > 4 && !loading && (
           <Pagination className="my-custom-pagination">
             <Pagination.Prev
               onClick={() => handlePageChange(currentPage - 2)}
@@ -545,5 +521,3 @@ function InvitesToJamsCardListPage() {
     </>
   )
 }
-
-export default InvitesToJamsCardListPage

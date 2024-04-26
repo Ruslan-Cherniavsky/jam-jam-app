@@ -60,6 +60,10 @@ const dataAxios: {
   userCardDataUpdate: (id: any, payload: object) => Promise<any>
   createJam: (jam: object) => Promise<any>
   getAllJamsByJammerId: (userId: any, pageNumber: any) => Promise<any>
+  getAllJammersFromJamRequestsByHostedIdPaginate: (
+    userId: any,
+    pageNumber: any
+  ) => Promise<any>
   getAllJamsByHostedById: (userId: any, pageNumber: any) => Promise<any>
   createUserMongoDB: (email: string | any) => Promise<any>
   fetchGenresByIds: (genreIds: string[]) => Promise<any>
@@ -504,6 +508,20 @@ const dataAxios: {
     try {
       const response = await axios.delete(
         `http://localhost:3500/jams/totaldeletejambyjamid/${jamId}`
+      )
+      return response
+    } catch (error) {
+      console.error("Error deleting jam and jam invites:", error)
+      throw error
+    }
+  },
+  getAllJammersFromJamRequestsByHostedIdPaginate: async (
+    userId,
+    pageNumber
+  ) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:3500/jamrequests/getalljammersfromjamrequestsbyhostedidpaginate/${userId}?page=${pageNumber}`
       )
       return response
     } catch (error) {

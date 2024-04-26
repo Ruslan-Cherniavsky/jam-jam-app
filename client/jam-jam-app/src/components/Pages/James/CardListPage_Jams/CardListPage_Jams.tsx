@@ -370,7 +370,9 @@ function JammersCardListPage() {
                 variant="outline-dark"
                 style={{marginBottom: "20px", marginTop: "20px"}}
                 disabled={loading}
-                onClick={handleSearch}
+                onClick={() => {
+                  navigate("/jam-requests")
+                }}
                 className="w-100">
                 Jam Requests
               </Button>

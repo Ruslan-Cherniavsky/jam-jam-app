@@ -25,6 +25,7 @@ import JamCardPage from "./James/jamCardPage/jamCardPage"
 import JoinedJamsCardListPage from "./James/JoinedJams/JoinedJamsPage"
 import CreateJamPage from "./James/CreateJam/Page/CreateJamPage"
 import HostedJamsPage from "./James/HostedJams/HostedJamsPage"
+import JamRequests from "./James/JamRequests/JamRequests"
 export default function () {
   const {currentUser} = useAuthContext()
 
@@ -128,6 +129,13 @@ export default function () {
                 element={
                   <PrivateRouteUpdateProfile>
                     <InvitesToJamsCardListPage />
+                  </PrivateRouteUpdateProfile>
+                }></Route>
+              <Route
+                path="/jam-requests"
+                element={
+                  <PrivateRouteUpdateProfile>
+                    <JamRequests />
                   </PrivateRouteUpdateProfile>
                 }></Route>
               <Route

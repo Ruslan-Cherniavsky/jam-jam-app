@@ -32,7 +32,7 @@ router.get(
 )
 
 router.get(
-  "/getalljammersfromjamrequestsbyhostedidpaginate",
+  "/getalljammersfromjamrequestsbyhostedidpaginate/:userId",
   getAllJammersFromJamRequestsByHostedIdPaginate
 )
 

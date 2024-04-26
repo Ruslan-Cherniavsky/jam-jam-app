@@ -36,6 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
     {to: "/host-jam", label: "Host Jam-Events"},
     {to: "/hosted-jams", label: "Created Jam-Events"},
     {to: "/joined-jams", label: "Joined Jam-Events"},
+    {to: "/jam-requests", label: "Joined Jam-Events"},
   ]
 
   return (
@@ -154,7 +155,18 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
             Invites to Jams
           </Link>
         </Nav.Item>
-
+        <Nav.Item>
+          <Link
+            style={{color: "gray"}}
+            to="/host-jam"
+            className={
+              pathname === "/host-jam"
+                ? "nav-link-custom nav-link link-black nav-custom active"
+                : "nav-link-custom nav-link link-black nav-custom"
+            }>
+            Host Jam
+          </Link>
+        </Nav.Item>
         <Nav.Item>
           <Link
             style={{color: "gray"}}
@@ -167,16 +179,17 @@ const Sidebar: React.FC<SidebarProps> = ({user}) => {
             Hosted Jams
           </Link>
         </Nav.Item>
+
         <Nav.Item>
           <Link
             style={{color: "gray"}}
-            to="/host-jam"
+            to="/jam-requests"
             className={
-              pathname === "/host-jam"
+              pathname === "/jam-requests"
                 ? "nav-link-custom nav-link link-black nav-custom active"
                 : "nav-link-custom nav-link link-black nav-custom"
             }>
-            Host Jam
+            Jam Requests{" "}
           </Link>
         </Nav.Item>
       </Nav>
