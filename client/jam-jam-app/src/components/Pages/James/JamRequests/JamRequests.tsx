@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react"
 import {
+  Alert,
   Button,
   Col,
   Container,
@@ -43,6 +44,9 @@ export default function JamRequests() {
   const [gettingUrlParams, setGettingUrlParams] = useState(true)
   const [jamRequests, setJamRequests] = useState([])
 
+  const [message, setMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
   const [searchText, setSearchText] = useState<SearchText | any>({username: ""})
 
   const [params, setParams] = useState<IParams | SearchText | Object | any>({})
@@ -62,6 +66,10 @@ export default function JamRequests() {
 
   interface SearchText {
     username: string | null
+  }
+
+  const messageCB = (message: string) => {
+    setError(message)
   }
 
   useEffect(() => {
@@ -151,39 +159,34 @@ export default function JamRequests() {
               userId,
               currentPage
             )
+          // console.log("data+++++++++++++", dataPaginate.data)
 
-          // const dataAll = await dataAxios.getAllFriendRequestsByReceiverId(
-          //   userId
-          // )
+          if (dataPaginate.status === 200) {
+            // if (dataPaginate.data.length && dataPaginate.data.length > 0) {
+            // }
+            if (
+              !dataPaginate.data.jamRequests ||
+              dataPaginate.data.jamRequests.length === 0
+            ) {
+              setJammers([])
+              setJamRequests([])
+              setTotalPages(1)
+              setLoading(false)
 
-          // console.log(dataPaginate.data.jamRequests)
+              return
+            }
+            const jamRequests = dataPaginate.data.jamRequests
+            const jammers = jamRequests.map(
+              (jamRequest: any) => (jamRequest = jamRequest.receiverId)
+            )
+            // console.log(jammers)
+            // console.log(dataPaginate)
 
-          const jamRequests = dataPaginate.data.jamRequests
+            setJammers(jammers)
 
-          const jammers = jamRequests.map(
-            (jamRequest: any) => (jamRequest = jamRequest.receiverId)
-          )
-          console.log(jammers)
-          console.log(dataPaginate)
-
-          setJammers(jammers)
-
-          setJamRequests(dataPaginate.data.jamRequests)
-          setTotalPages(dataPaginate.data.totalPages)
-
-          // dispatch(setFriendRequestsNumber(dataAll.friendRequests.length))
-
-          // if (dataPaginate.friendRequests.length > 0) {
-          //   const friendRequestSenders = dataPaginate.friendRequests.map(
-          //     (request: any) => request.senderId
-          //   )
-          //   setJammers(friendRequestSenders)
-          //   setTotalPages(dataPaginate.totalPages)
-          // } else {
-          //   setJammers([])
-          //   setTotalPages(1)
-          //   setLoading(false)
-          // }
+            setJamRequests(dataPaginate.data.jamRequests)
+            setTotalPages(dataPaginate.data.totalPages)
+          }
         }
         setLoading(false)
       } catch (error) {
@@ -402,12 +405,25 @@ export default function JamRequests() {
               </Pagination>
             )}
           </Col>
+          {error && (
+            <Col xl={4}>
+              <Alert
+                style={{
+                  height: "33px",
+                  paddingTop: " 4px",
+                  textAlign: "center",
+                }}
+                variant="danger small">
+                {error}
+              </Alert>
+            </Col>
+          )}
           <Col xl={2}></Col>
         </Row>
 
         <div className="d-block d-xl-none">
           <Container>
-            <h5
+            {/* <h5
               style={{
                 backgroundColor: "#f8f9fc",
                 color: "#929292",
@@ -418,10 +434,10 @@ export default function JamRequests() {
                 marginBottom: "20px",
               }}>
               Friend Requests
-            </h5>
+            </h5> */}
             <Row>
-              <Col md={6}>
-                <Button
+              {/* <Col md={6}> */}
+              {/* <Button
                   variant="outline-dark"
                   // size="sm"
                   className="mr-2"
@@ -463,10 +479,10 @@ export default function JamRequests() {
                     className="mr-1"
                   />{" "}
                   My Friends{" "}
-                </Button>
-              </Col>
+                </Button> */}
+              {/* </Col> */}
 
-              <Col xl={4}>
+              {/* <Col xl={4}>
                 {jammers.length > 0 && (
                   <Pagination className="my-custom-pagination">
                     <Pagination.Prev
@@ -480,7 +496,7 @@ export default function JamRequests() {
                     />
                   </Pagination>
                 )}
-              </Col>
+              </Col> */}
             </Row>
           </Container>
         </div>
@@ -488,6 +504,7 @@ export default function JamRequests() {
         {jammers && !loading ? (
           jammers.length > 0 ? (
             <JammersRequestsCardList
+              messageCB={messageCB}
               jamRequests={jamRequests}
               updateListCB={handlePageUpdate}
               cardListType={CARD_LIST_TYPE}

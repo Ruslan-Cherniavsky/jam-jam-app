@@ -652,6 +652,7 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
       senderId: {$ne: userId},
     }).populate({
       path: "jamId",
+
       match: {hostedBy: userId},
     })
 
@@ -665,12 +666,15 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
       })
       .populate("instrumentId")
       .populate({path: "senderId", select: "_id userName"})
-      .populate({path: "receiverId"})
+      .populate({
+        path: "receiverId",
+        populate: [{path: "instruments"}, {path: "genres"}],
+      })
       .skip((page - 1) * perPage)
       .limit(perPage)
 
     if (!jamRequests || jamRequests.length === 0) {
-      return res.status(404).json({message: "No jam requests found"})
+      return res.status(200).json(jamRequests)
     }
 
     return res.status(200).json({jamRequests, totalPages})

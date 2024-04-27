@@ -126,6 +126,9 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
   const userId = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?._id
   )
+  const currentUserName = useSelector(
+    (state: RootState) => state.userDataMongoDB.allUserData?.userName
+  )
 
   // const handleInviteToJam = () => {
   //   console.log("Inviting to jam:", jammer.userName)
@@ -484,40 +487,50 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                     {")"}
                   </h5>
 
-                  {jammer.jammersId.map((jammer) => (
-                    <li key={jammer._id}>
-                      <Link to={`/jamerCard/${jammer._id}`}>
-                        {jammer.userName}
-                      </Link>
-                    </li>
+                  {jammer.jammersId.map((jammerId) => (
+                    <div key={jammer._id}>
+                      <li>
+                        <Link to={`/jamerCard/${jammer._id}`}>
+                          {jammerId.userName}
+                        </Link>{" "}
+                        {""}
+                        {currentUserName === jammerId.userName && (
+                          // <span>{jammerId.userName}</span>
+                          <a
+                            href="#"
+                            onClick={() =>
+                              leaveJammerRole(jam._id, jammer.instrument._id)
+                            }
+                            style={{color: "red"}}>
+                            Leave{" "}
+                          </a>
+                        )}
+                        {/* <span>some</span> */}
+                      </li>
+                    </div>
                   ))}
+
                   {jam.jammers.some(
                     (jammer) =>
-                      jammer.maxNumberOfJammers > jammer.jammersId.length
+                      Number(jammer.maxNumberOfJammers) >
+                      Number(jammer.jammersId.length)
                   ) ? (
                     !jammer.jammersId.some(
-                      (jammer) => jammer._id === userId
-                    ) ? (
+                      (jammersId) => jammersId._id === userId
+                    ) && (
                       <a
+                        key={jammer._id} // Make sure to provide a unique key
                         href="#"
                         onClick={() =>
                           sendJamRequest(jam._id, jammer.instrument._id)
                         }>
                         Request to join
                       </a>
-                    ) : (
-                      <a
-                        href="#"
-                        onClick={() =>
-                          leaveJammerRole(jam._id, jammer.instrument._id)
-                        }
-                        style={{color: "red"}}>
-                        Leave this role{" "}
-                      </a>
                     )
                   ) : (
-                    <a>Full</a>
+                    <span key={jammer._id}>Full</span>
                   )}
+
                   <br></br>
                   <br></br>
 

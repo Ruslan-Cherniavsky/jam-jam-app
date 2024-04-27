@@ -15,6 +15,12 @@ import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
 import ImageUploaderCrop from "../ImageUploader/ImageUploaderCrop"
 import {RootState} from "../../../../../redux/store"
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome"
+import {
+  faCalendarCheck,
+  faEnvelopeOpenText,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons"
 
 interface Jam {
   _id: string
@@ -339,286 +345,424 @@ export default function CreateJam({jam}: {jam?: Jam | null}) {
 
   return (
     <>
-      <Container
-        style={{padding: "0px 0px 20px 0px"}}
-        className="container mt-4">
-        <Card>
-          <Card.Header>
-            <h2>Create Jam</h2>
-          </Card.Header>
-          <Card.Body>
-            {error && <Alert variant="danger">{error}</Alert>}
-            {message && <Alert variant="info">{message}</Alert>}
+      <div className="container mt-4">
+        <h5
+          style={{
+            backgroundColor: "#f8f9fc",
+            color: "#929292",
+            textAlign: "center",
+            paddingBottom: "6px",
+            paddingTop: "2px",
+            marginBottom: "20px",
+          }}>
+          Jam Requests
+        </h5>
 
-            <Form onSubmit={handleSubmit}>
-              <Row className="d-flex justify-content-center">
-                <Col xl={3} lg={3} md={3} sm={12}></Col>
+        <Container className="selectContainer border rounded">
+          <Row>
+            {/* <Col md={4}>
+        <ToggleButtonGroup
+          type="checkbox"
+          className="w-100"
+          style={{marginBottom: "20px"}}
+          value={value}
+          onChange={handleChange}>
+          <ToggleButton id="tbg-btn-1" value={1} variant="outline-dark">
+            <FontAwesomeIcon
+              style={{
+                color: "#BCBCBC",
+                marginRight: "12px",
+              }}
+              icon={faMap}
+              className="mr-1"
+            />{" "}
+            {value[1] === 1 ? " Cards Vew" : "Map Vew"}
+          </ToggleButton>
+    
+        </ToggleButtonGroup>
+      </Col> */}
 
-                <Col xl={5} lg={6} md={6} sm={12}>
-                  <ImageUploaderCrop
-                    handleImageURL={handleImageURL}
-                    currentURL={jam?.img}
-                  />
-                </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                onClick={() => {
+                  navigate("/jam-events")
+                }}
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                className="w-100">
+                <FontAwesomeIcon
+                  style={{
+                    color: "#BCBCBC",
+                    marginRight: "3px",
+                  }}
+                  icon={faPlus}
+                  className="mr-1"
+                />
+                Explore Jams
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                onClick={() => {
+                  navigate("/joined-jams")
+                }}
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                className="w-100">
+                <FontAwesomeIcon
+                  style={{
+                    color: "#BCBCBC",
+                    marginRight: "9px",
+                  }}
+                  icon={faCalendarCheck}
+                  className="mr-1"
+                />
+                Joined Jams
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                disabled={loading}
+                onClick={() => {
+                  navigate("/invites-to-jams")
+                }}
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                className="w-100">
+                <FontAwesomeIcon
+                  style={{
+                    color: "#BCBCBC",
+                    marginRight: "8px",
+                  }}
+                  icon={faEnvelopeOpenText}
+                  className="mr-1"
+                />
+                Jam Invites
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                disabled={loading}
+                onClick={() => {
+                  navigate("/host-jam")
+                }}
+                className="w-100">
+                Host Jam
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                disabled={loading}
+                onClick={() => {
+                  navigate("/hosted-jams")
+                }}
+                className="w-100">
+                Hosted Jams
+              </Button>
+            </Col>
+            <Col xl={2} sm={6} xs={6}>
+              <Button
+                variant="outline-dark"
+                style={{marginBottom: "20px", marginTop: "20px"}}
+                disabled={loading}
+                onClick={() => {
+                  navigate("/jam-requests")
+                }}
+                className="w-100">
+                Jam Requests
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+        <Container
+          style={{padding: "0px 0px 20px 0px"}}
+          className="container mt-4">
+          <Card>
+            <Card.Header>
+              <h2>Create Jam</h2>
+            </Card.Header>
+            <Card.Body>
+              {error && <Alert variant="danger">{error}</Alert>}
+              {message && <Alert variant="info">{message}</Alert>}
 
-                <Col xl={3} lg={3} md={3} sm={12}></Col>
+              <Form onSubmit={handleSubmit}>
+                <Row className="d-flex justify-content-center">
+                  <Col xl={3} lg={3} md={3} sm={12}></Col>
 
-                <Col xl={5} lg={6} md={9} sm={12}>
-                  <br></br>
-                  <Form.Group id="jamName">
-                    <Form.Label>Jam Name</Form.Label>
-                    <Form.Control
-                      placeholder="Jam Name"
-                      type="text"
-                      value={jamName}
-                      onChange={handleJamNameChange}
-                      required
+                  <Col xl={5} lg={6} md={6} sm={12}>
+                    <ImageUploaderCrop
+                      handleImageURL={handleImageURL}
+                      currentURL={jam?.img}
                     />
-                  </Form.Group>
+                  </Col>
 
-                  <br />
+                  <Col xl={3} lg={3} md={3} sm={12}></Col>
 
-                  <Row>
-                    <Col xl={5} lg={7} md={5} sm={5} xs={5}>
-                      <Form.Label>Jam Date</Form.Label>
-                      <Form.Group controlId="jamDate">
-                        <DatePicker
-                          selected={jamDate}
-                          onChange={(date: Date) => setJamDate(date)}
-                          showTimeSelect
-                          timeFormat="HH:mm"
-                          timeIntervals={15}
-                          timeCaption="time"
-                          dateFormat="MMMM d, yyyy h:mm aa"
-                          className="form-control"
-                          required
-                        />
-                      </Form.Group>
-                    </Col>
+                  <Col xl={5} lg={6} md={9} sm={12}>
+                    <br></br>
+                    <Form.Group id="jamName">
+                      <Form.Label>Jam Name</Form.Label>
+                      <Form.Control
+                        placeholder="Jam Name"
+                        type="text"
+                        value={jamName}
+                        onChange={handleJamNameChange}
+                        required
+                      />
+                    </Form.Group>
 
                     <br />
-                    <Col xl={6} lg={7} md={6} sm={6} xs={6}>
-                      <Form.Group controlId="type">
-                        <Form.Label>Jam Type</Form.Label>
-                        <Form.Select
-                          value={type}
-                          onChange={handleTypeChange}
-                          required>
-                          <option value="" disabled>
-                            Select Type
+
+                    <Row>
+                      <Col xl={5} lg={7} md={5} sm={5} xs={5}>
+                        <Form.Label>Jam Date</Form.Label>
+                        <Form.Group controlId="jamDate">
+                          <DatePicker
+                            selected={jamDate}
+                            onChange={(date: Date) => setJamDate(date)}
+                            showTimeSelect
+                            timeFormat="HH:mm"
+                            timeIntervals={15}
+                            timeCaption="time"
+                            dateFormat="MMMM d, yyyy h:mm aa"
+                            className="form-control"
+                            required
+                          />
+                        </Form.Group>
+                      </Col>
+
+                      <br />
+                      <Col xl={6} lg={7} md={6} sm={6} xs={6}>
+                        <Form.Group controlId="type">
+                          <Form.Label>Jam Type</Form.Label>
+                          <Form.Select
+                            value={type}
+                            onChange={handleTypeChange}
+                            required>
+                            <option value="" disabled>
+                              Select Type
+                            </option>
+                            <option value="indoor">Indoor</option>
+                            <option value="outdoor">Outdoor</option>
+                          </Form.Select>
+                        </Form.Group>
+                      </Col>
+                    </Row>
+                    <br />
+                    <hr />
+                    <br />
+
+                    <Form.Group controlId="countries">
+                      <Form.Label>Select Country:</Form.Label>
+                      <Form.Control
+                        as="select"
+                        required
+                        onChange={handleCountryChange}
+                        value={isoCode}>
+                        <option value="" disabled>
+                          Select country
+                        </option>
+                        {Country.getAllCountries().map((country) => (
+                          <option key={country.isoCode} value={country.isoCode}>
+                            {country.name}
                           </option>
-                          <option value="indoor">Indoor</option>
-                          <option value="outdoor">Outdoor</option>
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <br />
-                  <hr />
-                  <br />
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+                    <br></br>
 
-                  <Form.Group controlId="countries">
-                    <Form.Label>Select Country:</Form.Label>
-                    <Form.Control
-                      as="select"
-                      required
-                      onChange={handleCountryChange}
-                      value={isoCode}>
-                      <option value="" disabled>
-                        Select country
-                      </option>
-                      {Country.getAllCountries().map((country) => (
-                        <option key={country.isoCode} value={country.isoCode}>
-                          {country.name}
+                    <Form.Group controlId="regions">
+                      <Form.Label>Select Region:</Form.Label>
+                      <Form.Control
+                        as="select"
+                        onChange={handleRegionChange}
+                        value={region}>
+                        <option value="" disabled>
+                          Select region
                         </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                  <br></br>
+                        {State.getStatesOfCountry(isoCode).map((state) => (
+                          <option key={state.isoCode} value={state.isoCode}>
+                            {state.name}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
+                    <br></br>
 
-                  <Form.Group controlId="regions">
-                    <Form.Label>Select Region:</Form.Label>
-                    <Form.Control
-                      as="select"
-                      onChange={handleRegionChange}
-                      value={region}>
-                      <option value="" disabled>
-                        Select region
-                      </option>
-                      {State.getStatesOfCountry(isoCode).map((state) => (
-                        <option key={state.isoCode} value={state.isoCode}>
-                          {state.name}
+                    <Form.Group controlId="cities">
+                      <Form.Label>Select City:</Form.Label>
+                      <Form.Control
+                        as="select"
+                        onChange={handleCityChange}
+                        value={city}>
+                        <option value="" disabled>
+                          Select city
                         </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
-                  <br></br>
+                        {City.getCitiesOfState(isoCode, region).map((city) => (
+                          <option key={city.name} value={city.name}>
+                            {city.name}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
 
-                  <Form.Group controlId="cities">
-                    <Form.Label>Select City:</Form.Label>
-                    <Form.Control
-                      as="select"
-                      onChange={handleCityChange}
-                      value={city}>
-                      <option value="" disabled>
-                        Select city
-                      </option>
-                      {City.getCitiesOfState(isoCode, region).map((city) => (
-                        <option key={city.name} value={city.name}>
-                          {city.name}
-                        </option>
-                      ))}
-                    </Form.Control>
-                  </Form.Group>
+                    <br></br>
+                    <hr />
+                    {/* <br></br> */}
+                    <MultiSelect
+                      ifRequired={true}
+                      dataArray={genres}
+                      selectionName="genre"
+                      selectedDB={jam?.genres || []}
+                      selectedCallbackFn={selectedGenresCB}
+                    />
 
-                  <br></br>
-                  <hr />
-                  {/* <br></br> */}
-                  <MultiSelect
-                    ifRequired={true}
-                    dataArray={genres}
-                    selectionName="genre"
-                    selectedDB={jam?.genres || []}
-                    selectedCallbackFn={selectedGenresCB}
-                  />
+                    <br></br>
+                    <br></br>
 
-                  <br></br>
-                  <br></br>
-
-                  {/* <div className="d-none d-md-block">
+                    {/* <div className="d-none d-md-block">
                 <div style={{marginTop: "8px"}}></div>
               </div> */}
 
-                  <MultiSelect
-                    ifRequired={true}
-                    dataArray={instruments}
-                    selectionName="instrument"
-                    selectedDB={jam?.sharedInstruments || []}
-                    selectedCallbackFn={selectedInstrumentsCB}
-                  />
+                    <MultiSelect
+                      ifRequired={true}
+                      dataArray={instruments}
+                      selectionName="instrument"
+                      selectedDB={jam?.sharedInstruments || []}
+                      selectedCallbackFn={selectedInstrumentsCB}
+                    />
 
-                  <br></br>
-                  <br></br>
+                    <br></br>
+                    <br></br>
 
-                  <div
-                    style={{
-                      border: "gray solid 1px ",
+                    <div
+                      style={{
+                        border: "gray solid 1px ",
 
-                      borderRadius: "15px",
-                      padding: "12px",
-                    }}>
-                    <Row>
-                      <Col xl={6} lg={6} md={6} sm={6} xs={6}>
-                        <Form.Group controlId="instrument">
-                          <Form.Label>instrument Role</Form.Label>
-                          <Form.Select
-                            value={instrumentRoleId}
-                            onChange={handleInstrumentRoleChange}>
-                            <option value="" disabled>
-                              Instrument Role
-                            </option>
-                            {instruments.map((instrument: any) => (
-                              <option
-                                key={instrument._id}
-                                value={instrument._id}>
-                                {instrument.instrument}{" "}
+                        borderRadius: "15px",
+                        padding: "12px",
+                      }}>
+                      <Row>
+                        <Col xl={6} lg={6} md={6} sm={6} xs={6}>
+                          <Form.Group controlId="instrument">
+                            <Form.Label>instrument Role</Form.Label>
+                            <Form.Select
+                              value={instrumentRoleId}
+                              onChange={handleInstrumentRoleChange}>
+                              <option value="" disabled>
+                                Instrument Role
                               </option>
-                            ))}
-                          </Form.Select>
-                        </Form.Group>
-                      </Col>
-                      <Col xl={3} lg={3} md={3} sm={3} xs={3}>
-                        <Form.Group controlId="number of jammers">
-                          <Form.Label>Jammers</Form.Label>
-                          <Form.Select
-                            value={numberOfRoles}
-                            onChange={handleNumberOfRolesChange}>
-                            <option value="" disabled>
-                              Select Max Number of Jammers
-                            </option>
-                            {Array.from({length: 10}, (_, index) => (
-                              <option key={index + 1} value={index + 1}>
-                                {index + 1}
+                              {instruments.map((instrument: any) => (
+                                <option
+                                  key={instrument._id}
+                                  value={instrument._id}>
+                                  {instrument.instrument}{" "}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
+                        <Col xl={3} lg={3} md={3} sm={3} xs={3}>
+                          <Form.Group controlId="number of jammers">
+                            <Form.Label>Jammers</Form.Label>
+                            <Form.Select
+                              value={numberOfRoles}
+                              onChange={handleNumberOfRolesChange}>
+                              <option value="" disabled>
+                                Select Max Number of Jammers
                               </option>
-                            ))}
-                          </Form.Select>
-                        </Form.Group>
-                      </Col>
+                              {Array.from({length: 10}, (_, index) => (
+                                <option key={index + 1} value={index + 1}>
+                                  {index + 1}
+                                </option>
+                              ))}
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
 
-                      <Col xl={3} lg={3} md={3} sm={3} xs={3}>
-                        <Button
-                          variant="outline-dark"
-                          style={{marginTop: "32px"}}
-                          disabled={loading}
-                          className="w-100"
-                          // href="#"
-                          // type="submit"
-                          onClick={addJammerRole}>
-                          Add
-                        </Button>
-                      </Col>
-                    </Row>
+                        <Col xl={3} lg={3} md={3} sm={3} xs={3}>
+                          <Button
+                            variant="outline-dark"
+                            style={{marginTop: "32px"}}
+                            disabled={loading}
+                            className="w-100"
+                            // href="#"
+                            // type="submit"
+                            onClick={addJammerRole}>
+                            Add
+                          </Button>
+                        </Col>
+                      </Row>
+
+                      <br></br>
+
+                      {jemmerDisplayRoles &&
+                        jemmerDisplayRoles.length > 0 &&
+                        jemmerDisplayRoles.map(
+                          (jammersDisplayRole: any, index: any) => (
+                            <Row key={index}>
+                              <hr></hr>
+                              <Col xl={7} lg={7} md={7} sm={7} xs={7}>
+                                <p>
+                                  {jammersDisplayRole.instrument.instrument}
+                                </p>
+                              </Col>
+                              <Col xl={2} lg={2} md={2} sm={2} xs={2}>
+                                <p>{jammersDisplayRole.maxNumberOfJammers}</p>
+                              </Col>
+                              <Col xl={3} lg={3} md={3} sm={3} xs={3}>
+                                <Button
+                                  variant="outline-dark"
+                                  // style={{marginTop: "32px"}}
+                                  disabled={loading}
+                                  className="w-100"
+                                  size="sm"
+                                  // href="#"
+                                  // type="submit"
+                                  onClick={() => deleteJammerRole(index)}>
+                                  {" "}
+                                  Delete
+                                </Button>
+                              </Col>
+                            </Row>
+                          )
+                        )}
+                    </div>
 
                     <br></br>
 
-                    {jemmerDisplayRoles &&
-                      jemmerDisplayRoles.length > 0 &&
-                      jemmerDisplayRoles.map(
-                        (jammersDisplayRole: any, index: any) => (
-                          <Row key={index}>
-                            <hr></hr>
-                            <Col xl={7} lg={7} md={7} sm={7} xs={7}>
-                              <p>{jammersDisplayRole.instrument.instrument}</p>
-                            </Col>
-                            <Col xl={2} lg={2} md={2} sm={2} xs={2}>
-                              <p>{jammersDisplayRole.maxNumberOfJammers}</p>
-                            </Col>
-                            <Col xl={3} lg={3} md={3} sm={3} xs={3}>
-                              <Button
-                                variant="outline-dark"
-                                // style={{marginTop: "32px"}}
-                                disabled={loading}
-                                className="w-100"
-                                size="sm"
-                                // href="#"
-                                // type="submit"
-                                onClick={() => deleteJammerRole(index)}>
-                                {" "}
-                                Delete
-                              </Button>
-                            </Col>
-                          </Row>
-                        )
-                      )}
-                  </div>
+                    <Form.Group controlId="jamDescription">
+                      <Form.Label>Jam Description</Form.Label>
+                      <Form.Control
+                        value={jamDescription}
+                        style={{height: "150px", marginBottom: "7px"}}
+                        as="textarea"
+                        onChange={handleJamDescriptionChange}
+                        required
+                      />
+                    </Form.Group>
 
-                  <br></br>
-
-                  <Form.Group controlId="jamDescription">
-                    <Form.Label>Jam Description</Form.Label>
-                    <Form.Control
-                      value={jamDescription}
-                      style={{height: "150px", marginBottom: "7px"}}
-                      as="textarea"
-                      onChange={handleJamDescriptionChange}
-                      required
-                    />
-                  </Form.Group>
-
-                  <Button
-                    variant="outline-dark"
-                    style={{marginTop: "14px"}}
-                    disabled={loading}
-                    className="w-100"
-                    type="submit">
-                    {loading ? "Creating Jam..." : "Create Jam"}
-                  </Button>
-                </Col>
-              </Row>
-            </Form>
-          </Card.Body>
-        </Card>
-      </Container>
+                    <Button
+                      variant="outline-dark"
+                      style={{marginTop: "14px"}}
+                      disabled={loading}
+                      className="w-100"
+                      type="submit">
+                      {loading ? "Creating Jam..." : "Create Jam"}
+                    </Button>
+                  </Col>
+                </Row>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Container>
+      </div>
     </>
   )
 }

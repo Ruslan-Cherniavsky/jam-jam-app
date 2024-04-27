@@ -1,11 +1,11 @@
 import React, {useState} from "react"
-import {Navigate} from "react-router-dom"
+import {Navigate, useNavigate} from "react-router-dom"
 import Card from "react-bootstrap/Card"
 import ListGroup from "react-bootstrap/ListGroup"
 import "bootstrap/dist/css/bootstrap.min.css"
 import Button from "react-bootstrap/Button"
 import "./CardList_Jammers_JamRequests.css"
-import {Col, Row} from "react-bootstrap"
+import {Alert, Col, Row} from "react-bootstrap"
 import {useSelector} from "react-redux"
 import {RootState} from "../../redux/store"
 import dataAxios from "../../server/data.axios"
@@ -66,6 +66,7 @@ interface JammersCardListProps {
   cardListType: string
   updateListCB: Function
   jamRequests: JamRequest[]
+  messageCB: Function
 }
 
 const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
@@ -73,8 +74,11 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
   cardListType,
   updateListCB,
   jamRequests,
+  messageCB,
 }) => {
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
+  // const [message, setMessage] = useState<string | null>(null)
+  // const [error, setError] = useState<string | null>(null)
 
   const userId = useSelector(
     (state: RootState) => state.userDataMongoDB.allUserData?._id
@@ -82,6 +86,8 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
   // const userId = useSelector(
   //   (state: RootState) => state.userDataMongoDB.allUserData?._id
   // )
+
+  const navigate = useNavigate()
 
   const handleCardClick = (currentJammerId: string) => {
     setSelectedUserId(currentJammerId)
@@ -105,55 +111,51 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
   }
 
   const handleConfirmRequest = async (
-    currentJammerId: string,
+    JamId: string,
     jemmerUsername: string
   ) => {
     try {
-      if (userId) {
-        const data = await dataAxios.getAllFriendRequestsByReceiverId(userId)
+      if (JamId) {
+        const response = await dataAxios.respondToJamRequest(JamId, "approved")
 
-        console.log(data.friendRequests)
-
-        const friendRequest = data.friendRequests.filter(
-          (request: any) => request.senderId._id === currentJammerId
-        )
-
-        const response = await dataAxios.respondToFriendRequest(
-          friendRequest,
-          "approved"
-        )
         console.log(response)
         if (response.status === 200) {
-          console.log(`new friend ${jemmerUsername} confirmed succesful`)
+          console.log(`new jam Role for  confirmed succesful`)
+        }
+
+        if (response.status === 400) {
+          console.log(response.response.data)
         }
         updateListCB()
       }
-    } catch (error) {
+    } catch (error: any) {
+      if (
+        error.response.status === 400 &&
+        error.response.data.message === "This jammer roles is full"
+      ) {
+        messageCB(error.response.data.message)
+        return
+      }
+
       console.error("Error confirming friend request :", error)
     }
   }
-  const handleRejectRequest = async (
-    currentJammerId: string,
-    jemmerUsername: string
-  ) => {
+  const handleRejectRequest = async (JamId: string, jemmerUsername: string) => {
     try {
-      if (userId) {
-        const data = await dataAxios.getAllFriendRequestsByReceiverId(userId)
+      if (JamId) {
+        const response = await dataAxios.respondToJamRequest(JamId, "rejected")
 
-        const friendRequest = data.friendRequests.filter(
-          (request: any) => request.senderId._id === currentJammerId
-        )
-
-        const response = await dataAxios.respondToFriendRequest(
-          friendRequest,
-          "rejected"
-        )
+        console.log(response.status)
         if (response.status === 200) {
-          console.log(`new friend ${jemmerUsername} rejected succesful`)
+          console.log(`jam Role rejected succesful`)
+          updateListCB()
         }
-        updateListCB()
+
+        // if (response.response.status === 400) {
+        //   console.log(response.response.data)
+        // }
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error confirming friend request :", error)
     }
   }
@@ -170,6 +172,7 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                   ? "custom-selected"
                   : ""
               }`}>
+              {" "}
               {jamRequest.receiverId.img ? (
                 <Card.Img
                   src={jamRequest.receiverId.img}
@@ -186,7 +189,6 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                   <span>No Image</span>
                 </div>
               )}
-
               <Card.Body className=" text-center">
                 <Card.Title
                   style={{
@@ -214,10 +216,20 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                     }}>
-                    {/* {jammer.instruments
+                    {/* {jamRequest.receiverId.instruments.map(
+                      (instruments: any) =>
+                        instruments.instrument.join(", ") || "- "
+                    )} */}
+
+                    {jamRequest.receiverId.instruments
                       .map((instruments: any) => instruments.instrument)
-                      .join(", ") || "- "} */}
-                    {/* {jamRequest.jamId.jamName} */}
+                      .join(", ") || "- "}
+                    <br />
+                    {jamRequest.receiverId.genres
+                      .map((genre: any) => genre.genre)
+                      .join(", ") || "- "}
+
+                    <hr />
                     <p>
                       {" "}
                       Request to join{" "}
@@ -250,8 +262,6 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                   </div>
                 </ListGroup>
 
-                {cardListType === "Explore Jammers" && <p></p>}
-
                 {cardListType === "Friend Requests" && (
                   <div className="friendRequestsCont">
                     <Row>
@@ -265,10 +275,11 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                           }}
                           variant="outline-dark"
                           className="confirm-button"
+                          href="#"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleConfirmRequest(
-                              jamRequest.receiverId._id,
+                              jamRequest._id,
                               jamRequest.receiverId.userName
                             )
                           }}>
@@ -283,12 +294,13 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                             marginTop: "10px",
                           }}
                           size="sm"
+                          href="#"
                           variant="outline-dark"
                           className="reject-button"
                           onClick={(e) => {
                             e.stopPropagation()
                             handleRejectRequest(
-                              jamRequest.receiverId._id,
+                              jamRequest._id,
                               jamRequest.receiverId.userName
                             )
                           }}>
@@ -299,47 +311,7 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
                   </div>
                 )}
                 {cardListType === "My Friends" && (
-                  <div className="friendRequestsCont">
-                    <Row>
-                      <Col md={6} sm={12} xs={12}>
-                        <Button
-                          size="sm"
-                          style={{
-                            borderColor: "#BCBCBC",
-                            width: "100%",
-                            marginTop: "10px",
-                          }}
-                          variant="outline-dark"
-                          className="confirm-button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleUnfriend(
-                              jamRequest.receiverId._id,
-                              jamRequest.receiverId.userName
-                            )
-                          }}>
-                          Unfriend
-                        </Button>
-                      </Col>
-                      <Col md={6} sm={12} xs={12}>
-                        <Button
-                          size="sm"
-                          style={{
-                            borderColor: "#BCBCBC",
-                            width: "100%",
-                            marginTop: "10px",
-                          }}
-                          variant="outline-dark"
-                          className="confirm-button"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleCardClick(jamRequest.receiverId._id)
-                          }}>
-                          invite to jam
-                        </Button>
-                      </Col>
-                    </Row>
-                  </div>
+                  <div className="friendRequestsCont"></div>
                 )}
               </Card.Body>
             </Card>
