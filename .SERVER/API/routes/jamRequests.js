@@ -11,11 +11,15 @@ const {
   deleteJamRequestsById,
   getAllJammersFromJamRequestsByHostedIdPaginate,
   getAllJamRequestsByIds,
+  joinJam,
 
   // getAllJamRequestsByReceiverIdAndSenderIdPaginate,
 } = require("../controllers/jamRequests")
 
 router.post("/sendjamrequest", sendJamRequest)
+
+router.post("/joinjam", joinJam)
+
 router.post("/invitetojam", inviteToJam)
 router.post("/respondtojamrequest", respondToJamRequest)
 

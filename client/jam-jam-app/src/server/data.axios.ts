@@ -41,6 +41,8 @@ const dataAxios: {
   jemCardDataFetch: (id: any) => Promise<any>
   respondToJamRequest: (requestId: string, status: string) => Promise<any>
   getAllJamsPaginate: (pageNumber: any) => Promise<any>
+
+  joinJam: (requestData: any) => Promise<any>
   totalDeleteJamByJamId: (jamId: string) => Promise<any>
   getAllFilteredJamsPaginate: (params: Params, pageNumber: any) => Promise<any>
   deleteJammerFromJamByIds: (
@@ -512,6 +514,18 @@ const dataAxios: {
       return response
     } catch (error) {
       console.error("Error deleting jam and jam invites:", error)
+      throw error
+    }
+  },
+  joinJam: async (requestData) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3500/jamrequests/joinjam`,
+        requestData
+      )
+      return response
+    } catch (error) {
+      console.error("Error joining jam :", error)
       throw error
     }
   },

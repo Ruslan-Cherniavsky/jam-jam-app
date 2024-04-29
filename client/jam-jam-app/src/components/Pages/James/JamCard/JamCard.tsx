@@ -226,6 +226,55 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
     }
   }
 
+  const joinJamByUserId = async (
+    jamId: string,
+    jamHostedById: string,
+    instrumentId: string
+  ) => {
+    try {
+      if (!userId) {
+        setMessage("Error.")
+        return
+      }
+      if (!jam) {
+        setMessage("Error.")
+        return
+      }
+
+      if (jamHostedById !== userId) {
+        setMessage(
+          "You can't join this jam because you are not the host of this jam."
+        )
+      }
+
+      const ifJammersRequired = jam.jammers.some(
+        (jammer) => jammer.maxNumberOfJammers > jammer.jammersId.length
+      )
+
+      if (!ifJammersRequired) {
+        setMessage("Jam Roles are full.")
+        return
+      }
+
+      const requestData = {
+        jamId: jamId,
+        userId: userId,
+        instrumentId: instrumentId,
+      }
+
+      const response = await dataAxios.joinJam(requestData)
+
+      if (response.status === 200) {
+        setMessage("You have successfully joined this role in this jam.")
+        setMessage("You have successfully joined this role in this jam.")
+        updateCard()
+        return
+      }
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
   const deleteJamRole = async (
     jamId: string,
     instrumentId: string,
@@ -510,7 +559,7 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                     border: "solid 1px",
                     borderColor: iconColor,
                     borderRadius: "15px",
-                    padding: "18px",
+                    padding: "18px 18px 0px 18px",
                     marginBottom: "30px",
                     // margin: "5px",
                     // backgroundColor: "#f3f3f3",
@@ -537,7 +586,7 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
 
                       {/* <Col style={{paddingLeft: "14px"}}> */}
                       <Col xl={1} lg={2} md={2} xs={3}>
-                        {jam.jammers.some(
+                        {/* {jam.jammers.some(
                           (jammer) =>
                             Number(jammer.maxNumberOfJammers) >
                             Number(jammer.jammersId.length)
@@ -557,9 +606,9 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                           )
                         ) : (
                           <span key={jammer._id}>Full</span>
-                        )}
+                        )} */}
 
-                        {jam.jammers.some(
+                        {/* {jam.jammers.some(
                           (jammer) =>
                             Number(jammer.maxNumberOfJammers) >
                             Number(jammer.jammersId.length)
@@ -579,11 +628,12 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                           )
                         ) : (
                           <span key={jammer._id}>Full</span>
-                        )}
+                        )} */}
                       </Col>
                     </Row>
 
-                    <hr />
+                    {/* {jammer.jammersId.length > 0 && <hr />} */}
+                    <hr></hr>
                     {jammer.jammersId.map((jammerId) => (
                       <Row key={jammer._id}>
                         <Col xl={11} lg={10} md={10} xs={9}>
@@ -597,6 +647,7 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                         <Col xl={1} lg={2} md={2} xs={3}>
                           {currentUserName === jammerId.userName && (
                             // <span>{jammerId.userName}</span>
+
                             <a
                               href="#"
                               onClick={() =>
@@ -619,19 +670,19 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                                     jammerId._id
                                   )
                                 }
-                                style={{color: "red"}}>
+                                style={{color: "red", marginBottom: "20px"}}>
                                 Delete{" "}
                               </a>
                             )}
                           {""}
                           {/* <span>some</span> */}
                         </Col>
-                        <hr></hr>
+                        {currentUserName != jammerId.userName && <hr></hr>}
                       </Row>
                     ))}
                   </div>
 
-                  {/* <div style={{paddingLeft: "14px"}}>
+                  <div style={{paddingLeft: "14px"}}>
                     {jam.jammers.some(
                       (jammer) =>
                         Number(jammer.maxNumberOfJammers) >
@@ -641,14 +692,17 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                         (jammersId) => jammersId._id === userId
                       ) &&
                       jam.hostedBy._id != userId && (
-                        <a
-                          key={jammer._id} // Make sure to provide a unique key
-                          href="#"
-                          onClick={() =>
-                            sendJamRequest(jam._id, jammer.instrument._id)
-                          }>
-                          Request to join
-                        </a>
+                        <div style={{marginBottom: "20px"}}>
+                          <a
+                            key={jammer._id} // Make sure to provide a unique key
+                            href="#"
+                            style={{color: "green"}}
+                            onClick={() =>
+                              sendJamRequest(jam._id, jammer.instrument._id)
+                            }>
+                            Request to join
+                          </a>
+                        </div>
                       )
                     ) : (
                       <span key={jammer._id}>Full</span>
@@ -663,19 +717,26 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                         (jammersId) => jammersId._id === userId
                       ) &&
                       jam.hostedBy._id === userId && (
-                        <a
-                          key={jammer._id} // Make sure to provide a unique key
-                          href="#"
-                          onClick={() =>
-                            sendJamRequest(jam._id, jammer.instrument._id)
-                          }>
-                          Join
-                        </a>
+                        <div style={{marginBottom: "20px"}}>
+                          <a
+                            style={{color: "green"}}
+                            key={jammer._id} // Make sure to provide a unique key
+                            href="#"
+                            onClick={() =>
+                              joinJamByUserId(
+                                jam._id,
+                                jam.hostedBy._id,
+                                jammer.instrument._id
+                              )
+                            }>
+                            Join
+                          </a>
+                        </div>
                       )
                     ) : (
                       <span key={jammer._id}>Full</span>
                     )}
-                  </div> */}
+                  </div>
                   {/* <br></br> */}
 
                   {/* To Do specific Logic */}

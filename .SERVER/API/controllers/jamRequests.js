@@ -684,6 +684,62 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
   }
 }
 
+const joinJam = async (req, res) => {
+  const {jamId, userId, instrumentId} = req.body
+
+  try {
+    // Validate input parameters
+    if (!mongoose.isValidObjectId(jamId)) {
+      return res.status(400).json({error: "Invalid user ID"})
+    }
+    if (!mongoose.isValidObjectId(userId)) {
+      return res.status(400).json("Invalid user ID")
+    }
+    if (!mongoose.isValidObjectId(instrumentId)) {
+      return res.status(400).json("Invalid instrument ID")
+    }
+
+    // Retrieve the jam document
+    const jam = await Jam.findById(jamId)
+    if (!jam) {
+      return res.status(400).json("Jam not found")
+    }
+
+    // Check if the instrument is available in the jam
+    const instrument = await Instruments.findById(instrumentId)
+    if (!instrument) {
+      return res.status(400).json("Instrument not found")
+    }
+    const isInstrumentAvailable = jam.jammers.some(
+      (jammer) => jammer.instrument.toString() === instrumentId
+    )
+    if (!isInstrumentAvailable) {
+      return res.status(400).json("Instrument is not available in this jam")
+    }
+
+    // Update the jam document
+    const jammerIndex = jam.jammers.findIndex(
+      (jammer) => jammer.instrument.toString() === instrumentId
+    )
+    if (jammerIndex === -1) {
+      return res.status(400).json("Instrument is not available in this jam")
+    }
+    const maxNumberOfJammers = jam.jammers[jammerIndex].maxNumberOfJammers
+    if (jam.jammers[jammerIndex].jammersId.length >= maxNumberOfJammers) {
+      return res.status(400).json("This jammer role is full")
+    }
+    jam.jammers[jammerIndex].jammersId.push(userId)
+
+    // Save the updated jam document
+    await jam.save()
+
+    return res.status(200).json({message: "User joined the jam successfully"})
+  } catch (error) {
+    console.error("Error joining jam:", error)
+    return res.status(500).json({error: "Internal Server Error"})
+  }
+}
+
 module.exports = {
   sendJamRequest,
   inviteToJam,
@@ -700,4 +756,6 @@ module.exports = {
   getAllJammersFromJamRequestsByHostedIdPaginate,
 
   getAllJamRequestsByIds,
+
+  joinJam,
 }
