@@ -174,9 +174,9 @@ const sendJamRequest = async (req, res) => {
       return res.status(404).json({message: "Sender not found!"})
     }
 
-    if (senderId !== receiverId) {
-      return res.status(404).json({error: "senderId and receiverId must much!"})
-    }
+    // if (senderId !== receiverId) {
+    //   return res.status(404).json({error: "senderId and receiverId must much!"})
+    // }
 
     const jam = await Jam.findById(jamId)
     if (!jam) {
@@ -210,7 +210,7 @@ const sendJamRequest = async (req, res) => {
     if (isJammer) {
       return res
         .status(400)
-        .json({message: "You are already on this role in this jam."})
+        .json({message: "The Jammer are already on this role in this jam."})
     }
 
     const isJammersNumberValid = jam.jammers.some(
@@ -242,6 +242,7 @@ const sendJamRequest = async (req, res) => {
       jamId,
       instrumentId,
     })
+
     await newRequest.save()
 
     return res
@@ -439,13 +440,6 @@ const respondToJamRequest = async (req, res) => {
 
     if (status === "approved") {
       const isJammersNumberValid = jam.jammers.some((jammer) => {
-        // console.log("Max Number Of Jammers:", jammer.maxNumberOfJammers)
-        // console.log("Number of Jammers:", jammer.jammersId.length)
-        // console.log(
-        //   "Instrument from request:",
-        //   request.instrumentId._id.toString()
-        // )
-        // console.log("Instrument:", jammer.instrument.toString())
         return (
           jammer.maxNumberOfJammers > jammer.jammersId.length &&
           jammer.instrument.toString() === request.instrumentId._id.toString()
@@ -628,8 +622,7 @@ const getAllJamRequestsByReceiverIdPaginate = async (req, res) => {
 const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
   const page = parseInt(req.query.page) || 1
   const perPage = 12
-  // const userId = req.params.userId
-  const userId = req.params.userId // Corrected to use req.body
+  const userId = req.params.userId
 
   try {
     if (!mongoose.isValidObjectId(userId)) {
@@ -641,19 +634,11 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
       return res.status(404).json({message: "User not found."})
     }
 
-    // console.log(userId)
-
-    const jamsWithUserAsHost = await Jam.find({hostedBy: userId}).lean()
-    if (!jamsWithUserAsHost || jamsWithUserAsHost.length === 0) {
-      return res.status(404).json({message: "User has not hosted any jams."})
-    }
-
     const totalJamRequests = await JamRequests.countDocuments({
       senderId: {$ne: userId},
     }).populate({
       path: "jamId",
-
-      match: {hostedBy: userId},
+      match: {hostedBy: userId}, // Adding match condition for hostedBy field
     })
 
     const totalPages = Math.ceil(totalJamRequests / perPage)
@@ -662,7 +647,7 @@ const getAllJammersFromJamRequestsByHostedIdPaginate = async (req, res) => {
       .populate({
         path: "jamId",
         select: "_id jamName",
-        match: {hostedBy: userId},
+        match: {hostedBy: userId}, // Adding match condition for hostedBy field
       })
       .populate("instrumentId")
       .populate({path: "senderId", select: "_id userName"})

@@ -459,7 +459,8 @@ const dataAxios: {
       throw error
     }
   },
-  getAllJamsByHostedById: async (userId, pageNumber) => {
+  getAllJamsByHostedById: async (userId) => {
+    const pageNumber = 1
     try {
       const response = await axios.get(
         `http://localhost:3500/jams/getalljamsbyhostedbyid/${userId}?page=${pageNumber}`

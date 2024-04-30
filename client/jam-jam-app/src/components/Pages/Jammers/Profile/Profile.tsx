@@ -25,6 +25,7 @@ import {useNavigate} from "react-router-dom"
 import dataAxios from "../../../../server/data.axios"
 import {RootState} from "../../../../redux/store"
 import {useDispatch, useSelector} from "react-redux"
+import JamsListModal from "./JamsListModat"
 
 interface UserCardProps {
   jammer: {
@@ -70,6 +71,8 @@ interface ReceiverId {
 }
 
 const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
+  const [showInviteModal, setShowInviteModal] = useState<boolean>(false)
+
   // const {userId} = useParams<{userId: string}>()
   const {currentUser} = useAuthContext()
   const navigate = useNavigate()
@@ -354,7 +357,7 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
                 </Button>
               </Col>
               <Col xl={2} lg={4} md={4} sm={6} xs={6}>
-                <Button
+                {/* <Button
                   disabled={jammer?.email === currentUser?.email}
                   variant="outline-dark"
                   size="sm"
@@ -369,7 +372,29 @@ const UserProfileCard: React.FC<UserCardProps> = ({jammer}) => {
                     className="mr-2"
                   />{" "}
                   Invite to Jam
+                </Button> */}
+
+                <Button
+                  variant="outline-dark"
+                  size="sm"
+                  style={{
+                    borderColor: iconColor,
+                    width: "100%",
+                  }}
+                  onClick={() => setShowInviteModal(true)}>
+                  <FontAwesomeIcon
+                    style={{color: iconColor, marginRight: "4px"}}
+                    icon={faMusic}
+                    className="mr-2"
+                  />{" "}
+                  Invite to Jam
                 </Button>
+
+                <JamsListModal
+                  jammerId={jammer._id}
+                  show={showInviteModal}
+                  onHide={() => setShowInviteModal(false)}
+                />
               </Col>
             </Row>
           )}

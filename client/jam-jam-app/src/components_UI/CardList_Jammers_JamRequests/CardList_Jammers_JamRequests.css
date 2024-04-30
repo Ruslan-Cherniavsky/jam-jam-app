@@ -20,3 +20,16 @@
   /* bottom: 135px; */
   /* background-color: #f5f5f5; */
 }
+
+.jamNameLink {
+  color: purple;
+  text-decoration: none;
+  padding: 2px; /* Add padding to create space for the border */
+  margin: 3px; /* Add padding to create space for the border */
+}
+
+.jamNameLink:hover {
+  outline: 1px solid rgb(180, 180, 180); /* Set the outline to mimic an inside border */
+  box-shadow: inset 0 0 0 1px rgb(190, 190, 190); /* Use box-shadow to create the border inside */
+  border-radius: 6px;
+}

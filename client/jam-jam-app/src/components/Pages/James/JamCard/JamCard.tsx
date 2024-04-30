@@ -1,4 +1,4 @@
-import React, {useState} from "react"
+import React, {useId, useState} from "react"
 import {Navigate, useParams} from "react-router-dom"
 
 import {
@@ -151,13 +151,24 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
       }
 
       const ifJammersRequired = jam.jammers.some(
-        (jammer) => jammer.maxNumberOfJammers > jammer.jammersId.length
+        (jammer) =>
+          jammer.maxNumberOfJammers <= jammer.jammersId.length &&
+          jammer.instrument._id === instrumentId
       )
 
-      if (!ifJammersRequired) {
+      if (ifJammersRequired) {
         setMessage("Jam Roles are full.")
         return
       }
+
+      // const isJammRequestExist = jam.jammers.some((jammer) => {
+      //   jammer.jammersId.some((jammerId: any) => jammerId._id === userId)
+      // })
+
+      // if (isJammRequestExist) {
+      //   setMessage("Jam request has already been sent.")
+      //   return
+      // }
 
       const params = {
         senderId: userId,
@@ -165,11 +176,10 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
         jamId: jam._id,
         instrumentId: instrumentId,
       }
-
       const jamRequestsByUser: ExistingJamRequestsResponse =
         await dataAxios.getalljamrequestsbyids(params)
 
-      // console.log(jamRequestsByUser?.existingJamRequests)
+      console.log(jamRequestsByUser?.existingJamRequests)
 
       if (jamRequestsByUser?.existingJamRequests) {
         setMessage("Jam request has already been sent.")
@@ -185,18 +195,24 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
 
       if (ifJamRequestSentAndAprooved) {
         setMessage("You are already on this role in this jam.")
+        updateCard()
+
         return
       }
 
-      if (userId)
-        if (userId) {
-          const jamRequestresponse = await dataAxios.sendJamRequest(
-            userId,
-            userId,
-            jamId,
-            instrumentId
-          )
+      if (userId) {
+        const jamRequestresponse = await dataAxios.sendJamRequest(
+          userId,
+          userId,
+          jamId,
+          instrumentId
+        )
+        if (jamRequestresponse.status === 200) {
+          setMessage("You have successfully sent jam request.")
+          updateCard()
+          return
         }
+      }
     } catch (error) {
       console.error(error)
     }
@@ -219,6 +235,7 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
       if (response.status === 200) {
         setMessage("You have left this role in this jam.")
         updateCard()
+
         return
       }
     } catch (error) {
@@ -242,16 +259,21 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
       }
 
       if (jamHostedById !== userId) {
+        updateCard()
+
         setMessage(
           "You can't join this jam because you are not the host of this jam."
         )
+        return
       }
 
       const ifJammersRequired = jam.jammers.some(
-        (jammer) => jammer.maxNumberOfJammers > jammer.jammersId.length
+        (jammer) =>
+          jammer.maxNumberOfJammers <= jammer.jammersId.length &&
+          jammer.instrument._id === instrumentId
       )
 
-      if (!ifJammersRequired) {
+      if (ifJammersRequired) {
         setMessage("Jam Roles are full.")
         return
       }
@@ -265,7 +287,6 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
       const response = await dataAxios.joinJam(requestData)
 
       if (response.status === 200) {
-        setMessage("You have successfully joined this role in this jam.")
         setMessage("You have successfully joined this role in this jam.")
         updateCard()
         return
@@ -552,41 +573,53 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
             instruments.
           </h6> */}
             <br></br>
+
             {!ifPastEvent ? (
               jam.jammers.map((jammer) => (
-                <div
-                  style={{
-                    border: "solid 1px",
-                    borderColor: iconColor,
-                    borderRadius: "15px",
-                    padding: "18px 18px 0px 18px",
-                    marginBottom: "30px",
-                    // margin: "5px",
-                    // backgroundColor: "#f3f3f3",
-                  }}>
-                  <div
+                <Row>
+                  <Col xl={2} lg={2} md={1} className="sm-block" sb></Col>
+                  <Col
+                    xl={8}
+                    lg={8}
+                    md={10}
+                    sm={12}
+                    xs={12}
+                    key={jammer._id}
                     style={{
-                      marginLeft: "15px",
-                    }}
-                    key={jammer._id}>
-                    <Row>
-                      <Col
-                        xl={11}
-                        lg={10}
-                        md={10}
-                        xs={9}
-                        style={{fontSize: "22px"}}>
-                        {jammer.instrument.instrument}
-                        {" ("}
-                        {jammer.jammersId.length || 0}
-                        {"/"}
-                        {jammer.maxNumberOfJammers}
-                        {")"}
-                      </Col>
+                      // width: "90%",
+                      // marginLeft: "5%",
+                      border: "solid 1px",
+                      borderColor: iconColor,
+                      borderRadius: "15px",
+                      padding: "18px 18px 0px 18px",
+                      marginBottom: "30px",
+                      // margin: "5px",
+                      // backgroundColor: "#f3f3f3",
+                    }}>
+                    <div
+                      style={{
+                        marginLeft: "15px",
+                        marginBottom: "20px",
+                      }}
+                      key={jammer._id}>
+                      <Row>
+                        <Col
+                          xl={11}
+                          lg={10}
+                          md={10}
+                          xs={9}
+                          style={{fontSize: "22px"}}>
+                          {jammer.instrument.instrument}
+                          {" ("}
+                          {jammer.jammersId.length || 0}
+                          {"/"}
+                          {jammer.maxNumberOfJammers}
+                          {")"}
+                        </Col>
 
-                      {/* <Col style={{paddingLeft: "14px"}}> */}
-                      <Col xl={1} lg={2} md={2} xs={3}>
-                        {/* {jam.jammers.some(
+                        {/* <Col style={{paddingLeft: "14px"}}> */}
+                        <Col xl={1} lg={2} md={2} xs={3}>
+                          {/* {jam.jammers.some(
                           (jammer) =>
                             Number(jammer.maxNumberOfJammers) >
                             Number(jammer.jammersId.length)
@@ -608,7 +641,7 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                           <span key={jammer._id}>Full</span>
                         )} */}
 
-                        {/* {jam.jammers.some(
+                          {/* {jam.jammers.some(
                           (jammer) =>
                             Number(jammer.maxNumberOfJammers) >
                             Number(jammer.jammersId.length)
@@ -629,120 +662,147 @@ const JamCard = ({jam, updateCard, ifPastEvent}: JamCardListProps) => {
                         ) : (
                           <span key={jammer._id}>Full</span>
                         )} */}
-                      </Col>
-                    </Row>
-
-                    {/* {jammer.jammersId.length > 0 && <hr />} */}
-                    <hr></hr>
-                    {jammer.jammersId.map((jammerId) => (
-                      <Row key={jammer._id}>
-                        <Col xl={11} lg={10} md={10} xs={9}>
-                          <div style={{marginBottom: "20px"}}>
-                            <Link to={`/jamerCard/${jammerId._id}`}>
-                              {jammerId.userName}
-                            </Link>{" "}
-                          </div>
-                          {""}
                         </Col>
-                        <Col xl={1} lg={2} md={2} xs={3}>
-                          {currentUserName === jammerId.userName && (
-                            // <span>{jammerId.userName}</span>
+                      </Row>
+
+                      {/* {jammer.jammersId.length > 0 && <hr />} */}
+                      {jammer.jammersId.map((jammerId, index) => (
+                        <Row key={jammerId._id}>
+                          {/* <hr></hr> */}
+                          <Col xl={12}>
+                            <hr></hr>
+                          </Col>
+                          <Col xl={10} lg={10} md={9} xs={9}>
+                            {/* <div style={{marginBottom: "20px"}}> */}
+
+                            <div>
+                              <Link to={`/jamerCard/${jammerId._id}`}>
+                                {jammerId.userName}
+                              </Link>{" "}
+                            </div>
+                            {""}
+                            {/* {index !== jammer.jammersId.length - 1 && <hr />} */}
+                          </Col>
+                          <Col xl={2} lg={2} md={3} xs={3}>
+                            {currentUserName === jammerId.userName && (
+                              // <span>{jammerId.userName}</span>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}>
+                                <a
+                                  href="#"
+                                  onClick={() =>
+                                    leaveJammerRole(
+                                      jam._id,
+                                      jammer.instrument._id
+                                    )
+                                  }
+                                  style={{color: "red"}}>
+                                  Leave{" "}
+                                </a>
+                              </div>
+                            )}
+                            {""}
+                            {userId != jammerId._id &&
+                              jam.hostedBy._id === userId && (
+                                // <span>{jammerId.userName}</span>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    justifyContent: "center",
+                                  }}>
+                                  <a
+                                    href="#"
+                                    onClick={() =>
+                                      deleteJamRole(
+                                        jam._id,
+                                        jammer.instrument._id,
+                                        jammerId._id
+                                      )
+                                    }
+                                    style={{
+                                      color: "red",
+                                      // marginBottom: "20px",
+                                    }}>
+                                    Delete{" "}
+                                  </a>
+                                </div>
+                              )}
+                            {""}
+                            {/* <span>some</span> */}
+                          </Col>
+                          {/* {currentUserName != jammerId.userName && <hr></hr>} */}
+
+                          {/* <hr></hr> */}
+
+                          {/* {index !== jammer.jammersId.length - 1 &&
+                          jammer.maxNumberOfJammers >
+                            jammer.jammersId.length && <hr />} */}
+                        </Row>
+                      ))}
+                    </div>
+
+                    <div style={{paddingLeft: "14px"}}>
+                      {jam.jammers.some(
+                        (jammer) =>
+                          Number(jammer.maxNumberOfJammers) >
+                          Number(jammer.jammersId.length)
+                      ) &&
+                        !jammer.jammersId.some(
+                          (jammersId) => jammersId._id === userId
+                        ) &&
+                        jam.hostedBy._id != userId && (
+                          <div style={{marginBottom: "20px"}}>
+                            <hr></hr>
+                            <a
+                              key={jammer._id} // Make sure to provide a unique key
+                              href="#"
+                              style={{color: "green"}}
+                              onClick={() =>
+                                sendJamRequest(jam._id, jammer.instrument._id)
+                              }>
+                              Request to join
+                            </a>
+                          </div>
+                        )}
+
+                      {jam.jammers.some(
+                        (jammer) =>
+                          Number(jammer.maxNumberOfJammers) >
+                          Number(jammer.jammersId.length)
+                      ) &&
+                        !jammer.jammersId.some(
+                          (jammersId) => jammersId._id === userId
+                        ) &&
+                        jam.hostedBy._id === userId && (
+                          <div style={{marginBottom: "20px"}}>
+                            <hr></hr>
 
                             <a
+                              style={{color: "green"}}
+                              key={jammer._id} // Make sure to provide a unique key
                               href="#"
                               onClick={() =>
-                                leaveJammerRole(jam._id, jammer.instrument._id)
-                              }
-                              style={{color: "red"}}>
-                              Leave{" "}
+                                joinJamByUserId(
+                                  jam._id,
+                                  jam.hostedBy._id,
+                                  jammer.instrument._id
+                                )
+                              }>
+                              Join
                             </a>
-                          )}
-                          {""}
-                          {userId != jammerId._id &&
-                            jam.hostedBy._id === userId && (
-                              // <span>{jammerId.userName}</span>
-                              <a
-                                href="#"
-                                onClick={() =>
-                                  deleteJamRole(
-                                    jam._id,
-                                    jammer.instrument._id,
-                                    jammerId._id
-                                  )
-                                }
-                                style={{color: "red", marginBottom: "20px"}}>
-                                Delete{" "}
-                              </a>
-                            )}
-                          {""}
-                          {/* <span>some</span> */}
-                        </Col>
-                        {currentUserName != jammerId.userName && <hr></hr>}
-                      </Row>
-                    ))}
-                  </div>
+                          </div>
+                        )}
+                    </div>
+                    {/* <br></br> */}
 
-                  <div style={{paddingLeft: "14px"}}>
-                    {jam.jammers.some(
-                      (jammer) =>
-                        Number(jammer.maxNumberOfJammers) >
-                        Number(jammer.jammersId.length)
-                    ) ? (
-                      !jammer.jammersId.some(
-                        (jammersId) => jammersId._id === userId
-                      ) &&
-                      jam.hostedBy._id != userId && (
-                        <div style={{marginBottom: "20px"}}>
-                          <a
-                            key={jammer._id} // Make sure to provide a unique key
-                            href="#"
-                            style={{color: "green"}}
-                            onClick={() =>
-                              sendJamRequest(jam._id, jammer.instrument._id)
-                            }>
-                            Request to join
-                          </a>
-                        </div>
-                      )
-                    ) : (
-                      <span key={jammer._id}>Full</span>
-                    )}
+                    {/* To Do specific Logic */}
 
-                    {jam.jammers.some(
-                      (jammer) =>
-                        Number(jammer.maxNumberOfJammers) >
-                        Number(jammer.jammersId.length)
-                    ) ? (
-                      !jammer.jammersId.some(
-                        (jammersId) => jammersId._id === userId
-                      ) &&
-                      jam.hostedBy._id === userId && (
-                        <div style={{marginBottom: "20px"}}>
-                          <a
-                            style={{color: "green"}}
-                            key={jammer._id} // Make sure to provide a unique key
-                            href="#"
-                            onClick={() =>
-                              joinJamByUserId(
-                                jam._id,
-                                jam.hostedBy._id,
-                                jammer.instrument._id
-                              )
-                            }>
-                            Join
-                          </a>
-                        </div>
-                      )
-                    ) : (
-                      <span key={jammer._id}>Full</span>
-                    )}
-                  </div>
-                  {/* <br></br> */}
-
-                  {/* To Do specific Logic */}
-
-                  {/* <p>{jammer.instrument.instrument}</p> */}
-                </div>
+                    {/* <p>{jammer.instrument.instrument}</p> */}
+                  </Col>
+                </Row>
               ))
             ) : (
               <a style={{color: "red"}}>

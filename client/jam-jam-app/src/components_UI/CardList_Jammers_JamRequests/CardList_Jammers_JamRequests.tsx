@@ -120,7 +120,7 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
 
         console.log(response)
         if (response.status === 200) {
-          console.log(`new jam Role for  confirmed succesful`)
+          console.log(`new jam Role for confirmed succesful`)
         }
 
         if (response.status === 400) {
@@ -241,10 +241,16 @@ const JammersRequestsCardList: React.FC<JammersCardListProps> = ({
 
                     <p>
                       {" "}
-                      in:{" "}
-                      <span style={{color: "purple"}}>
+                      in:
+                      <a
+                        onClick={() =>
+                          navigate(`/jamCard/${jamRequest?.jamId?._id}`)
+                        }
+                        className="jamNameLink"
+                        style={{color: "purple"}}>
                         {jamRequest?.jamId?.jamName}
-                      </span>
+                      </a>
+                      jam.
                     </p>
                   </div>
 
